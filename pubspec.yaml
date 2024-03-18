@@ -1,7 +1,15 @@
 name: dmart
-description: A starting point for Dart libraries or applications.
-version: 1.0.0
+description: A pure Dart implementation of the Dmart client that depends on dio.
+version: 1.0.2
 repository: https://github.com/edraj/flutterdmart
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
 
 environment:
   sdk: ^3.2.5

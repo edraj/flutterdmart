@@ -20,11 +20,16 @@ import 'package:dmart/src/models/response_entry.dart';
 import 'package:dmart/src/models/retrieve_entry_request.dart';
 import 'package:dmart/src/models/status.dart';
 
+/// Dmart class that has all the methods to interact with the Dmart server.
 class Dmart {
+  /// The base url of the Dmart server.
   static String dmartServerUrl = "localhost:8282";
+  /// The token that is used for authentication.
   static String? token;
+  /// The instance of the Dio class.
   static Dio? _dioInstance;
 
+  /// The instance of the Dio class.
   static Dio get _dio {
     if (_dioInstance == null) {
       throw DmartException(DmartExceptionEnum.NOT_INITIALIZED,
@@ -32,24 +37,6 @@ class Dmart {
     }
     return _dioInstance!;
   }
-
-  static void initDmart({isDioVerbose = false}) async {
-    _dioInstance = Dio(BaseOptions(
-      baseUrl: dmartServerUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ));
-    if (isDioVerbose) {
-      _dioInstance?.interceptors.add(LogInterceptor(responseBody: true));
-      _dioInstance?.interceptors.add(
-        LogInterceptor(
-          logPrint: (o) => print(o.toString()),
-        ),
-      );
-    }
-  }
-
-  // apis
 
   static final Map<String, dynamic> _headers = {
     "content-type": "application/json"
@@ -67,6 +54,25 @@ class Dmart {
     );
   }
 
+  /// Initializes the Dmart class with the base url of the Dmart server.
+  /// `isDioVerbose` is used to enable the verbose mode of the Dio class.
+  static void initDmart({isDioVerbose = false}) async {
+    _dioInstance = Dio(BaseOptions(
+      baseUrl: dmartServerUrl,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+    ));
+    if (isDioVerbose) {
+      _dioInstance?.interceptors.add(LogInterceptor(responseBody: true));
+      _dioInstance?.interceptors.add(
+        LogInterceptor(
+          logPrint: (o) => print(o.toString()),
+        ),
+      );
+    }
+  }
+
+  /// Logs in the user with the given [loginRequest].
   static Future<(LoginResponse?, Error?)> login(
       LoginRequest loginRequest) async {
     try {
@@ -83,6 +89,7 @@ class Dmart {
     }
   }
 
+  /// Creates a user with the given [createUserRequest].
   static Future<(CreateUserResponse?, Error?)> createUser(
       CreateUserRequest createUserRequest) async {
     try {
@@ -97,6 +104,7 @@ class Dmart {
     }
   }
 
+  /// Logs out the user.
   static Future<(ApiResponse?, Error?)> logout() async {
     if (token == null) {
       throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
@@ -115,6 +123,7 @@ class Dmart {
     }
   }
 
+  /// Retrieves the profile of the user.
   static Future<(ProfileResponse?, Error?)> getProfile() async {
     if (token == null) {
       throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
@@ -147,6 +156,7 @@ class Dmart {
     }
   }
 
+  /// Retrieves the user with the given [QueryRequest].
   static Future<(ApiQueryResponse?, Error?)> query(QueryRequest query,
       {String scope = "managed"}) async {
     if (token == null) {
@@ -171,6 +181,7 @@ class Dmart {
     }
   }
 
+  /// Requests an action with the given [ActionRequest].
   static Future<(ActionResponse?, Error?)> request(ActionRequest action) async {
     if (token == null) {
       throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
@@ -189,6 +200,7 @@ class Dmart {
     }
   }
 
+  /// Retrieves the entry with the given [RetrieveEntryRequest].
   static Future<(ResponseEntry?, Error?)> retrieveEntry(
       RetrieveEntryRequest request,
       {String scope = "managed"}) async {
@@ -212,6 +224,7 @@ class Dmart {
     }
   }
 
+  /// Creates a space with the given [ActionRequest].
   static Future<(ActionResponse?, Error?)> createSpace(
       ActionRequest action) async {
     if (token == null) {
@@ -231,6 +244,7 @@ class Dmart {
     }
   }
 
+  /// Retrieves the spaces.
   static Future<(ApiQueryResponse?, Error?)> getSpaces() async {
     return await query(QueryRequest(
       queryType: QueryType.spaces,
@@ -241,7 +255,8 @@ class Dmart {
     ));
   }
 
-  Future<dynamic> getPayload(GetPayloadRequest request) async {
+  /// Retrieves the space with the given [GetPayloadRequest].
+  static Future<dynamic> getPayload(GetPayloadRequest request) async {
     try {
       final response = await _dio.get(
         '/managed/payload/${request.resourceType}/${request.spaceName}/${request.subpath}/${request.shortname}${request.ext}',
@@ -254,7 +269,8 @@ class Dmart {
     }
   }
 
-  Future<(ApiQueryResponse?, Error?)> progressTicket(
+  /// Progresses the ticket with the given [ProgressTicketRequest].
+  static Future<(ApiQueryResponse?, Error?)> progressTicket(
       ProgressTicketRequest request) async {
     try {
       final response = await _dio.put(
@@ -272,6 +288,8 @@ class Dmart {
     }
   }
 
+  /// Creates an attachment
+  /// providing [shortname], [entitySubpath], [payloadFile], [spaceName], [isActive], and [resourceType].
   static Future<(Response?, Error?)> createAttachment({
     required String shortname,
     required String entitySubpath,
@@ -341,6 +359,7 @@ class Dmart {
     }
   }
 
+  /// Submits a record with the given [spaceName], [schemaShortname], [subpath], and [record].
   static Future<(ActionResponse?, Error?)> submit(
       String spaceName,
       String schemaShortname,
@@ -363,6 +382,7 @@ class Dmart {
     }
   }
 
+  /// Constructs the attachment url with the given [resourceType], [spaceName], [subpath], [parentShortname], [shortname], and [ext].
   static String getAttachmentUrl(String resourceType, String spaceName,
       String subpath, String parentShortname, String shortname, String ext) {
     return '$dmartServerUrl/managed/payload/$resourceType/$spaceName/${subpath.replaceAll(RegExp(r'/+$'), '')}/$parentShortname/$shortname.$ext'
