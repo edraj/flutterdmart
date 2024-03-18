@@ -24,8 +24,10 @@ import 'package:dmart/src/models/status.dart';
 class Dmart {
   /// The base url of the Dmart server.
   static String dmartServerUrl = "localhost:8282";
+
   /// The token that is used for authentication.
   static String? token;
+
   /// The instance of the Dio class.
   static Dio? _dioInstance;
 
