@@ -5,20 +5,22 @@ A Dart implementation of the Dmart that depends on dio.
 ## APIs
 
 * :white_check_mark: `void initDmart({bool isDioVerbose = false})` - Initializes the Dio networking instance.
+* :white_check_mark: `Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
+* :white_check_mark: `Future<dynamic> getSettings()` - Retrieves the Dmart settings.
 * :white_check_mark: `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
 * :white_check_mark: `Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
-* :white_circle: `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
+* :white_check_mark: `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
 * :white_check_mark: `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
 * :white_check_mark: `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
 * :white_check_mark: `Future<(ActionResponse?, Error?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
-* :white_circle: `Future<(ResponseEntry?, Error?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
+* :white_check_mark: `Future<(ResponseEntry?, Error?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
 * :white_check_mark: `Future<(ActionResponse?, Error?)> createSpace(ActionRequest action)` - Creates a new space.
 * :white_check_mark: `Future<(ApiQueryResponse?, Error?)> getSpaces()` - Retrieves a list of spaces.
-* :white_circle: `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
-* :white_circle: `Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
-* :white_circle: `Future<(Response?, Error?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
+* :white_check_mark: `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
+* :white_check_mark: `Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
+* :white_check_mark: `Future<(Response?, Error?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
 * :white_circle: `Future<(ActionResponse?, Error?)> submit(String spaceName, String schemaShortname, String subpath, Map<String, dynamic> record)` - Submits a record to Dmart.
-* :white_circle: `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
+* :white_check_mark: `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
 
 ## Basic Usage
 
@@ -28,6 +30,15 @@ A Dart implementation of the Dmart that depends on dio.
 Dmart.initDmart();
 // Or with dio verbose for debugging purposes
 Dmart.initDmart(isDioVerbose: true);
+```
+
+* Getting manifests and settings
+
+```dart
+// Get manifests
+var (respManifests, _) = await Dmart.getManifest();
+// Get settings
+var (respSettings, _) = await Dmart.getSettings();
 ```
 
 * User creation
@@ -110,6 +121,30 @@ for (var record in respQuery?.records ?? []) {
 }
 ```
 
+*Retrieve entry
+```dart
+var (respEntry, _) = await Dmart.retrieveEntry(
+  RetrieveEntryRequest(
+      resourceType: ResourceType.user,
+      spaceName: 'management',
+      subpath: 'users',
+      shortname: 'jimmy',
+      retrieveJsonPayload: true,
+  )
+);
+```
+
+* Get entry payload
+
+```dart
+var (respEntryPayload, _) = await Dmart.getPayload(GetPayloadRequest(
+  resourceType: ResourceType.content,
+  spaceName: 'myspace',
+  subpath: 'mysubpath',
+  shortname: 'myentry'
+));
+```
+
 * Content creation
 
 ```dart
@@ -174,4 +209,46 @@ ActionRequest action = ActionRequest(
     records: [actionRequestRecord],
 );
 var (respRequestAttachment, err) = await Dmart.request(action);
+```
+
+* Progress a ticket
+
+```dart
+var (respProgression, _) = await Dmart.progressTicket(
+  ProgressTicketRequest(
+    spaceName: "myspace",
+    subpath: "test",
+    shortname: "myticket",
+    action: "rejected",
+  )
+);
+```
+
+* Create attachment
+
+```dart
+File img = File("/path/to/myimg.jpg");
+var (respAttachmentCreation, _) = await Dmart.createAttachment(
+    spaceName: "myspace",
+    entitySubpath: "mysubpath",
+    entityShortname: "myshortname",
+    attachmentShortname: "auto",
+    attachmentBinary: img,
+);
+```
+
+* get attachment url
+```dart
+String attachmentURL = await Dmart.getAttachmentUrl(
+    spaceName: "myspace",
+    entitySubpath: "mysubpath",
+    entityShortname: "myshortname",
+    attachmentShortname: "myAttachment",
+);
+```
+
+* Logout
+
+```dart
+var (respLogout, _) = await Dmart.logout();
 ```

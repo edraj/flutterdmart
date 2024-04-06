@@ -1,5 +1,7 @@
+import 'package:dmart/src/enums/resource_type.dart';
+
 class GetPayloadRequest {
-  final String resourceType;
+  final ResourceType resourceType;
   final String spaceName;
   final String subpath;
   final String shortname;

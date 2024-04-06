@@ -8,4 +8,8 @@ enum ContentType {
   pdf,
   audio,
   video,
+  jsonl,
+  csv,
+  sqlite,
+  parquet,
 }

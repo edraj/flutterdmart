@@ -14,6 +14,7 @@ class ResponseEntry extends MetaExtended {
   final String? updatedAt;
   final String? ownerShortname;
   final Payload? payload;
+  final List<Map<String, dynamic>>? acl;
   final Map<String, dynamic>? attachments;
 
   ResponseEntry({
@@ -37,6 +38,7 @@ class ResponseEntry extends MetaExtended {
     required this.updatedAt,
     required this.ownerShortname,
     this.payload,
+    this.acl,
     this.attachments,
   }) : super(
           email: email,
@@ -72,6 +74,7 @@ class ResponseEntry extends MetaExtended {
       payload: json['payload'] != null
           ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
           : null,
+      acl: json['acl'] != null ? (json['acl'] as List<Map<String, dynamic>>) : null,
       attachments: json['attachments'] != null
           ? Map<String, dynamic>.from(json['attachments'])
           : null,
@@ -89,5 +92,32 @@ class ResponseEntry extends MetaExtended {
     }
 
     return responseEntry;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'msisdn': msisdn,
+      'is_email_verified': isEmailVerified,
+      'is_msisdn_verified': isMsisdnVerified,
+      'force_password_change': forcePasswordChange,
+      'password': password,
+      'workflow_shortname': workflowShortname,
+      'state': state,
+      'is_open': isOpen,
+      'uuid': uuid,
+      'shortname': shortname,
+      'subpath': subpath,
+      'is_active': isActive,
+      'tags': tags?.toList(),
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+      'owner_shortname': ownerShortname,
+      'payload': payload?.toJson(),
+      'acl': acl,
+      'attachments': attachments,
+      'displayname': displayname?.toJson(),
+      'description': description?.toJson(),
+    };
   }
 }

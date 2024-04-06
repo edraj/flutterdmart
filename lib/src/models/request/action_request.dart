@@ -49,7 +49,7 @@ class ActionRequestRecord {
     );
   }
 
-  toJson() {
+  Map<String, dynamic> toJson() {
     return {
       "resource_type": resourceType.name,
       "shortname": shortname,

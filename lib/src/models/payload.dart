@@ -34,4 +34,15 @@ class Payload {
 
     return payload;
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'content_type': contentType.name,
+      'schema_shortname': schemaShortname,
+      'checksum': checksum,
+      'body': body,
+      'last_validated': lastValidated,
+      'validation_status': validationStatus?.name,
+    };
+  }
 }
