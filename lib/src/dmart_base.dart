@@ -427,24 +427,39 @@ class Dmart {
   }
 
   /// Constructs the attachment url with the given [resourceType], [spaceName], [entitySubpath], [entityShortname], [attachmentShortname], and [ext].
-  static String getAttachmentUrl(String resourceType, String spaceName,
-      String entitySubpath, String entityShortname, String attachmentShortname, String ext) {
+  static String getAttachmentUrl(
+      String resourceType,
+      String spaceName,
+      String entitySubpath,
+      String entityShortname,
+      String attachmentShortname,
+      String ext) {
     return '$dmartServerUrl/managed/payload/$resourceType/$spaceName/${entitySubpath.replaceAll(RegExp(r'/+$'), '')}/$entityShortname/$attachmentShortname.$ext'
         .replaceAll('..', '.');
   }
 
+  /// Retrieves the manifest.
   static Future<dynamic> getManifest() async {
     try {
-      final response = await _dio.get('/info/manifest', options: Options(headers: {..._headers, "Authorization": "Bearer $token"}),);
+      final response = await _dio.get(
+        '/info/manifest',
+        options:
+            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+      );
       return (response.data, null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));
     }
   }
 
+  /// Retrieves the settings.
   static Future<dynamic> getSettings() async {
     try {
-      final response = await _dio.get('/info/settings', options: Options(headers: {..._headers, "Authorization": "Bearer $token"}),);
+      final response = await _dio.get(
+        '/info/settings',
+        options:
+            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+      );
       return (response.data, null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));

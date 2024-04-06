@@ -1,1 +1,5 @@
+.dart_tool/
 .idea/*
+/.dart_tool/
+/.idea/
+pubspec.lock

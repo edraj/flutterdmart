@@ -27,7 +27,6 @@ class ProfileResponse extends ApiResponse {
     }
     return profileResponse;
   }
-
 }
 
 class ProfileResponseRecord {
