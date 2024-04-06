@@ -1,4 +1,4 @@
-## 1.0.4
+## 1.0.5
 
 - Implementing dmart features up to dmart@1.1.12.
 
