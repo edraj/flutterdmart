@@ -115,7 +115,8 @@ class Dmart {
 
   /// Logs in the user with the given [loginRequest].
   static Future<(LoginResponse?, Error?)> login(
-      LoginRequest loginRequest) async {
+    LoginRequest loginRequest,
+  ) async {
     try {
       final response = await _dio.post(
         '/user/login',
@@ -201,7 +202,7 @@ class Dmart {
   /// Retrieves the user with the given [QueryRequest].
   static Future<(ApiQueryResponse?, Error?)> query(QueryRequest query,
       {String scope = "managed"}) async {
-    if (token == null) {
+    if (token == null && scope == "managed") {
       throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
           DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
     }
@@ -246,7 +247,7 @@ class Dmart {
   static Future<(ResponseEntry?, Error?)> retrieveEntry(
       RetrieveEntryRequest request,
       {String scope = "managed"}) async {
-    if (token == null) {
+    if (token == null && scope == "managed") {
       throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
           DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
     }
@@ -268,7 +269,8 @@ class Dmart {
 
   /// Creates a space with the given [ActionRequest].
   static Future<(ActionResponse?, Error?)> createSpace(
-      ActionRequest action) async {
+    ActionRequest action,
+  ) async {
     if (token == null) {
       throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
           DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
@@ -318,7 +320,8 @@ class Dmart {
 
   /// Progresses the ticket with the given [ProgressTicketRequest].
   static Future<(ApiQueryResponse?, Error?)> progressTicket(
-      ProgressTicketRequest request) async {
+    ProgressTicketRequest request,
+  ) async {
     if (token == null) {
       throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
           DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
@@ -405,20 +408,16 @@ class Dmart {
 
   /// Submits a record with the given [spaceName], [schemaShortname], [subpath], and [record].
   static Future<(ActionResponse?, Error?)> submit(
-      String spaceName,
-      String schemaShortname,
-      String subpath,
-      Map<String, dynamic> record) async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    String spaceName,
+    String schemaShortname,
+    String subpath,
+    Map<String, dynamic> record,
+  ) async {
     try {
       final response = await _dio.post(
         '/public/submit/$spaceName/$schemaShortname/$subpath',
         data: record,
-        options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+        options: Options(headers: _headers),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -428,12 +427,13 @@ class Dmart {
 
   /// Constructs the attachment url with the given [resourceType], [spaceName], [entitySubpath], [entityShortname], [attachmentShortname], and [ext].
   static String getAttachmentUrl(
-      String resourceType,
-      String spaceName,
-      String entitySubpath,
-      String entityShortname,
-      String attachmentShortname,
-      String ext) {
+    String resourceType,
+    String spaceName,
+    String entitySubpath,
+    String entityShortname,
+    String attachmentShortname,
+    String ext,
+  ) {
     return '$dmartServerUrl/managed/payload/$resourceType/$spaceName/${entitySubpath.replaceAll(RegExp(r'/+$'), '')}/$entityShortname/$attachmentShortname.$ext'
         .replaceAll('..', '.');
   }

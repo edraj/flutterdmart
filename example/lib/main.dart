@@ -15,7 +15,6 @@ import 'package:dmart/src/models/retrieve_entry_request.dart';
 
 import 'consts.dart';
 
-
 Future<void> main() async {
   const baseUrl = 'https://dmart.cc/dmart';
   Dmart.dmartServerUrl = baseUrl;
@@ -64,7 +63,6 @@ Future<void> main() async {
 
   var (respCreateSpace, _) = await Dmart.createSpace(createSpaceActionRequest);
 
-
   // Get all users
   var (respQuery, _) = await Dmart.query(
     QueryRequest(
@@ -79,25 +77,20 @@ Future<void> main() async {
   }
 
   // Retrieve entry
-  var (respEntry, _) = await Dmart.retrieveEntry(
-      RetrieveEntryRequest(
-          resourceType: ResourceType.user,
-          spaceName: 'management',
-          subpath: 'users',
-          shortname: 'jimmy',
-          retrieveJsonPayload: true,
-      )
-  );
+  var (respEntry, _) = await Dmart.retrieveEntry(RetrieveEntryRequest(
+    resourceType: ResourceType.user,
+    spaceName: 'management',
+    subpath: 'users',
+    shortname: 'jimmy',
+    retrieveJsonPayload: true,
+  ));
 
   // Get entry payload
-  var (respEntryPayload, _) = await Dmart.getPayload(
-      GetPayloadRequest(
-        resourceType: ResourceType.content,
-        spaceName: 'myspace',
-        subpath: 'mysubpath',
-        shortname: 'myentry'
-      )
-  );
+  var (respEntryPayload, _) = await Dmart.getPayload(GetPayloadRequest(
+      resourceType: ResourceType.content,
+      spaceName: 'myspace',
+      subpath: 'mysubpath',
+      shortname: 'myentry'));
 
   // Create a folder
   ActionRequestRecord actionRequestRecordFolder = ActionRequestRecord(
@@ -150,23 +143,19 @@ Future<void> main() async {
       }
     },
   );
-  var (respRequestAttachment, _) = await Dmart.request(
-      ActionRequest(
-        spaceName: 'my_space',
-        requestType: RequestType.create,
-        records: [actionRequestRecordAttachment],
-      )
-  );
+  var (respRequestAttachment, _) = await Dmart.request(ActionRequest(
+    spaceName: 'my_space',
+    requestType: RequestType.create,
+    records: [actionRequestRecordAttachment],
+  ));
 
   // Progress a ticket
-  var (respProgression, _) = await Dmart.progressTicket(
-      ProgressTicketRequest(
-        spaceName: "myspace",
-        subpath: "test",
-        shortname: "myticket",
-        action: "rejected",
-      )
-  );
+  var (respProgression, _) = await Dmart.progressTicket(ProgressTicketRequest(
+    spaceName: "myspace",
+    subpath: "test",
+    shortname: "myticket",
+    action: "rejected",
+  ));
 
   // Create an attachment
   File img = File("/path/to/myimg.jpg");
@@ -186,4 +175,16 @@ Future<void> main() async {
 
   // Logout
   var (respLogout, _) = await Dmart.logout();
+
+  // Submit an entry
+  var (respSubmitEntry, _) = await Dmart.submit(
+    "applications",
+    "log",
+    "logs",
+    {
+      "shortname": "myentry",
+      "resource_type": ResourceType.content.name,
+      "state": "awesome entry it is !"
+    },
+  );
 }

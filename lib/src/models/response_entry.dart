@@ -74,7 +74,9 @@ class ResponseEntry extends MetaExtended {
       payload: json['payload'] != null
           ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
           : null,
-      acl: json['acl'] != null ? (json['acl'] as List<Map<String, dynamic>>) : null,
+      acl: json['acl'] != null
+          ? (json['acl'] as List<Map<String, dynamic>>)
+          : null,
       attachments: json['attachments'] != null
           ? Map<String, dynamic>.from(json['attachments'])
           : null,

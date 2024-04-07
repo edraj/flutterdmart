@@ -4,23 +4,23 @@ A Dart implementation of the Dmart that depends on dio.
 
 ## APIs
 
-* :white_check_mark: `void initDmart({bool isDioVerbose = false})` - Initializes the Dio networking instance.
-* :white_check_mark: `Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
-* :white_check_mark: `Future<dynamic> getSettings()` - Retrieves the Dmart settings.
-* :white_check_mark: `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
-* :white_check_mark: `Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
-* :white_check_mark: `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
-* :white_check_mark: `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
-* :white_check_mark: `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
-* :white_check_mark: `Future<(ActionResponse?, Error?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
-* :white_check_mark: `Future<(ResponseEntry?, Error?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
-* :white_check_mark: `Future<(ActionResponse?, Error?)> createSpace(ActionRequest action)` - Creates a new space.
-* :white_check_mark: `Future<(ApiQueryResponse?, Error?)> getSpaces()` - Retrieves a list of spaces.
-* :white_check_mark: `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
-* :white_check_mark: `Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
-* :white_check_mark: `Future<(Response?, Error?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
-* :white_circle: `Future<(ActionResponse?, Error?)> submit(String spaceName, String schemaShortname, String subpath, Map<String, dynamic> record)` - Submits a record to Dmart.
-* :white_check_mark: `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
+* `void initDmart({bool isDioVerbose = false})` - Initializes the Dio networking instance.
+* `Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
+* `Future<dynamic> getSettings()` - Retrieves the Dmart settings.
+* `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
+* `Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
+* `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
+* `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
+* `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
+* `Future<(ActionResponse?, Error?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
+* `Future<(ResponseEntry?, Error?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
+* `Future<(ActionResponse?, Error?)> createSpace(ActionRequest action)` - Creates a new space.
+* `Future<(ApiQueryResponse?, Error?)> getSpaces()` - Retrieves a list of spaces.
+* `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
+* `Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
+* `Future<(Response?, Error?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
+* `Future<(ActionResponse?, Error?)> submit(String spaceName, String schemaShortname, String subpath, Map<String, dynamic> record)` - Submits a record (log/feedback) to Dmart.
+* `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
 
 ## Basic Usage
 
@@ -237,13 +237,27 @@ var (respAttachmentCreation, _) = await Dmart.createAttachment(
 );
 ```
 
-* get attachment url
+* Get attachment url
 ```dart
 String attachmentURL = await Dmart.getAttachmentUrl(
     spaceName: "myspace",
     entitySubpath: "mysubpath",
     entityShortname: "myshortname",
     attachmentShortname: "myAttachment",
+);
+```
+
+* Submit an entry
+```dart
+var (respSubmitEntry, _) = await Dmart.submit(
+    "applications",
+    "log",
+    "logs",
+    {
+      "shortname": "myentry",
+      "resource_type": ResourceType.content.name,
+      "state": "awesome entry it is !"
+    },
 );
 ```
 

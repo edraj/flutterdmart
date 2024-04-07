@@ -5,5 +5,5 @@ enum RequestType {
   delete,
   move,
   assign,
-  updateACL,
+  update_acl,
 }
