@@ -7,4 +7,6 @@ enum QueryType {
   spaces,
   counters,
   reports,
+  attachments,
+  attachments_aggregation,
 }

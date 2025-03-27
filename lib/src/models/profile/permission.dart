@@ -1,9 +1,14 @@
 import 'package:dmart/src/enums/action_type.dart';
 
+/// Permission is a class that represents the permissions of a user on a resource.
 class Permission {
+  /// The actions allowed on the resource.
   final List<ActionType> allowedActions;
+  /// The conditions to check for the permissions.
   final List<String> conditions;
+  /// The fields restricted by the permissions.
   final List<dynamic> restrictedFields;
+  /// The values allowed for the fields.
   final Map<String, dynamic>? allowedFieldsValues;
 
   Permission({

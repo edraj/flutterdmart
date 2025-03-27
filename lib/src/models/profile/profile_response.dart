@@ -37,7 +37,6 @@ class ProfileResponseRecord {
   ProfileResponseRecord({
     required this.resourceType,
     required this.shortname,
-    String? branchName,
     required String subpath,
     required this.attributes,
   });
@@ -46,7 +45,6 @@ class ProfileResponseRecord {
     return ProfileResponseRecord(
       resourceType: ResourceType.values.byName(json['resource_type']),
       shortname: json['shortname'],
-      branchName: json['branch_name'],
       subpath: json['subpath'],
       attributes: ProfileResponseRecordAttributes.fromJson(
         Map<String, dynamic>.from(json['attributes']),

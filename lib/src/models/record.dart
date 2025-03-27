@@ -1,16 +1,19 @@
+/// A model class for the record object
 class Record {
+  /// The type of resource to perform the action on.
   String? resourceType;
+  /// The shortname of the resource.
   String? shortname;
-  String? branchName;
+  /// The subpath of the resource.
   String? subpath;
+  /// The attributes to perform the action with.
   dynamic attributes;
 
-  Record({this.resourceType, this.shortname, this.branchName, this.subpath});
+  Record({this.resourceType, this.shortname, this.subpath});
 
   Record.fromJson(Map<String, dynamic> json) {
     resourceType = json['resource_type'];
     shortname = json['shortname'];
-    branchName = json['branch_name'];
     subpath = json['subpath'];
     attributes = json['attributes'];
   }
@@ -19,7 +22,6 @@ class Record {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['resource_type'] = resourceType;
     data['shortname'] = shortname;
-    data['branch_name'] = branchName;
     data['subpath'] = subpath;
     data['attributes'] = attributes;
     return data;

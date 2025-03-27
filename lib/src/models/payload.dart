@@ -1,12 +1,19 @@
 import 'package:dmart/src/enums/content_type.dart';
 import 'package:dmart/src/enums/validation_status.dart';
 
+/// Payload is a class that represents the payload of a resource.
 class Payload {
+  /// The type of content in the payload.
   final ContentType contentType;
+  /// The shortname of the schema of the payload.
   final String? schemaShortname;
+  /// The checksum of the payload.
   final String? checksum;
+  /// The body of the payload.
   final dynamic body;
+  /// The date the payload was last validated.
   final String? lastValidated;
+  /// The status of the validation of the payload.
   ValidationStatus? validationStatus;
 
   Payload({

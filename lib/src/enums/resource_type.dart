@@ -12,7 +12,6 @@ enum ResourceType {
   alteration,
   history,
   space,
-  branch,
   permission,
   role,
   ticket,
@@ -20,4 +19,5 @@ enum ResourceType {
   post,
   pluginWrapper,
   notification,
+  reaction,
 }

@@ -42,7 +42,7 @@ class Dmart {
     return _dioInstance!;
   }
 
-  static final Map<String, dynamic> _headers = {
+  static final Map<String, dynamic> headers = {
     "content-type": "application/json"
   };
 
@@ -59,7 +59,14 @@ class Dmart {
     );
   }
 
-  static String _getMediaTypeFromDmartContentType(
+  static void _isTokenNull() {
+    if (token == null) {
+      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
+          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
+    }
+  }
+
+  static String getMediaTypeFromDmartContentType(
       DmartContentType.ContentType contentType) {
     switch (contentType) {
       case DmartContentType.ContentType.image:
@@ -92,25 +99,50 @@ class Dmart {
   }
 
   /// Initializes the Dmart class with the base url of the Dmart server.
-  /// `isDioVerbose` is used to enable the verbose mode of the Dio class.
-  static void initDmart({isDioVerbose = false}) async {
-    _dioInstance = Dio(BaseOptions(
-      baseUrl: dmartServerUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ));
+  /// `dio` is used to override the default instance of Dio.
+  /// `dioConfig` is used to override the default configuration of Dio.
+  /// `interceptors` is used to override the default interceptors of Dio.
+  /// `isDioVerbose` is used to enable the verbose mode of Dio.
+  static void initDmart({
+    Dio? dio,
+    BaseOptions? dioConfig,
+    Iterable<Interceptor> interceptors = const [],
+    bool isDioVerbose = false,
+  }) async {
+    if (dio != null) {
+      _dioInstance = dio;
+      if (dioConfig != null) {
+        print('[WARNING] setting dioConfig will be ignored as dio is provided!');
+      }
+    } else {
+      if (dioConfig != null) {
+        dioConfig = BaseOptions(
+          baseUrl: dmartServerUrl,
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+        );
+      }
+
+      _dioInstance = Dio(dioConfig);
+    }
+
     if (isDioVerbose) {
-      _dioInstance?.interceptors.add(LogInterceptor(
+      _dioInstance?.interceptors.add(
+        LogInterceptor(
           requestBody: true,
           requestHeader: true,
           responseBody: true,
-          responseHeader: true));
+          responseHeader: true,
+        ),
+      );
       _dioInstance?.interceptors.add(
         LogInterceptor(
           logPrint: (o) => print(o.toString()),
         ),
       );
     }
+
+    _dioInstance?.interceptors.addAll(interceptors);
   }
 
   /// Logs in the user with the given [loginRequest].
@@ -121,7 +153,7 @@ class Dmart {
       final response = await _dio.post(
         '/user/login',
         data: loginRequest.toJson(),
-        options: Options(headers: _headers),
+        options: Options(headers: headers),
       );
       var loginResponse = LoginResponse.fromJson(response.data);
       token = loginResponse.token;
@@ -138,7 +170,7 @@ class Dmart {
       final response = await _dio.post(
         '/user/create',
         data: createUserRequest.toJson(),
-        options: Options(headers: _headers),
+        options: Options(headers: headers),
       );
       return (CreateUserResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -148,16 +180,13 @@ class Dmart {
 
   /// Logs out the user.
   static Future<(ApiResponse?, Error?)> logout() async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    _isTokenNull();
     try {
       final response = await _dio.post(
         '/user/logout',
         data: {},
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ApiResponse.fromJson(response.data), null);
@@ -168,15 +197,12 @@ class Dmart {
 
   /// Retrieves the profile of the user.
   static Future<(ProfileResponse?, Error?)> getProfile() async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    _isTokenNull();
     try {
       final response = await _dio.get(
         '/user/profile',
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       final profileResponse = ProfileResponse.fromJson(response.data);
@@ -215,7 +241,7 @@ class Dmart {
         '/$scope/query',
         data: query.toJson(),
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ApiQueryResponse.fromJson(response.data), null);
@@ -226,16 +252,13 @@ class Dmart {
 
   /// Requests an action with the given [ActionRequest].
   static Future<(ActionResponse?, Error?)> request(ActionRequest action) async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    _isTokenNull();
     try {
       final response = await _dio.post(
         '/managed/request',
         data: action.toJson(),
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -258,7 +281,7 @@ class Dmart {
         '/$scope/entry/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}?retrieve_json_payload=${request.retrieveJsonPayload}&retrieve_attachments=${request.retrieveAttachments}&validate_schema=${request.validateSchema}'
             .replaceAll(RegExp(r'/+'), '/'),
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ResponseEntry.fromJson(response.data), null);
@@ -271,16 +294,13 @@ class Dmart {
   static Future<(ActionResponse?, Error?)> createSpace(
     ActionRequest action,
   ) async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    _isTokenNull();
     try {
       final response = await _dio.post(
         '/managed/space',
         data: action.toJson(),
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -301,15 +321,12 @@ class Dmart {
 
   /// Retrieves the space with the given [GetPayloadRequest].
   static Future<dynamic> getPayload(GetPayloadRequest request) async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    _isTokenNull();
     try {
       final response = await _dio.get(
         '/managed/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.ext}',
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ResponseEntry.fromJson(response.data), null);
@@ -322,10 +339,7 @@ class Dmart {
   static Future<(ApiQueryResponse?, Error?)> progressTicket(
     ProgressTicketRequest request,
   ) async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    _isTokenNull();
     try {
       final response = await _dio.put(
         '/managed/progress-ticket/${request.spaceName}/${request.subpath}/${request.shortname}/${request.action}',
@@ -334,7 +348,7 @@ class Dmart {
           'comment': request.comment,
         },
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ApiQueryResponse.fromJson(response.data), null);
@@ -356,10 +370,7 @@ class Dmart {
     String resourceType = "media",
     bool isActive = true,
   }) async {
-    if (token == null) {
-      throw DmartException(DmartExceptionEnum.NOT_VALID_TOKEN,
-          DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!);
-    }
+    _isTokenNull();
 
     Map<String, dynamic> payloadData = {
       'resource_type': resourceType,
@@ -376,18 +387,23 @@ class Dmart {
     var payloadJson = json.encode(payloadData);
 
     FormData formData = FormData();
-    formData.files.add(MapEntry(
+    formData.files.add(
+      MapEntry(
         'payload_file',
         await MultipartFile.fromFile(
           attachmentBinary.path,
           contentType:
-              MediaType.parse(_getMediaTypeFromDmartContentType(contentType)),
-        )));
-    formData.files.add(MapEntry(
-      'request_record',
-      MultipartFile.fromBytes(utf8.encode(payloadJson),
-          filename: 'payload.json'),
-    ));
+              MediaType.parse(getMediaTypeFromDmartContentType(contentType)),
+        ),
+      ),
+    );
+    formData.files.add(
+      MapEntry(
+        'request_record',
+        MultipartFile.fromBytes(utf8.encode(payloadJson),
+            filename: 'payload.json'),
+      ),
+    );
     formData.fields.add(MapEntry('space_name', spaceName));
 
     try {
@@ -396,7 +412,7 @@ class Dmart {
         data: formData,
         options: Options(
           contentType: 'multipart/form-data',
-          headers: {..._headers, "Authorization": "Bearer $token"},
+          headers: {...headers, "Authorization": "Bearer $token"},
         ),
       );
 
@@ -417,7 +433,7 @@ class Dmart {
       final response = await _dio.post(
         '/public/submit/$spaceName/$schemaShortname/$subpath',
         data: record,
-        options: Options(headers: _headers),
+        options: Options(headers: headers),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -444,7 +460,7 @@ class Dmart {
       final response = await _dio.get(
         '/info/manifest',
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (response.data, null);
     } on DioException catch (e) {
@@ -458,7 +474,7 @@ class Dmart {
       final response = await _dio.get(
         '/info/settings',
         options:
-            Options(headers: {..._headers, "Authorization": "Bearer $token"}),
+            Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (response.data, null);
     } on DioException catch (e) {

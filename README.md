@@ -4,7 +4,16 @@ A Dart implementation of the Dmart that depends on dio.
 
 ## APIs
 
-* `void initDmart({bool isDioVerbose = false})` - Initializes the Dio networking instance.
+Properties:
+* `String dmartServerUrl` - The base URL of the Dmart instance.
+* `String token` - The token to be used for authentication.
+
+Methods:
+* `void initDmart({Dio? dio, BaseOptions? dioConfig, Iterable<Interceptor> interceptors = const [], bool isDioVerbose = false,})` - Initializes the Dio networking instance.
+* * if `dio` is set:
+* * * `dioConfig` will not take effect.
+* * * `isDioVerbose` will still extend the interceptor.
+* * * `interceptors` will still extend the interceptor.
 * `Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
 * `Future<dynamic> getSettings()` - Retrieves the Dmart settings.
 * `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
@@ -21,6 +30,7 @@ A Dart implementation of the Dmart that depends on dio.
 * `Future<(Response?, Error?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
 * `Future<(ActionResponse?, Error?)> submit(String spaceName, String schemaShortname, String subpath, Map<String, dynamic> record)` - Submits a record (log/feedback) to Dmart.
 * `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
+* `String getMediaTypeFromDmartContentType(DmartContentType.ContentType contentType)` - Returns the media type from a Dmart content type.
 
 ## Basic Usage
 
