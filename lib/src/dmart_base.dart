@@ -112,7 +112,8 @@ class Dmart {
     if (dio != null) {
       _dioInstance = dio;
       if (dioConfig != null) {
-        print('[WARNING] setting dioConfig will be ignored as dio is provided!');
+        print(
+            '[WARNING] setting dioConfig will be ignored as dio is provided!');
       }
     } else {
       if (dioConfig != null) {

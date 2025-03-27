@@ -2,10 +2,13 @@
 class Record {
   /// The type of resource to perform the action on.
   String? resourceType;
+
   /// The shortname of the resource.
   String? shortname;
+
   /// The subpath of the resource.
   String? subpath;
+
   /// The attributes to perform the action with.
   dynamic attributes;
 

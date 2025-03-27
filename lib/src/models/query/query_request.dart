@@ -6,38 +6,55 @@ import 'package:dmart/src/enums/sort_type.dart';
 class QueryRequest {
   /// The type of query to perform.
   QueryType queryType;
+
   /// The name of the space in which the resources reside.
   String spaceName;
+
   /// The subpath of the resources.
   String subpath;
+
   /// The search query to filter the resources by.
   String? search;
+
   /// The types of resources to filter by.
   List<ResourceType>? filterTypes;
+
   /// The schema names of the resources to filter by.
   List<String>? filterSchemaNames;
+
   /// The shortnames of the resources to filter by.
   List<String>? filterShortnames;
+
   /// The date to filter the resources from.
   String? fromDate;
+
   /// The date to filter the resources to.
   String? toDate;
+
   /// The attribute to sort the resources by.
   String? sortBy;
+
   /// The type of sort to perform.
   SortyType? sortType;
+
   /// Whether to retrieve the JSON payload of the resources.
   bool? retrieveJsonPayload;
+
   /// Whether to retrieve the attachments of the resources.
   bool? retrieveAttachments;
+
   /// Whether to validate the schema of the resources.
   bool? validateSchema;
+
   /// The jq filter to apply to the resources.
   String? jqFilter;
+
   /// Whether to filter the resources by the exact subpath.
   bool? exactSubpath;
+
   /// The number of resources to retrieve.
   int? limit;
+
   /// The offset of the resources to retrieve.
   int? offset;
 

@@ -4,16 +4,22 @@ import 'package:dmart/src/enums/resource_type.dart';
 class RetrieveEntryRequest {
   /// The type of resource to retrieve.
   final ResourceType resourceType;
+
   /// The name of the space in which the resource resides.
   final String spaceName;
+
   /// The subpath of the resource.
   final String subpath;
+
   /// The shortname of the resource.
   final String shortname;
+
   /// Whether to retrieve the JSON payload of the resource.
   final bool retrieveJsonPayload;
+
   /// Whether to retrieve the attachments of the resource.
   final bool retrieveAttachments;
+
   /// Whether to validate the schema of the resource.
   final bool validateSchema;
 
