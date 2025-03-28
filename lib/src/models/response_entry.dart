@@ -14,7 +14,7 @@ class ResponseEntry extends MetaExtended {
   final String? updatedAt;
   final String? ownerShortname;
   final Payload? payload;
-  final List<Map<String, dynamic>>? acl;
+  final List<dynamic>? acl;
   final Map<String, dynamic>? attachments;
 
   ResponseEntry({
@@ -53,6 +53,7 @@ class ResponseEntry extends MetaExtended {
        );
 
   factory ResponseEntry.fromJson(Map<String, dynamic> json) {
+    print(json);
     ResponseEntry responseEntry = ResponseEntry(
       email: json['email'],
       msisdn: json['msisdn'],
@@ -75,10 +76,7 @@ class ResponseEntry extends MetaExtended {
           json['payload'] != null
               ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
               : null,
-      acl:
-          json['acl'] != null
-              ? (json['acl'] as List<Map<String, dynamic>>)
-              : null,
+      acl: json['acl'] != null ? (json['acl'] as List<dynamic>) : null,
       attachments:
           json['attachments'] != null
               ? Map<String, dynamic>.from(json['attachments'])
