@@ -18,9 +18,10 @@ class ApiQueryResponse extends ApiResponse {
     return ApiQueryResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
       error: json['error'] != null ? Error.fromJson(json['error']) : null,
-      records: (json['records'] as List<dynamic>)
-          .map((record) => ResponseRecord.fromJson(record))
-          .toList(),
+      records:
+          (json['records'] as List<dynamic>)
+              .map((record) => ResponseRecord.fromJson(record))
+              .toList(),
       attributes: ApiQueryResponseAttributes.fromJson(
         Map<String, dynamic>.from(json['attributes']),
       ),
@@ -32,10 +33,7 @@ class ApiQueryResponseAttributes {
   final int total;
   final int returned;
 
-  ApiQueryResponseAttributes({
-    required this.total,
-    required this.returned,
-  });
+  ApiQueryResponseAttributes({required this.total, required this.returned});
 
   factory ApiQueryResponseAttributes.fromJson(Map<String, dynamic> json) {
     return ApiQueryResponseAttributes(

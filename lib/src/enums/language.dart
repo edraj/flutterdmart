@@ -1,7 +1,1 @@
-enum Language {
-  arabic,
-  english,
-  kurdish,
-  french,
-  turkish,
-}
+enum Language { arabic, english, kurdish, french, turkish }

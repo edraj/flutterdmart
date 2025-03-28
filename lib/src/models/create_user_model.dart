@@ -6,17 +6,14 @@ class CreateUserRequest {
 
   String shortname;
 
-  CreateUserRequest({
-    this.shortname = "auto",
-    required this.attributes,
-  });
+  CreateUserRequest({this.shortname = "auto", required this.attributes});
 
   Map<String, dynamic> toJson() => {
-        'shortname': shortname,
-        'subpath': "users",
-        'resource_type': "user",
-        'attributes': attributes.toJson(),
-      };
+    'shortname': shortname,
+    'subpath': "users",
+    'resource_type': "user",
+    'attributes': attributes.toJson(),
+  };
 }
 
 class CreateUserAttributes {
@@ -61,31 +58,28 @@ class CreateUserAttributes {
       );
 
   Map<String, dynamic> toJson() => {
-        'invitation': invitation,
-        'displayname': displayname.toJson(),
-        'email': email,
-        'profile_pic_url': profilePicUrl,
-        'msisdn': msisdn,
-        'password': password,
-        'roles': roles,
-        'groups': groups,
-        'firebaseToken': firebaseToken,
-        'language': language,
-        'isEmailVerified': isEmailVerified,
-        'isMsisdnVerified': isMsisdnVerified,
-        'forcePasswordChange': forcePasswordChange,
-        'is_active': true,
-      };
+    'invitation': invitation,
+    'displayname': displayname.toJson(),
+    'email': email,
+    'profile_pic_url': profilePicUrl,
+    'msisdn': msisdn,
+    'password': password,
+    'roles': roles,
+    'groups': groups,
+    'firebaseToken': firebaseToken,
+    'language': language,
+    'isEmailVerified': isEmailVerified,
+    'isMsisdnVerified': isMsisdnVerified,
+    'forcePasswordChange': forcePasswordChange,
+    'is_active': true,
+  };
 }
 
 class CreateUserResponse {
   late String status;
   Error? error;
 
-  CreateUserResponse({
-    required this.status,
-    this.error,
-  });
+  CreateUserResponse({required this.status, this.error});
 
   factory CreateUserResponse.fromJson(Map<String, dynamic> json) =>
       CreateUserResponse(

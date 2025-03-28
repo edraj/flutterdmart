@@ -1,3 +1,7 @@
+## 1.0.10
+- formated code
+- upgrading deps
+
 ## 1.0.9
 - Implementing dmart features up to dmart@1.3.5+
 - Extending ResourceType: +reaction

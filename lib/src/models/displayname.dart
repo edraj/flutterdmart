@@ -12,10 +12,6 @@ class Displayname {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'ar': ar,
-      'en': en,
-      'kd': kd,
-    };
+    return {'ar': ar, 'en': en, 'kd': kd};
   }
 }

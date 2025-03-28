@@ -1,4 +1,1 @@
-enum ValidationStatus {
-  valid,
-  invalid,
-}
+enum ValidationStatus { valid, invalid }

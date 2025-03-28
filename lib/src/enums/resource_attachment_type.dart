@@ -1,7 +1,1 @@
-enum ResourceAttachmentType {
-  json,
-  comment,
-  media,
-  relationship,
-  alteration,
-}
+enum ResourceAttachmentType { json, comment, media, relationship, alteration }

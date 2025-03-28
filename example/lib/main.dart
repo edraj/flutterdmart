@@ -1,23 +1,11 @@
 import 'dart:io';
 
 import 'package:dmart/dmart.dart';
-import 'package:dmart/src/enums/query_type.dart';
-import 'package:dmart/src/enums/request_type.dart';
-import 'package:dmart/src/enums/resource_type.dart';
-import 'package:dmart/src/models/create_user_model.dart';
-import 'package:dmart/src/models/displayname.dart';
-import 'package:dmart/src/models/get_payload_request.dart';
-import 'package:dmart/src/models/login_model.dart';
-import 'package:dmart/src/models/progress_ticket_request.dart';
-import 'package:dmart/src/models/query/query_request.dart';
-import 'package:dmart/src/models/request/action_request.dart';
-import 'package:dmart/src/models/retrieve_entry_request.dart';
 
 import 'consts.dart';
 
 Future<void> main() async {
-  const baseUrl = 'https://dmart.cc/dmart';
-  Dmart.dmartServerUrl = baseUrl;
+  Dmart.dmartServerUrl = 'https://api.dmart.cc';
   Dmart.initDmart();
 
   // Creating a user

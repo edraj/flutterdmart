@@ -1,4 +1,1 @@
-enum Status {
-  success,
-  failed,
-}
+enum Status { success, failed }

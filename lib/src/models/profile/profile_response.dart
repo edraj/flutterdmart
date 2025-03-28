@@ -9,11 +9,8 @@ import 'package:dmart/src/models/status.dart';
 class ProfileResponse extends ApiResponse {
   List<ProfileResponseRecord>? records;
 
-  ProfileResponse({
-    required Status status,
-    Error? error,
-    this.records,
-  }) : super(status: status, error: error);
+  ProfileResponse({required Status status, Error? error, this.records})
+    : super(status: status, error: error);
 
   factory ProfileResponse.fromJson(Map<String, dynamic> json) {
     ProfileResponse profileResponse = ProfileResponse(
@@ -21,9 +18,10 @@ class ProfileResponse extends ApiResponse {
       error: json['error'] != null ? Error.fromJson(json['error']) : null,
     );
     if (json['records'] != null) {
-      profileResponse.records = (json['records'] as List<dynamic>)
-          .map((record) => ProfileResponseRecord.fromJson(record))
-          .toList();
+      profileResponse.records =
+          (json['records'] as List<dynamic>)
+              .map((record) => ProfileResponseRecord.fromJson(record))
+              .toList();
     }
     return profileResponse;
   }
@@ -108,8 +106,9 @@ class ProfileResponseRecordAttributes {
       'is_email_verified': isEmailVerified,
       'is_msisdn_verified': isMsisdnVerified,
       'force_password_change': forcePasswordChange,
-      'permissions':
-          permissions.map((key, value) => MapEntry(key, value.toJson())),
+      'permissions': permissions.map(
+        (key, value) => MapEntry(key, value.toJson()),
+      ),
     };
   }
 }

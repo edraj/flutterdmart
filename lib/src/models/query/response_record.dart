@@ -54,15 +54,16 @@ class ResponseRecordAttributes {
   factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
     ResponseRecordAttributes responseRecordAttributes =
         ResponseRecordAttributes(
-      isActive: json['is_active'],
-      tags: Set<String>.from(json['tags'] ?? []),
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      ownerShortname: json['owner_shortname'],
-      payload: json['payload'] != null
-          ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
-          : null,
-    );
+          isActive: json['is_active'],
+          tags: Set<String>.from(json['tags'] ?? []),
+          createdAt: json['created_at'],
+          updatedAt: json['updated_at'],
+          ownerShortname: json['owner_shortname'],
+          payload:
+              json['payload'] != null
+                  ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
+                  : null,
+        );
 
     if (json['displayname'] != null) {
       responseRecordAttributes.displayname = Translation.fromJson(

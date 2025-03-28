@@ -59,9 +59,10 @@ class ActionRequestRecord {
       shortname: json['shortname'],
       subpath: json['subpath'],
       attributes: Map<String, dynamic>.from(json['attributes']),
-      attachments: json['attachments'] != null
-          ? Map<ResourceType, List<dynamic>>.from(json['attachments'])
-          : null,
+      attachments:
+          json['attachments'] != null
+              ? Map<ResourceType, List<dynamic>>.from(json['attachments'])
+              : null,
     );
   }
 
@@ -70,7 +71,7 @@ class ActionRequestRecord {
       "resource_type": resourceType.name,
       "shortname": shortname,
       "subpath": subpath,
-      "attributes": attributes
+      "attributes": attributes,
     };
   }
 }

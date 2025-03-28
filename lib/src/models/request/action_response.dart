@@ -7,11 +7,8 @@ import 'package:dmart/src/models/status.dart';
 class ActionResponse extends ApiResponse {
   List<ActionResponseRecord>? records;
 
-  ActionResponse({
-    required Status status,
-    Error? error,
-    this.records,
-  }) : super(status: status, error: error);
+  ActionResponse({required Status status, Error? error, this.records})
+    : super(status: status, error: error);
 
   factory ActionResponse.fromJson(Map<String, dynamic> json) {
     ActionResponse actionResponse = ActionResponse(
@@ -19,9 +16,10 @@ class ActionResponse extends ApiResponse {
       error: json['error'] != null ? Error.fromJson(json['error']) : null,
     );
     if (json['records'] != null) {
-      actionResponse.records = (json['records'] as List<dynamic>)
-          .map((record) => ActionResponseRecord.fromJson(record))
-          .toList();
+      actionResponse.records =
+          (json['records'] as List<dynamic>)
+              .map((record) => ActionResponseRecord.fromJson(record))
+              .toList();
     }
 
     return actionResponse;
@@ -38,12 +36,12 @@ class ActionResponseRecord extends ResponseRecord {
     required String subpath,
     required ResponseRecordAttributes attributes,
   }) : super(
-          resourceType: resourceType,
-          uuid: uuid,
-          shortname: shortname,
-          subpath: subpath,
-          attributes: attributes,
-        );
+         resourceType: resourceType,
+         uuid: uuid,
+         shortname: shortname,
+         subpath: subpath,
+         attributes: attributes,
+       );
 
   factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
     var actionResponseRecord = ActionResponseRecord(
@@ -66,19 +64,18 @@ class ActionResponseAttachments {
   final List<ActionResponseRecord> media;
   final List<ActionResponseRecord> json;
 
-  ActionResponseAttachments({
-    required this.media,
-    required this.json,
-  });
+  ActionResponseAttachments({required this.media, required this.json});
 
   factory ActionResponseAttachments.fromJson(Map<String, dynamic> json) {
     return ActionResponseAttachments(
-      media: (json['media'] as List<dynamic>)
-          .map((mediaRecord) => ActionResponseRecord.fromJson(mediaRecord))
-          .toList(),
-      json: (json['json'] as List<dynamic>)
-          .map((jsonRecord) => ActionResponseRecord.fromJson(jsonRecord))
-          .toList(),
+      media:
+          (json['media'] as List<dynamic>)
+              .map((mediaRecord) => ActionResponseRecord.fromJson(mediaRecord))
+              .toList(),
+      json:
+          (json['json'] as List<dynamic>)
+              .map((jsonRecord) => ActionResponseRecord.fromJson(jsonRecord))
+              .toList(),
     );
   }
 }

@@ -69,8 +69,9 @@ class LoginAttributes {
   LoginAttributes.fromJson(Map<String, dynamic> json) {
     accessToken = json['access_token'];
     type = json['type'];
-    displayname = json['displayname'] != null
-        ? Displayname.fromJson(json['displayname'])
-        : null;
+    displayname =
+        json['displayname'] != null
+            ? Displayname.fromJson(json['displayname'])
+            : null;
   }
 }

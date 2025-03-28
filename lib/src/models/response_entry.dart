@@ -41,16 +41,16 @@ class ResponseEntry extends MetaExtended {
     this.acl,
     this.attachments,
   }) : super(
-          email: email,
-          msisdn: msisdn,
-          isEmailVerified: isEmailVerified,
-          isMsisdnVerified: isMsisdnVerified,
-          forcePasswordChange: forcePasswordChange,
-          password: password,
-          workflowShortname: workflowShortname,
-          state: state,
-          isOpen: isOpen,
-        );
+         email: email,
+         msisdn: msisdn,
+         isEmailVerified: isEmailVerified,
+         isMsisdnVerified: isMsisdnVerified,
+         forcePasswordChange: forcePasswordChange,
+         password: password,
+         workflowShortname: workflowShortname,
+         state: state,
+         isOpen: isOpen,
+       );
 
   factory ResponseEntry.fromJson(Map<String, dynamic> json) {
     ResponseEntry responseEntry = ResponseEntry(
@@ -71,15 +71,18 @@ class ResponseEntry extends MetaExtended {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       ownerShortname: json['owner_shortname'],
-      payload: json['payload'] != null
-          ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
-          : null,
-      acl: json['acl'] != null
-          ? (json['acl'] as List<Map<String, dynamic>>)
-          : null,
-      attachments: json['attachments'] != null
-          ? Map<String, dynamic>.from(json['attachments'])
-          : null,
+      payload:
+          json['payload'] != null
+              ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
+              : null,
+      acl:
+          json['acl'] != null
+              ? (json['acl'] as List<Map<String, dynamic>>)
+              : null,
+      attachments:
+          json['attachments'] != null
+              ? Map<String, dynamic>.from(json['attachments'])
+              : null,
     );
 
     if (json['displayname'] != null) {

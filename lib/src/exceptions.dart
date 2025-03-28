@@ -1,7 +1,4 @@
-enum DmartExceptionEnum {
-  NOT_INITIALIZED,
-  NOT_VALID_TOKEN,
-}
+enum DmartExceptionEnum { NOT_INITIALIZED, NOT_VALID_TOKEN }
 
 class DmartExceptionMessages {
   static const Map<DmartExceptionEnum, String> messages = {

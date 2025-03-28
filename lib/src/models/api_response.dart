@@ -5,10 +5,7 @@ class ApiResponse<T> {
   final Status status;
   final Error? error;
 
-  ApiResponse({
-    required this.status,
-    this.error,
-  });
+  ApiResponse({required this.status, this.error});
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
     return ApiResponse(
