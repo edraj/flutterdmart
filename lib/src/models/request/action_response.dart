@@ -24,24 +24,31 @@ class ActionResponse extends ApiResponse {
 
     return actionResponse;
   }
+
+  /// Converts the ActionResponse object to a JSON object.
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status.name;
+    if (error != null) {
+      data['error'] = error!.toJson();
+    }
+    if (records != null) {
+      data['records'] = records!.map((record) => record.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 class ActionResponseRecord extends ResponseRecord {
   late final ActionResponseAttachments? attachments;
 
   ActionResponseRecord({
-    required ResourceType resourceType,
-    required String uuid,
-    required String shortname,
-    required String subpath,
-    required ResponseRecordAttributes attributes,
-  }) : super(
-         resourceType: resourceType,
-         uuid: uuid,
-         shortname: shortname,
-         subpath: subpath,
-         attributes: attributes,
-       );
+    required super.resourceType,
+    required super.uuid,
+    required super.shortname,
+    required super.subpath,
+    required super.attributes,
+  });
 
   factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
     var actionResponseRecord = ActionResponseRecord(
@@ -57,6 +64,20 @@ class ActionResponseRecord extends ResponseRecord {
       );
     }
     return actionResponseRecord;
+  }
+
+  /// Converts the ActionResponseRecord object to a JSON object.
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['resource_type'] = resourceType.name;
+    data['uuid'] = uuid;
+    data['shortname'] = shortname;
+    data['subpath'] = subpath;
+    data['attributes'] = attributes.toJson();
+    if (attachments != null) {
+      data['attachments'] = attachments!.toJson();
+    }
+    return data;
   }
 }
 
@@ -77,5 +98,13 @@ class ActionResponseAttachments {
               .map((jsonRecord) => ActionResponseRecord.fromJson(jsonRecord))
               .toList(),
     );
+  }
+
+  /// Converts the ActionResponseAttachments object to a JSON object.
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['media'] = media.map((record) => record.toJson()).toList();
+    data['json'] = json.map((record) => record.toJson()).toList();
+    return data;
   }
 }

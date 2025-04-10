@@ -14,4 +14,16 @@ class ProgressTicketRequest {
     this.resolution,
     this.comment,
   });
+
+  /// Converts the request to a JSON object.
+  Map<String, dynamic> toJson() {
+    return {
+      'space_name': spaceName,
+      'subpath': subpath,
+      'shortname': shortname,
+      'action': action,
+      'resolution': resolution,
+      'comment': comment,
+    };
+  }
 }

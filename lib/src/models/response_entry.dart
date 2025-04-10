@@ -97,6 +97,7 @@ class ResponseEntry extends MetaExtended {
     return responseEntry;
   }
 
+  /// Converts the ResponseEntry object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'email': email,

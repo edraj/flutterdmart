@@ -8,6 +8,7 @@ class CreateUserRequest {
 
   CreateUserRequest({this.shortname = "auto", required this.attributes});
 
+  /// Converts the CreateUserRequest object to a JSON object.
   Map<String, dynamic> toJson() => {
     'shortname': shortname,
     'subpath': "users",
@@ -57,6 +58,7 @@ class CreateUserAttributes {
         password: json['password'],
       );
 
+  /// Converts the CreateUserAttributes object to a JSON object.
   Map<String, dynamic> toJson() => {
     'invitation': invitation,
     'displayname': displayname.toJson(),
@@ -86,4 +88,10 @@ class CreateUserResponse {
         status: json['status'],
         error: json['error'] != null ? Error.fromJson(json['error']) : null,
       );
+
+  /// Converts the CreateUserResponse object to a JSON object.
+  Map<String, dynamic> toJson() => {
+    'status': status,
+    'error': error?.toJson(),
+  };
 }

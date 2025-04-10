@@ -14,6 +14,7 @@ class Record {
 
   Record({this.resourceType, this.shortname, this.subpath});
 
+  /// Creates a record object from a JSON object.
   Record.fromJson(Map<String, dynamic> json) {
     resourceType = json['resource_type'];
     shortname = json['shortname'];
@@ -21,6 +22,7 @@ class Record {
     attributes = json['attributes'];
   }
 
+  /// Converts the record object to a JSON object.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['resource_type'] = resourceType;

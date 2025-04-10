@@ -1,4 +1,4 @@
-## 1.0.10+1
+## 1.0.10+2
 - formated code
 - upgrading deps
 

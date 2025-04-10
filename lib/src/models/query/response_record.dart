@@ -28,6 +28,17 @@ class ResponseRecord {
       ),
     );
   }
+
+  /// Converts the ResponseRecord object to a JSON object.
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['resource_type'] = resourceType.name;
+    data['uuid'] = uuid;
+    data['shortname'] = shortname;
+    data['subpath'] = subpath;
+    data['attributes'] = attributes.toJson();
+    return data;
+  }
 }
 
 class ResponseRecordAttributes {
@@ -78,5 +89,25 @@ class ResponseRecordAttributes {
     }
 
     return responseRecordAttributes;
+  }
+
+  /// Converts the responseRecordAttributes object to a JSON object.
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['is_active'] = isActive;
+    if (displayname != null) {
+      data['displayname'] = displayname!.toJson();
+    }
+    if (description != null) {
+      data['description'] = description!.toJson();
+    }
+    data['tags'] = tags.toList();
+    data['created_at'] = createdAt;
+    data['updated_at'] = updatedAt;
+    data['owner_shortname'] = ownerShortname;
+    if (payload != null) {
+      data['payload'] = payload!.toJson();
+    }
+    return data;
   }
 }

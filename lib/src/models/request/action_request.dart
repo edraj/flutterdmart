@@ -18,6 +18,7 @@ class ActionRequest {
     required this.records,
   });
 
+  /// Converts the ActionRequest object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'space_name': spaceName,
@@ -66,6 +67,7 @@ class ActionRequestRecord {
     );
   }
 
+  /// Converts the ActionRequestRecord object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       "resource_type": resourceType.name,

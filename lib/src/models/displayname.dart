@@ -11,6 +11,7 @@ class Displayname {
     kd = json['kd'];
   }
 
+  /// Converts the Displayname object to a JSON object.
   Map<String, dynamic> toJson() {
     return {'ar': ar, 'en': en, 'kd': kd};
   }

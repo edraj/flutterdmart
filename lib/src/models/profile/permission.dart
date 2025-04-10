@@ -36,6 +36,7 @@ class Permission {
     );
   }
 
+  /// Converts the Permission object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'allowed_actions': allowedActions,

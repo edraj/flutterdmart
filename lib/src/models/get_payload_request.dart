@@ -14,4 +14,15 @@ class GetPayloadRequest {
     required this.shortname,
     this.ext = '.json',
   });
+
+  /// Converts the request to a JSON object.
+  Map<String, dynamic> toJson() {
+    return {
+      'resource_type': resourceType.name,
+      'space_name': spaceName,
+      'subpath': subpath,
+      'shortname': shortname,
+      'ext': ext,
+    };
+  }
 }

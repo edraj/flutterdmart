@@ -15,6 +15,7 @@ class Error {
     );
   }
 
+  /// Converts the Error object to a JSON object.
   Map<String, dynamic> toJson() {
     return {'type': type, 'code': code, 'message': message, 'info': info};
   }

@@ -21,6 +21,7 @@ class MetaExtended {
     this.isOpen,
   });
 
+  /// Converts the object to a JSON object.
   factory MetaExtended.fromJson(Map<String, dynamic> json) {
     return MetaExtended(
       email: json['email'],
@@ -33,5 +34,20 @@ class MetaExtended {
       state: json['state'],
       isOpen: json['is_open'],
     );
+  }
+
+  /// Converts the object to a JSON object.
+  Map<String, dynamic> toJson() {
+    return {
+      'email': email,
+      'msisdn': msisdn,
+      'is_email_verified': isEmailVerified,
+      'is_msisdn_verified': isMsisdnVerified,
+      'force_password_change': forcePasswordChange,
+      'password': password,
+      'workflow_shortname': workflowShortname,
+      'state': state,
+      'is_open': isOpen,
+    };
   }
 }

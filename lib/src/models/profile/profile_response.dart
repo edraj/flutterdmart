@@ -97,6 +97,7 @@ class ProfileResponseRecordAttributes {
     );
   }
 
+  /// Converts the ProfileResponseRecordAttributes object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'email': email,

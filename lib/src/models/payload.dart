@@ -30,6 +30,7 @@ class Payload {
     this.validationStatus,
   });
 
+  /// Converts a JSON object to a Payload object.
   factory Payload.fromJson(Map<String, dynamic> json) {
     Payload payload = Payload(
       contentType: ContentType.values.byName(json['content_type']),
@@ -47,6 +48,7 @@ class Payload {
     return payload;
   }
 
+  /// Converts the Payload object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'content_type': contentType.name,

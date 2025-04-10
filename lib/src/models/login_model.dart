@@ -17,6 +17,7 @@ class LoginRequest {
 
   LoginRequest.withMSISDN({required this.msisdn, required this.password});
 
+  /// Converts the LoginRequest object to a JSON map.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (shortname != null) {
@@ -41,6 +42,7 @@ class LoginResponse extends BaseResponse {
 
   LoginResponse({this.token, required super.status, super.records});
 
+  /// Converts the LoginResponse object to a JSON map.
   LoginResponse.fromJson(Map<String, dynamic> json) {
     status = Status.values.byName(json['status']);
     if (status == Status.failed) {
@@ -57,6 +59,14 @@ class LoginResponse extends BaseResponse {
       displayname = attribute.displayname;
     }
   }
+
+  /// Converts the LoginResponse object to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status?.name,
+      'records': records?.map((record) => record.toJson()).toList(),
+    };
+  }
 }
 
 class LoginAttributes {
@@ -66,6 +76,7 @@ class LoginAttributes {
 
   LoginAttributes({this.accessToken, this.type, this.displayname});
 
+  /// Converts the LoginAttributes object to a JSON map.
   LoginAttributes.fromJson(Map<String, dynamic> json) {
     accessToken = json['access_token'];
     type = json['type'];
@@ -73,5 +84,14 @@ class LoginAttributes {
         json['displayname'] != null
             ? Displayname.fromJson(json['displayname'])
             : null;
+  }
+
+  /// Converts the LoginAttributes object to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'access_token': accessToken,
+      'type': type,
+      'displayname': displayname?.toJson(),
+    };
   }
 }

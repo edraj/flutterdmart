@@ -32,4 +32,17 @@ class RetrieveEntryRequest {
     this.retrieveAttachments = false,
     this.validateSchema = true,
   });
+
+  /// Converts the request to a JSON object.
+  Map<String, dynamic> toJson() {
+    return {
+      'resource_type': resourceType.name,
+      'space_name': spaceName,
+      'subpath': subpath,
+      'shortname': shortname,
+      'retrieve_json_payload': retrieveJsonPayload,
+      'retrieve_attachments': retrieveAttachments,
+      'validate_schema': validateSchema,
+    };
+  }
 }

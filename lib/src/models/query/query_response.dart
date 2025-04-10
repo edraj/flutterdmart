@@ -41,4 +41,12 @@ class ApiQueryResponseAttributes {
       returned: json['returned'],
     );
   }
+
+  /// Converts the ApiQueryResponseAttributes object to a JSON object.
+  Map<String, dynamic> toJson() {
+    return {
+      'total': total,
+      'returned': returned,
+    };
+  }
 }

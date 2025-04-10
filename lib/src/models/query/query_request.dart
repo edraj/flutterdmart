@@ -79,6 +79,7 @@ class QueryRequest {
     this.offset,
   });
 
+  /// Converts the QueryRequest object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'type': queryType.toString().split('.').last,

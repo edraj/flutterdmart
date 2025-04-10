@@ -17,6 +17,7 @@ class BaseResponse {
     }
   }
 
+  /// Converts the BaseResponse object to a JSON object.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status;

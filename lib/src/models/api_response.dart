@@ -13,4 +13,12 @@ class ApiResponse<T> {
       error: json['error'] != null ? Error.fromJson(json['error']) : null,
     );
   }
+
+  /// Converts the ApiResponse object to a JSON object.
+  Map<String, dynamic> toJson() {
+    return {
+      'status': status.name,
+      'error': error?.toJson(),
+    };
+  }
 }

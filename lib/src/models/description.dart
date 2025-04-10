@@ -11,6 +11,7 @@ class Description {
     kd = json['kd'];
   }
 
+  /// Converts the Description object to a JSON object.
   Map<String, dynamic> toJson() {
     return {'ar': ar, 'en': en, 'kd': kd};
   }
