@@ -85,7 +85,7 @@ class QueryRequest {
       'type': queryType.toString().split('.').last,
       'space_name': spaceName,
       'subpath': subpath,
-      'filter_types': filterTypes,
+      'filter_types': filterTypes?.map((type) => type.toString().split('.').last).toList(),
       'filter_schema_names': filterSchemaNames,
       'filter_shortnames': filterShortnames,
       'search': search,

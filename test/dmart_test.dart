@@ -1,5 +1,4 @@
 import 'package:dmart/dmart.dart';
-import 'package:dmart/src/models/login_model.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -8,22 +7,41 @@ void main() {
       // Additional setup goes here.
     });
 
-    test('Check dio init', () async {
-      const baseUrl = 'https://dmart.cc/dmart';
-      Dmart.dmartServerUrl = baseUrl;
-      Dmart.initDmart();
-      expect(true, true);
-    });
+    // test('Check dio init', () async {
+    //   const baseUrl = 'https://dmart.cc/dmart';
+    //   Dmart.dmartServerUrl = baseUrl;
+    //   Dmart.initDmart();
+    //   expect(true, true);
+    // });
+    //
+    // test('Test login', () async {
+    //   const baseUrl = 'https://dmart.cc/dmart';
+    //   Dmart.dmartServerUrl = baseUrl;
+    //   Dmart.initDmart();
+    //   final response = await Dmart.login(
+    //     LoginRequest(shortname: 'test', password: 'test'),
+    //   );
+    //   print(response);
+    //   expect(response, isNotNull);
+    // });
 
-    test('Test login', () async {
+    test('Test get payload', () async {
       const baseUrl = 'https://dmart.cc/dmart';
       Dmart.dmartServerUrl = baseUrl;
       Dmart.initDmart();
-      final response = await Dmart.login(LoginRequest(
-        shortname: 'test',
-        password: 'test',
-      ));
-      print(response);
+      final x = await Dmart.login(
+        LoginRequest(shortname: 'dmart', password: 'TestTest1234'),
+      );
+      final (response, error) = await Dmart.query(
+        QueryRequest(
+          queryType: QueryType.search,
+          spaceName: 'management',
+          subpath: 'users',
+          filterTypes: [ResourceType.comment],
+        ),
+        scope: 'public',
+      );
+      print(response!.toJson());
       expect(response, isNotNull);
     });
   });

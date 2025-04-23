@@ -57,7 +57,7 @@ class Dmart {
       type: 'unknown',
       code: 0,
       info: [],
-      message: e.message.toString(),
+      message: e.message ?? e.error.toString(),
     );
   }
 
@@ -258,6 +258,7 @@ class Dmart {
 
       return (ApiQueryResponse.fromJson(response.data), null);
     } on DioException catch (e) {
+      print(e);
       return (null, _returnExceptionError(e));
     }
   }

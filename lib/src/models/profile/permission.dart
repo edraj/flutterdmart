@@ -39,7 +39,7 @@ class Permission {
   /// Converts the Permission object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
-      'allowed_actions': allowedActions,
+      'allowed_actions': allowedActions.map((type) => type.toString().split('.').last).toList(),
       'conditions': conditions,
       'restricted_fields': restrictedFields,
       'allowed_fields_values': allowedFieldsValues,

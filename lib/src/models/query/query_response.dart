@@ -27,6 +27,20 @@ class ApiQueryResponse extends ApiResponse {
       ),
     );
   }
+
+  /// Converts the ApiQueryResponse object to a JSON object.
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status'] = status.name;
+    if (error != null) {
+      data['error'] = error!.toJson();
+    }
+    if (records.isNotEmpty) {
+      data['records'] = records.map((record) => record.toJson()).toList();
+    }
+    data['attributes'] = attributes.toJson();
+    return data;
+  }
 }
 
 class ApiQueryResponseAttributes {
