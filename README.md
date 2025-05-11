@@ -20,6 +20,7 @@ Methods:
 * `Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
 * `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
 * `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
+* `Future<(ProfileResponse?, Error?)> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
 * `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
 * `Future<(ActionResponse?, Error?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
 * `Future<(ResponseEntry?, Error?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
@@ -86,6 +87,19 @@ Dmart.token = 'xxx.yyy.zzz';
 
 ```dart
 var (respProfile, _) = await Dmart.getProfile();
+```
+
+* Update user profile
+
+```dart
+var (respProfile, _) = await Dmart.updateProfile(
+    ActionRequestRecord(
+        shortname: 'dmart',
+        resourceType: ResourceType.user,
+        subpath: 'users',
+        attributes: {'language': 'kurdish'},
+    ),
+);
 ```
 
 * Get all spaces

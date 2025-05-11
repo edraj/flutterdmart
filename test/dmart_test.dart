@@ -29,20 +29,34 @@ void main() {
       const baseUrl = 'https://dmart.cc/dmart';
       Dmart.dmartServerUrl = baseUrl;
       Dmart.initDmart();
-      final x = await Dmart.login(
+      final _ = await Dmart.login(
         LoginRequest(shortname: 'dmart', password: 'TestTest1234'),
       );
-      final (response, error) = await Dmart.query(
-        QueryRequest(
-          queryType: QueryType.search,
-          spaceName: 'management',
+      var (x, y) = await Dmart.getProfile();
+      print(x?.records![0].attributes.language);
+
+      (x, y) = await Dmart.updateProfile(
+        ActionRequestRecord(
+          shortname: 'dmart',
+          resourceType: ResourceType.user,
           subpath: 'users',
-          filterTypes: [ResourceType.comment],
+          attributes: {'language': 'kurdish'},
         ),
-        scope: 'public',
       );
-      print(response!.toJson());
-      expect(response, isNotNull);
+
+      print(y?.info);
+
+      // final (response, error) = await Dmart.query(
+      //   QueryRequest(
+      //     queryType: QueryType.search,
+      //     spaceName: 'management',
+      //     subpath: 'users',
+      //     filterTypes: [ResourceType.comment],
+      //   ),
+      //   scope: 'public',
+      // );
+      // print(response!.toJson());
+      // expect(response, isNotNull);
     });
   });
 }

@@ -1,3 +1,6 @@
+## 1.1.0
+- add update profile
+
 ## 1.0.10+2
 - formated code
 - upgrading deps

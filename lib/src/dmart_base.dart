@@ -2,24 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:dmart/dmart.dart';
 import 'package:dmart/src/enums/content_type.dart' as DmartContentType;
-import 'package:dmart/src/enums/query_type.dart';
-import 'package:dmart/src/enums/sort_type.dart';
 import 'package:dmart/src/exceptions.dart';
-import 'package:dmart/src/models/api_response.dart';
-import 'package:dmart/src/models/create_user_model.dart';
-import 'package:dmart/src/models/error.dart';
-import 'package:dmart/src/models/get_payload_request.dart';
-import 'package:dmart/src/models/login_model.dart';
-import 'package:dmart/src/models/profile/profile_response.dart';
-import 'package:dmart/src/models/progress_ticket_request.dart';
-import 'package:dmart/src/models/query/query_request.dart';
-import 'package:dmart/src/models/query/query_response.dart';
-import 'package:dmart/src/models/request/action_request.dart';
-import 'package:dmart/src/models/request/action_response.dart';
-import 'package:dmart/src/models/response_entry.dart';
-import 'package:dmart/src/models/retrieve_entry_request.dart';
-import 'package:dmart/src/models/status.dart';
 import 'package:http_parser/http_parser.dart';
 
 /// Dmart class that has all the methods to interact with the Dmart server.
@@ -226,6 +211,39 @@ class Dmart {
           info: [profileResponse.error?.toJson() ?? {}],
           message: "Unable to retrieve the profile.",
         ),
+      );
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Update the profile of the user.
+  static Future<(ProfileResponse?, Error?)> updateProfile(ActionRequestRecord profile) async {
+    _isTokenNull();
+    try {
+      final response = await _dio.post(
+        '/user/profile',
+        options: Options(
+          headers: {...headers, "Authorization": "Bearer $token"},
+        ),
+        data: profile.toJson()
+      );
+
+      final profileResponse = ProfileResponse.fromJson(response.data);
+      if (profileResponse.status == Status.success &&
+          profileResponse.records != null &&
+          profileResponse.records!.isNotEmpty) {
+        return (profileResponse, null);
+      }
+
+      return (
+      null,
+      Error(
+        type: 'unknown',
+        code: 0,
+        info: [profileResponse.error?.toJson() ?? {}],
+        message: "Unable to retrieve the profile.",
+      ),
       );
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));
