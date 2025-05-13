@@ -101,6 +101,7 @@ class Dmart {
   }) async {
     if (dio != null) {
       _dioInstance = dio;
+      dmartServerUrl = dio.options.baseUrl;
       if (dioConfig != null) {
         print(
           '[WARNING] setting dioConfig will be ignored as dio is provided!',
@@ -251,7 +252,7 @@ class Dmart {
   }
 
   /// Retrieves the user with the given [QueryRequest].
-  static Future<(ApiQueryResponse?, Error?)> query(
+  static Future<(ActionResponse?, Error?)> query(
     QueryRequest query, {
     String scope = "managed",
   }) async {
@@ -274,7 +275,7 @@ class Dmart {
         ),
       );
 
-      return (ApiQueryResponse.fromJson(response.data), null);
+      return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
       print(e);
       return (null, _returnExceptionError(e));
@@ -346,7 +347,7 @@ class Dmart {
   }
 
   /// Retrieves the spaces.
-  static Future<(ApiQueryResponse?, Error?)> getSpaces() async {
+  static Future<(ActionResponse?, Error?)> getSpaces() async {
     return await query(
       QueryRequest(
         queryType: QueryType.spaces,

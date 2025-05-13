@@ -59,9 +59,7 @@ class ActionResponseRecord extends ResponseRecord {
       attributes: ResponseRecordAttributes.fromJson(json['attributes']),
     );
     if (json['attachments'] != null) {
-      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(
-        Map<String, dynamic>.from(json['attachments']),
-      );
+      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(json['attachments']);
     }
     return actionResponseRecord;
   }
@@ -82,20 +80,20 @@ class ActionResponseRecord extends ResponseRecord {
 }
 
 class ActionResponseAttachments {
-  final List<ActionResponseRecord> media;
-  final List<ActionResponseRecord> json;
+  final List<ResponseRecord>? media;
+  final List<ResponseRecord>? json;
 
   ActionResponseAttachments({required this.media, required this.json});
 
   factory ActionResponseAttachments.fromJson(Map<String, dynamic> json) {
     return ActionResponseAttachments(
       media:
-          (json['media'] as List<dynamic>)
-              .map((mediaRecord) => ActionResponseRecord.fromJson(mediaRecord))
+          (json['media'] as List<dynamic>?)
+              ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
               .toList(),
       json:
-          (json['json'] as List<dynamic>)
-              .map((jsonRecord) => ActionResponseRecord.fromJson(jsonRecord))
+          (json['json'] as List<dynamic>?)
+              ?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord))
               .toList(),
     );
   }
@@ -103,8 +101,8 @@ class ActionResponseAttachments {
   /// Converts the ActionResponseAttachments object to a JSON object.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['media'] = media.map((record) => record.toJson()).toList();
-    data['json'] = json.map((record) => record.toJson()).toList();
+    data['media'] = media?.map((record) => record.toJson()).toList();
+    data['json'] = json?.map((record) => record.toJson()).toList();
     return data;
   }
 }
