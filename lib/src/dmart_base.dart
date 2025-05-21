@@ -360,11 +360,13 @@ class Dmart {
   }
 
   /// Retrieves the space with the given [GetPayloadRequest].
-  static Future<dynamic> getPayload(GetPayloadRequest request) async {
+  static Future<dynamic> getPayload(GetPayloadRequest request, {
+    String scope = "managed",
+  }) async {
     _isTokenNull();
     try {
       final response = await _dio.get(
-        '/managed/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.ext}',
+        '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.ext}',
         options: Options(
           headers: {...headers, "Authorization": "Bearer $token"},
         ),
@@ -408,6 +410,7 @@ class Dmart {
         DmartContentType.ContentType.image,
     String resourceType = "media",
     bool isActive = true,
+    String scope = "managed",
   }) async {
     _isTokenNull();
 
@@ -447,7 +450,7 @@ class Dmart {
 
     try {
       Response? response = await _dio.post(
-        '/managed/resource_with_payload',
+        '/$scope/resource_with_payload',
         data: formData,
         options: Options(
           contentType: 'multipart/form-data',
