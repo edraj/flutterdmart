@@ -1,18 +1,18 @@
 class Description {
   String? en;
   String? ar;
-  String? kd;
+  String? ku;
 
-  Description({this.en, this.ar, this.kd});
+  Description({this.en, this.ar, this.ku});
 
   Description.fromJson(Map<String, dynamic> json) {
     en = json['en'];
     ar = json['ar'];
-    kd = json['kd'];
+    ku = json['ku'];
   }
 
   /// Converts the Description object to a JSON object.
   Map<String, dynamic> toJson() {
-    return {'ar': ar, 'en': en, 'kd': kd};
+    return {'ar': ar, 'en': en, 'ku': ku};
   }
 }
