@@ -469,11 +469,22 @@ class Dmart {
     String spaceName,
     String schemaShortname,
     String subpath,
+    String? resourceType,
+    String? workflowShortname,
     Map<String, dynamic> record,
   ) async {
     try {
+      var url = '/public/submit/$spaceName';
+      if (resourceType != null) {
+        url += '/$resourceType';
+      }
+      if (workflowShortname != null) {
+        url += '/$workflowShortname';
+      }
+      url += '/$schemaShortname/$subpath';
+
       final response = await _dio.post(
-        '/public/submit/$spaceName/$schemaShortname/$subpath',
+        url,
         data: record,
         options: Options(headers: headers),
       );
