@@ -366,7 +366,7 @@ class Dmart {
     _isTokenNull();
     try {
       final response = await _dio.get(
-        '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.ext}',
+        '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.schemaShortname}${request.ext}',
         options: Options(
           headers: {...headers, "Authorization": "Bearer $token"},
         ),

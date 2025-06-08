@@ -5,6 +5,7 @@ class GetPayloadRequest {
   final String spaceName;
   final String subpath;
   final String shortname;
+  final String schemaShortname;
   final String ext;
 
   GetPayloadRequest({
@@ -12,6 +13,7 @@ class GetPayloadRequest {
     required this.spaceName,
     required this.subpath,
     required this.shortname,
+    this.schemaShortname = "",
     this.ext = '.json',
   });
 
@@ -22,6 +24,7 @@ class GetPayloadRequest {
       'space_name': spaceName,
       'subpath': subpath,
       'shortname': shortname,
+      'schema_shortname': schemaShortname,
       'ext': ext,
     };
   }
