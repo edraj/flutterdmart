@@ -7,6 +7,8 @@ import 'package:dmart/src/enums/content_type.dart' as DmartContentType;
 import 'package:dmart/src/exceptions.dart';
 import 'package:http_parser/http_parser.dart';
 
+import 'models/request/check_exisiting_params.dart';
+
 /// Dmart class that has all the methods to interact with the Dmart server.
 class Dmart {
   /// The base url of the Dmart server.
@@ -132,6 +134,19 @@ class Dmart {
     }
 
     _dioInstance?.interceptors.addAll(interceptors);
+  }
+
+  Future<(dynamic, Error?)> checkExisting(CheckExistingParams params) async {
+    try {
+      final response = await Dmart._dio.get(
+        '/user/check-existing',
+        queryParameters: params.toQueryParams(),
+        options: Options(headers: headers),
+      );
+      return (response.data, null);
+    } on DioException catch (e) {
+      return (null, Dmart._returnExceptionError(e));
+    }
   }
 
   /// Logs in the user with the given [loginRequest].

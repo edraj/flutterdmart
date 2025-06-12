@@ -31,7 +31,7 @@ Future<void> main() async {
 
   // Get all spaces
   var (respSpaces, _) = await Dmart.getSpaces();
-  print(respSpaces?.records.length);
+  print(respSpaces?.records?.length);
 
   // Create space
   ActionRequest createSpaceActionRequest = ActionRequest(
@@ -137,13 +137,7 @@ Future<void> main() async {
     records: [actionRequestRecordAttachment],
   ));
 
-  // Progress a ticket
-  var (respProgression, _) = await Dmart.progressTicket(ProgressTicketRequest(
-    spaceName: "myspace",
-    subpath: "test",
-    shortname: "myticket",
-    action: "rejected",
-  ));
+  // var (respCreateSpace, _) = await Dmart.createSpace(createSpaceActionRequest);
 
   // Create an attachment
   File img = File("/path/to/myimg.jpg");
@@ -169,6 +163,8 @@ Future<void> main() async {
     "applications",
     "log",
     "logs",
+    null,
+    null,
     {
       "shortname": "myentry",
       "resource_type": ResourceType.content.name,

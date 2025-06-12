@@ -1,5 +1,6 @@
 import 'package:dmart/src/models/displayname.dart';
 import 'package:dmart/src/models/error.dart';
+import 'package:dmart/src/models/request/action_request.dart';
 
 class CreateUserRequest {
   late CreateUserAttributes attributes;
@@ -79,13 +80,15 @@ class CreateUserAttributes {
 
 class CreateUserResponse {
   late String status;
+  late ActionRequestRecord records;
   Error? error;
 
-  CreateUserResponse({required this.status, this.error});
+  CreateUserResponse({required this.status, this.error, required records});
 
   factory CreateUserResponse.fromJson(Map<String, dynamic> json) =>
       CreateUserResponse(
         status: json['status'],
+        records: json['records'],
         error: json['error'] != null ? Error.fromJson(json['error']) : null,
       );
 
