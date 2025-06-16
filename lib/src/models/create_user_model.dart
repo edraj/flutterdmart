@@ -32,6 +32,8 @@ class CreateUserAttributes {
   late bool? isEmailVerified;
   late bool? isMsisdnVerified;
   late bool? forcePasswordChange;
+  late String? msisdnOTP;
+  late String? emailOTP;
 
   CreateUserAttributes({
     required this.invitation,
@@ -47,17 +49,18 @@ class CreateUserAttributes {
     this.isEmailVerified,
     this.isMsisdnVerified,
     this.forcePasswordChange,
+    this.msisdnOTP,
+    this.emailOTP,
   });
 
-  factory CreateUserAttributes.fromJson(Map<String, dynamic> json) =>
-      CreateUserAttributes(
-        invitation: json['invitation'],
-        displayname: Displayname.fromJson(json['displayname']),
-        email: json['email'],
-        profilePicUrl: json['profile_pic_url'],
-        msisdn: json['msisdn'],
-        password: json['password'],
-      );
+  factory CreateUserAttributes.fromJson(Map<String, dynamic> json) => CreateUserAttributes(
+    invitation: json['invitation'],
+    displayname: Displayname.fromJson(json['displayname']),
+    email: json['email'],
+    profilePicUrl: json['profile_pic_url'],
+    msisdn: json['msisdn'],
+    password: json['password'],
+  );
 
   /// Converts the CreateUserAttributes object to a JSON object.
   Map<String, dynamic> toJson() => {
@@ -75,6 +78,8 @@ class CreateUserAttributes {
     'isMsisdnVerified': isMsisdnVerified,
     'forcePasswordChange': forcePasswordChange,
     'is_active': true,
+    'msisdn_otp': msisdnOTP,
+    'email_otp': emailOTP,
   };
 }
 
@@ -85,16 +90,12 @@ class CreateUserResponse {
 
   CreateUserResponse({required this.status, this.error, required records});
 
-  factory CreateUserResponse.fromJson(Map<String, dynamic> json) =>
-      CreateUserResponse(
-        status: json['status'],
-        records: json['records'],
-        error: json['error'] != null ? Error.fromJson(json['error']) : null,
-      );
+  factory CreateUserResponse.fromJson(Map<String, dynamic> json) => CreateUserResponse(
+    status: json['status'],
+    records: json['records'],
+    error: json['error'] != null ? Error.fromJson(json['error']) : null,
+  );
 
   /// Converts the CreateUserResponse object to a JSON object.
-  Map<String, dynamic> toJson() => {
-    'status': status,
-    'error': error?.toJson(),
-  };
+  Map<String, dynamic> toJson() => {'status': status, 'error': error?.toJson()};
 }
