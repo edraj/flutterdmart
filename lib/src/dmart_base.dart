@@ -119,7 +119,7 @@ class Dmart {
     _dioInstance?.interceptors.addAll(interceptors);
   }
 
-  Future<(dynamic, Error?)> checkExisting(CheckExistingParams params) async {
+  static Future<(dynamic, Error?)> checkExisting(CheckExistingParams params) async {
     try {
       final response = await Dmart._dio.get(
         '/user/check-existing',
