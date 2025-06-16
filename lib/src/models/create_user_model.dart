@@ -24,7 +24,7 @@ class CreateUserAttributes {
   late String? email;
   late String? profilePicUrl;
   late String? msisdn;
-  late String password;
+  late String? password;
   late List<String>? roles;
   late List<String>? groups;
   late String? firebaseToken;
@@ -41,7 +41,7 @@ class CreateUserAttributes {
     this.email,
     this.profilePicUrl,
     this.msisdn,
-    required this.password,
+    this.password,
     this.roles,
     this.groups,
     this.firebaseToken,
