@@ -85,7 +85,7 @@ class CreateUserAttributes {
 
 class CreateUserResponse {
   late String status;
-  late ActionRequestRecord records;
+  late List<ActionRequestRecord> records;
   Error? error;
 
   CreateUserResponse({required this.status, required this.records, this.error});
@@ -93,7 +93,7 @@ class CreateUserResponse {
   factory CreateUserResponse.fromJson(Map<String, dynamic> json) {
     return CreateUserResponse(
       status: json['status'],
-      records: ActionRequestRecord.fromJson(json['records'][0]),
+      records: (json['records'] as List).map((e) => ActionRequestRecord.fromJson(e)).toList(),
       error: json['error'] != null ? Error.fromJson(json['error']) : null,
     );
   }
