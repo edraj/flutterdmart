@@ -91,10 +91,9 @@ class CreateUserResponse {
   CreateUserResponse({required this.status, required this.records, this.error});
 
   factory CreateUserResponse.fromJson(Map<String, dynamic> json) {
-    final responseRecord = json['records'] as List<Map<String, dynamic>>;
     return CreateUserResponse(
       status: json['status'],
-      records: ActionRequestRecord.fromJson(responseRecord[0]),
+      records: ActionRequestRecord.fromJson(json['records'][0]),
       error: json['error'] != null ? Error.fromJson(json['error']) : null,
     );
   }
