@@ -33,6 +33,7 @@ export 'src/models/query/response_record.dart';
 export 'src/models/record.dart';
 export 'src/models/request/action_request.dart';
 export 'src/models/request/action_response.dart';
+export 'src/models/request/check_existing_params.dart';
 export 'src/models/response_entry.dart';
 export 'src/models/retrieve_entry_request.dart';
 export 'src/models/status.dart';
