@@ -8,8 +8,6 @@ import 'package:dmart/src/exceptions.dart';
 import 'package:dmart/src/extensions/map_extension.dart';
 import 'package:http_parser/http_parser.dart';
 
-import 'models/request/check_exisiting_params.dart';
-
 /// Dmart class that has all the methods to interact with the Dmart server.
 class Dmart {
   /// The base url of the Dmart server.
