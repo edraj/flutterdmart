@@ -121,7 +121,7 @@ class Dmart {
     try {
       final response = await Dmart._dio.get(
         '/user/check-existing',
-        queryParameters: params.toQueryParams(),
+        queryParameters: params.toQueryParams().withoutNulls(),
         options: Options(headers: headers),
       );
       return (response.data, null);
