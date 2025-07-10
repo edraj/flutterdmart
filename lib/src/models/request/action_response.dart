@@ -15,13 +15,16 @@ class ActionResponse extends ApiResponse {
   factory ActionResponse.fromJson(Map<String, dynamic> json) {
     ActionResponse actionResponse = ActionResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
-      error: json['error'] != null ? Error.fromJson(json['error']) : null, attributes: json['attributes'],
+      error: json['error'] != null ? Error.fromJson(json['error']) : null,
     );
     if (json['records'] != null) {
       actionResponse.records =
           (json['records'] as List<dynamic>)
               .map((record) => ActionResponseRecord.fromJson(record))
               .toList();
+    }
+    if (json['attributes'] != null) {
+      actionResponse.attributes = Attributes.fromJson(json['attributes']);
     }
 
     return actionResponse;
