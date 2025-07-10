@@ -1,19 +1,21 @@
 import 'package:dmart/src/enums/resource_type.dart';
 import 'package:dmart/src/models/api_response.dart';
+import 'package:dmart/src/models/attributes.dart';
 import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/query/response_record.dart';
 import 'package:dmart/src/models/status.dart';
 
 class ActionResponse extends ApiResponse {
   List<ActionResponseRecord>? records;
+  Attributes? attributes;
 
-  ActionResponse({required Status status, Error? error, this.records})
+  ActionResponse({required Status status, Error? error, this.records, this.attributes})
     : super(status: status, error: error);
 
   factory ActionResponse.fromJson(Map<String, dynamic> json) {
     ActionResponse actionResponse = ActionResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
-      error: json['error'] != null ? Error.fromJson(json['error']) : null,
+      error: json['error'] != null ? Error.fromJson(json['error']) : null, attributes: json['attributes'],
     );
     if (json['records'] != null) {
       actionResponse.records =
@@ -34,6 +36,9 @@ class ActionResponse extends ApiResponse {
     }
     if (records != null) {
       data['records'] = records!.map((record) => record.toJson()).toList();
+    }
+    if (attributes != null) {
+      data['attributes'] = attributes!.toJson();
     }
     return data;
   }
