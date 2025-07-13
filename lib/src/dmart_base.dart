@@ -8,6 +8,10 @@ import 'package:dmart/src/exceptions.dart';
 import 'package:dmart/src/extensions/map_extension.dart';
 import 'package:http_parser/http_parser.dart';
 
+import 'models/request/confirm_otp_request.dart';
+import 'models/request/password_reset_request.dart';
+import 'models/request/send_otp_request.dart';
+
 /// Dmart class that has all the methods to interact with the Dmart server.
 class Dmart {
   /// The base url of the Dmart server.
@@ -166,6 +170,93 @@ class Dmart {
         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
+      return (ApiResponse.fromJson(response.data), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Requests an OTP for the given [SendOTPRequest].
+  static Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request) async {
+    try {
+      final response = await _dio.post(
+        '/user/otp-request',
+        data: request.toJson().withoutNulls(),
+        options: Options(headers: headers),
+      );
+      return (ApiResponse.fromJson(response.data), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Requests an OTP for login with the given [SendOTPRequest].
+  static Future<(ApiResponse?, Error?)> otpRequestLogin(SendOTPRequest request) async {
+    try {
+      final response = await _dio.post(
+        '/user/otp-request-login',
+        data: request.toJson().withoutNulls(),
+        options: Options(headers: headers),
+      );
+      return (ApiResponse.fromJson(response.data), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Requests a password reset with the given [PasswordResetRequest].
+  static Future<(ApiResponse?, Error?)> passwordResetRequest(PasswordResetRequest request) async {
+    try {
+      final response = await _dio.post(
+        '/user/password-reset-request',
+        data: request.toJson().withoutNulls(),
+        options: Options(headers: headers),
+      );
+      return (ApiResponse.fromJson(response.data), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Confirms OTP with the given [ConfirmOTPRequest].
+  static Future<(ApiResponse?, Error?)> confirmOTP(ConfirmOTPRequest request) async {
+    _isTokenNull();
+    try {
+      final response = await _dio.post(
+        '/user/otp-confirm',
+        data: request.toJson().withoutNulls(),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
+      );
+      return (ApiResponse.fromJson(response.data), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Resets a user with the given [shortname].
+  static Future<(ApiResponse?, Error?)> userReset(String shortname) async {
+    _isTokenNull();
+    try {
+      final response = await _dio.post(
+        '/user/reset',
+        data: {'shortname': shortname},
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
+      );
+      return (ApiResponse.fromJson(response.data), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Validates password for the authenticated user.
+  static Future<(ApiResponse?, Error?)> validatePassword(String password) async {
+    _isTokenNull();
+    try {
+      final response = await _dio.post(
+        '/user/validate_password',
+        data: {'password': password},
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
+      );
       return (ApiResponse.fromJson(response.data), null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));

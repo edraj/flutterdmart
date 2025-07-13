@@ -19,6 +19,12 @@ Methods:
 * `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
 * `Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
 * `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
+* `Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request)` - Sends an OTP request for authentication.
+* `Future<(ApiResponse?, Error?)> otpRequestLogin(SendOTPRequest request)` - Sends an OTP request for login.
+* `Future<(ApiResponse?, Error?)> passwordResetRequest(PasswordResetRequest request)` - Sends a password reset request.
+* `Future<(ApiResponse?, Error?)> confirmOTP(ConfirmOTPRequest request)` - Confirms the OTP for login or password reset.
+* `Future<(ApiResponse?, Error?)> userReset(String shortname)` - Resets a user's password.
+* `Future<(ApiResponse?, Error?)> validatePassword(String password)` - Validates the user's password.
 * `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
 * `Future<(ProfileResponse?, Error?)> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
 * `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
