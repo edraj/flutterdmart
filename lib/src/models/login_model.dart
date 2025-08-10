@@ -8,31 +8,31 @@ import 'package:dmart/src/models/status.dart';
 class LoginRequest {
   String? shortname;
   String? email;
+  String? invitation;
   String? msisdn;
-  String password;
+  String? password;
 
   LoginRequest({required this.shortname, required this.password});
 
   LoginRequest.withEmail({required this.email, required this.password});
 
+  LoginRequest.withInvitation({required this.shortname, required this.invitation});
+
   LoginRequest.withMSISDN({required this.msisdn, required this.password});
 
-  /// Converts the LoginRequest object to a JSON map.
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    if (shortname != null) {
-      data['shortname'] = shortname;
-    } else if (email != null) {
-      data['email'] = email;
-    } else if (msisdn != null) {
-      data['msisdn'] = msisdn;
-    }
-
-    data['password'] = password;
-
+    final data = <String, dynamic>{
+      'shortname': shortname,
+      'email': email,
+      'msisdn': msisdn,
+      'invitation': invitation,
+      'password': password,
+    };
+    data.removeWhere((key, value) => value == null);
     return data;
   }
 }
+
 
 class LoginResponse extends BaseResponse {
   String? token;
