@@ -90,6 +90,8 @@ class Dmart {
         return "application/octet-stream";
       case DmartContentType.ContentType.parquet:
         return "application/octet-stream";
+      case DmartContentType.ContentType.apk:
+        return "application/vnd.android.package-archive";
     }
   }
 
