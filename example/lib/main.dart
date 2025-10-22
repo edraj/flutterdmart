@@ -49,7 +49,7 @@ Future<void> main() async {
         ),
       ]);
 
-  var (respCreateSpace, _) = await Dmart.createSpace(createSpaceActionRequest);
+  // var (respCreateSpace, _) = await Dmart.createSpace(createSpaceActionRequest);
 
   // Get all users
   var (respQuery, _) = await Dmart.query(

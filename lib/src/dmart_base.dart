@@ -456,24 +456,24 @@ class Dmart {
     }
   }
 
-  /// Creates a space with the given [ActionRequest].
-  static Future<(ActionResponse?, Error?)> createSpace(
-    ActionRequest action,
-  ) async {
-    _isTokenNull();
-    try {
-      final response = await _dio.post(
-        '/managed/space',
-        data: action.toJson(),
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
-      );
-      return (ActionResponse.fromJson(response.data), null);
-    } on DioException catch (e) {
-      return (null, _returnExceptionError(e));
-    }
-  }
+  // /// Creates a space with the given [ActionRequest].
+  // static Future<(ActionResponse?, Error?)> createSpace(
+  //   ActionRequest action,
+  // ) async {
+  //   _isTokenNull();
+  //   try {
+  //     final response = await _dio.post(
+  //       '/managed/space',
+  //       data: action.toJson(),
+  //       options: Options(
+  //         headers: {...headers, "Authorization": "Bearer $token"},
+  //       ),
+  //     );
+  //     return (ActionResponse.fromJson(response.data), null);
+  //   } on DioException catch (e) {
+  //     return (null, _returnExceptionError(e));
+  //   }
+  // }
 
   /// Retrieves the spaces.
   static Future<(ActionResponse?, Error?)> getSpaces() async {
