@@ -10,6 +10,7 @@ class LoginRequest {
   String? email;
   String? otp;
   String? invitation;
+  String? firebaseToken;
   String? msisdn;
   String? password;
 
@@ -32,6 +33,7 @@ class LoginRequest {
       'shortname': shortname,
       'email': email,
       'msisdn': msisdn,
+      'firebase_token': firebaseToken,
       'otp': otp,
       'invitation': invitation,
       'password': password,
