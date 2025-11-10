@@ -8,23 +8,31 @@ import 'package:dmart/src/models/status.dart';
 class LoginRequest {
   String? shortname;
   String? email;
+  String? otp;
   String? invitation;
   String? msisdn;
   String? password;
 
   LoginRequest({required this.shortname, required this.password});
 
+  LoginRequest.withShortnameAndOTP({required this.shortname, required this.otp});
+
   LoginRequest.withEmail({required this.email, required this.password});
+
+  LoginRequest.withEmailAndOTP({required this.email, required this.otp});
 
   LoginRequest.withInvitation({required this.shortname, required this.invitation});
 
   LoginRequest.withMSISDN({required this.msisdn, required this.password});
+
+  LoginRequest.withMSISDNAndOTP({required this.msisdn, required this.otp});
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
       'shortname': shortname,
       'email': email,
       'msisdn': msisdn,
+      'otp': otp,
       'invitation': invitation,
       'password': password,
     };
