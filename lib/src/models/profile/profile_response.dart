@@ -56,6 +56,7 @@ class ProfileResponseRecordAttributes {
   final String? msisdn;
   final Displayname displayname;
   final String type;
+  final String? firebaseToken;
   final Language? language;
   final bool isEmailVerified;
   final bool isMsisdnVerified;
@@ -66,6 +67,7 @@ class ProfileResponseRecordAttributes {
   ProfileResponseRecordAttributes({
     this.email,
     this.msisdn,
+    this.firebaseToken,
     required this.displayname,
     required this.type,
     this.language,
@@ -80,6 +82,7 @@ class ProfileResponseRecordAttributes {
     return ProfileResponseRecordAttributes(
       email: json['email'],
       msisdn: json['msisdn'],
+      firebaseToken: json['firebase_token'],
       displayname: Displayname.fromJson(
         Map<String, dynamic>.from(json['displayname']),
       ),
@@ -101,6 +104,8 @@ class ProfileResponseRecordAttributes {
   Map<String, dynamic> toJson() {
     return {
       'email': email,
+      'msisdn': msisdn,
+      'firebase_token': firebaseToken,
       'displayname': displayname.toJson(),
       'type': type,
       'language': language.toString(),
