@@ -102,7 +102,7 @@ class ActionResponseAttachments {
   factory ActionResponseAttachments.fromJson(Map<String, dynamic> json) {
     return ActionResponseAttachments(
       media:
-          json['json'] != null
+          json['media'] != null
               ? (json['media'] as List<dynamic>?)
                   ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
                   .toList()
