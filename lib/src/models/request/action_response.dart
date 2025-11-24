@@ -9,8 +9,12 @@ class ActionResponse extends ApiResponse {
   List<ActionResponseRecord>? records;
   Attributes? attributes;
 
-  ActionResponse({required Status status, Error? error, this.records, this.attributes})
-    : super(status: status, error: error);
+  ActionResponse({
+    required Status status,
+    Error? error,
+    this.records,
+    this.attributes,
+  }) : super(status: status, error: error);
 
   factory ActionResponse.fromJson(Map<String, dynamic> json) {
     ActionResponse actionResponse = ActionResponse(
@@ -67,7 +71,9 @@ class ActionResponseRecord extends ResponseRecord {
       attributes: ResponseRecordAttributes.fromJson(json['attributes']),
     );
     if (json['attachments'] != null) {
-      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(json['attachments']);
+      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(
+        json['attachments'],
+      );
     }
     return actionResponseRecord;
   }
@@ -96,13 +102,17 @@ class ActionResponseAttachments {
   factory ActionResponseAttachments.fromJson(Map<String, dynamic> json) {
     return ActionResponseAttachments(
       media:
-          (json['media'] as List<dynamic>?)
-              ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
-              .toList(),
+          json['json'] != null
+              ? (json['media'] as List<dynamic>?)
+                  ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
+                  .toList()
+              : null,
       json:
-          (json['json'] as List<dynamic>?)
-              ?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord))
-              .toList(),
+          json['json'] != null
+              ? (json['json'] as List<dynamic>?)
+                  ?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord))
+                  .toList()
+              : null,
     );
   }
 
