@@ -33,16 +33,14 @@ class Payload {
   /// Converts a JSON object to a Payload object.
   factory Payload.fromJson(Map<String, dynamic> json) {
     Payload payload = Payload(
-      contentType: ContentType.values.byName(json['content_type']),
+      contentType: ContentType.byName(json['content_type']),
       schemaShortname: json['schema_shortname'],
       checksum: json['checksum'],
       body: json['body'],
       lastValidated: json['last_validated'],
     );
     if (json['validation_status'] != null) {
-      payload.validationStatus = ValidationStatus.values.byName(
-        json['validation_status'],
-      );
+      payload.validationStatus = ValidationStatus.values.byName(json['validation_status']);
     }
 
     return payload;
