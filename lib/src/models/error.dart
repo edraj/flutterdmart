@@ -1,10 +1,10 @@
 class Error {
-  String? type;
-  int? code;
-  String? message;
-  List<Map<String, dynamic>>? info;
+  final String? type;
+  final int? code;
+  final String? message;
+  final List<Map<String, dynamic>>? info;
 
-  Error({this.type, this.code, this.message, this.info});
+  const Error({this.type, this.code, this.message, this.info});
 
   factory Error.fromJson(Map<String, dynamic> json) {
     return Error(
