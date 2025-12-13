@@ -19,13 +19,11 @@ class ResponseRecord {
 
   factory ResponseRecord.fromJson(Map<String, dynamic> json) {
     return ResponseRecord(
-      resourceType: ResourceType.values.byName(json['resource_type']),
+      resourceType: ResourceType.byName(json['resource_type']),
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
-      attributes: ResponseRecordAttributes.fromJson(
-        Map<String, dynamic>.from(json['attributes']),
-      ),
+      attributes: ResponseRecordAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
     );
   }
 
@@ -63,29 +61,21 @@ class ResponseRecordAttributes {
   });
 
   factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
-    ResponseRecordAttributes responseRecordAttributes =
-        ResponseRecordAttributes(
-          isActive: json['is_active'],
-          tags: Set<String>.from(json['tags'] ?? []),
-          createdAt: json['created_at'],
-          updatedAt: json['updated_at'],
-          ownerShortname: json['owner_shortname'],
-          payload:
-              json['payload'] != null
-                  ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
-                  : null,
-        );
+    ResponseRecordAttributes responseRecordAttributes = ResponseRecordAttributes(
+      isActive: json['is_active'],
+      tags: Set<String>.from(json['tags'] ?? []),
+      createdAt: json['created_at'],
+      updatedAt: json['updated_at'],
+      ownerShortname: json['owner_shortname'],
+      payload: json['payload'] != null ? Payload.fromJson(Map<String, dynamic>.from(json['payload'])) : null,
+    );
 
     if (json['displayname'] != null) {
-      responseRecordAttributes.displayname = Translation.fromJson(
-        Map<String, dynamic>.from(json['displayname']),
-      );
+      responseRecordAttributes.displayname = Translation.fromJson(Map<String, dynamic>.from(json['displayname']));
     }
 
     if (json['description'] != null) {
-      responseRecordAttributes.description = Translation.fromJson(
-        Map<String, dynamic>.from(json['description'] ?? {}),
-      );
+      responseRecordAttributes.description = Translation.fromJson(Map<String, dynamic>.from(json['description'] ?? {}));
     }
 
     return responseRecordAttributes;

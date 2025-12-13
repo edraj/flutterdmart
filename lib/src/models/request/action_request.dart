@@ -12,19 +12,14 @@ class ActionRequest {
   /// The records to perform the action on.
   final List<ActionRequestRecord> records;
 
-  ActionRequest({
-    required this.spaceName,
-    required this.requestType,
-    required this.records,
-  });
+  ActionRequest({required this.spaceName, required this.requestType, required this.records});
 
   /// Converts the ActionRequest object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'space_name': spaceName,
       'request_type': requestType.name,
-      'records':
-          records.map((ActionRequestRecord record) => record.toJson()).toList(),
+      'records': records.map((ActionRequestRecord record) => record.toJson()).toList(),
     };
   }
 }
@@ -56,24 +51,16 @@ class ActionRequestRecord {
 
   factory ActionRequestRecord.fromJson(Map<String, dynamic> json) {
     return ActionRequestRecord(
-      resourceType: ResourceType.values.byName(json['resource_type']),
+      resourceType: ResourceType.byName(json['resource_type']),
       shortname: json['shortname'],
       subpath: json['subpath'],
       attributes: Map<String, dynamic>.from(json['attributes']),
-      attachments:
-          json['attachments'] != null
-              ? Map<ResourceType, List<dynamic>>.from(json['attachments'])
-              : null,
+      attachments: json['attachments'] != null ? Map<ResourceType, List<dynamic>>.from(json['attachments']) : null,
     );
   }
 
   /// Converts the ActionRequestRecord object to a JSON object.
   Map<String, dynamic> toJson() {
-    return {
-      "resource_type": resourceType.name,
-      "shortname": shortname,
-      "subpath": subpath,
-      "attributes": attributes,
-    };
+    return {"resource_type": resourceType.name, "shortname": shortname, "subpath": subpath, "attributes": attributes};
   }
 }

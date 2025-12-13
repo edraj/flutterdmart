@@ -24,13 +24,8 @@ class Permission {
   factory Permission.fromJson(Map<String, dynamic> json) {
     return Permission(
       allowedActions:
-          (json['allowed_actions'] as List<dynamic>)
-              .map((action) => ActionType.values.byName(action.toString()))
-              .toList(),
-      conditions:
-          (json['conditions'] as List<dynamic>)
-              .map((condition) => condition.toString())
-              .toList(),
+          (json['allowed_actions'] as List<dynamic>).map((action) => ActionType.byName(action.toString())).toList(),
+      conditions: (json['conditions'] as List<dynamic>).map((condition) => condition.toString()).toList(),
       restrictedFields: json['restricted_fields'],
       allowedFieldsValues: json['allowed_fields_values'],
     );

@@ -8,7 +8,7 @@ class BaseResponse {
   BaseResponse({this.status, this.records});
 
   BaseResponse.fromJson(Map<String, dynamic> json) {
-    status = Status.values.byName(json['status']);
+    status = Status.byName(json['status']);
     if (json['records'] != null) {
       records = <Record>[];
       json['records'].forEach((v) {

@@ -18,15 +18,15 @@ class ResponseEntry extends MetaExtended {
   final Map<String, dynamic>? attachments;
 
   ResponseEntry({
-    String? email,
-    String? msisdn,
-    bool? isEmailVerified,
-    bool? isMsisdnVerified,
-    bool? forcePasswordChange,
-    String? password,
-    bool? isOpen,
-    String? workflowShortname,
-    String? state,
+    super.email,
+    super.msisdn,
+    super.isEmailVerified,
+    super.isMsisdnVerified,
+    super.forcePasswordChange,
+    super.password,
+    super.isOpen,
+    super.workflowShortname,
+    super.state,
     required this.uuid,
     required this.shortname,
     required this.subpath,
@@ -40,17 +40,7 @@ class ResponseEntry extends MetaExtended {
     this.payload,
     this.acl,
     this.attachments,
-  }) : super(
-         email: email,
-         msisdn: msisdn,
-         isEmailVerified: isEmailVerified,
-         isMsisdnVerified: isMsisdnVerified,
-         forcePasswordChange: forcePasswordChange,
-         password: password,
-         workflowShortname: workflowShortname,
-         state: state,
-         isOpen: isOpen,
-       );
+  });
 
   factory ResponseEntry.fromJson(Map<String, dynamic> json) {
     print(json);
@@ -72,32 +62,23 @@ class ResponseEntry extends MetaExtended {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       ownerShortname: json['owner_shortname'],
-      payload:
-          json['payload'] != null
-              ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
-              : null,
+      payload: json['payload'] != null ? Payload.fromJson(Map<String, dynamic>.from(json['payload'])) : null,
       acl: json['acl'] != null ? (json['acl'] as List<dynamic>) : null,
-      attachments:
-          json['attachments'] != null
-              ? Map<String, dynamic>.from(json['attachments'])
-              : null,
+      attachments: json['attachments'] != null ? Map<String, dynamic>.from(json['attachments']) : null,
     );
 
     if (json['displayname'] != null) {
-      responseEntry.displayname = Translation.fromJson(
-        Map<String, dynamic>.from(json['displayname']),
-      );
+      responseEntry.displayname = Translation.fromJson(Map<String, dynamic>.from(json['displayname']));
     }
     if (json['description'] != null) {
-      responseEntry.description = Translation.fromJson(
-        Map<String, dynamic>.from(json['description']),
-      );
+      responseEntry.description = Translation.fromJson(Map<String, dynamic>.from(json['description']));
     }
 
     return responseEntry;
   }
 
   /// Converts the ResponseEntry object to a JSON object.
+  @override
   Map<String, dynamic> toJson() {
     return {
       'email': email,

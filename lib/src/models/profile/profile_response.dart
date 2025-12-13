@@ -9,8 +9,7 @@ import 'package:dmart/src/models/status.dart';
 class ProfileResponse extends ApiResponse {
   List<ProfileResponseRecord>? records;
 
-  ProfileResponse({required Status status, Error? error, this.records})
-    : super(status: status, error: error);
+  ProfileResponse({required super.status, super.error, this.records});
 
   factory ProfileResponse.fromJson(Map<String, dynamic> json) {
     ProfileResponse profileResponse = ProfileResponse(
@@ -19,9 +18,7 @@ class ProfileResponse extends ApiResponse {
     );
     if (json['records'] != null) {
       profileResponse.records =
-          (json['records'] as List<dynamic>)
-              .map((record) => ProfileResponseRecord.fromJson(record))
-              .toList();
+          (json['records'] as List<dynamic>).map((record) => ProfileResponseRecord.fromJson(record)).toList();
     }
     return profileResponse;
   }
@@ -41,12 +38,10 @@ class ProfileResponseRecord {
 
   factory ProfileResponseRecord.fromJson(Map<String, dynamic> json) {
     return ProfileResponseRecord(
-      resourceType: ResourceType.values.byName(json['resource_type']),
+      resourceType: ResourceType.byName(json['resource_type']),
       shortname: json['shortname'],
       subpath: json['subpath'],
-      attributes: ProfileResponseRecordAttributes.fromJson(
-        Map<String, dynamic>.from(json['attributes']),
-      ),
+      attributes: ProfileResponseRecordAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
     );
   }
 }
@@ -83,19 +78,15 @@ class ProfileResponseRecordAttributes {
       email: json['email'],
       msisdn: json['msisdn'],
       firebaseToken: json['firebase_token'],
-      displayname: Displayname.fromJson(
-        Map<String, dynamic>.from(json['displayname']),
-      ),
+      displayname: Displayname.fromJson(Map<String, dynamic>.from(json['displayname'])),
       type: json['type'],
-      language: Language.values.byName(json['language']),
+      language: Language.byName(json['language']),
       isEmailVerified: json['is_email_verified'],
       isMsisdnVerified: json['is_msisdn_verified'],
       forcePasswordChange: json['force_password_change'],
       payload: json['payload']?['body'],
       permissions: Map<String, Permission>.from(
-        json['permissions'].map(
-          (key, value) => MapEntry(key, Permission.fromJson(value)),
-        ),
+        json['permissions'].map((key, value) => MapEntry(key, Permission.fromJson(value))),
       ),
     );
   }
@@ -112,9 +103,7 @@ class ProfileResponseRecordAttributes {
       'is_email_verified': isEmailVerified,
       'is_msisdn_verified': isMsisdnVerified,
       'force_password_change': forcePasswordChange,
-      'permissions': permissions.map(
-        (key, value) => MapEntry(key, value.toJson()),
-      ),
+      'permissions': permissions.map((key, value) => MapEntry(key, value.toJson())),
     };
   }
 }

@@ -19,5 +19,7 @@ enum ResourceType {
   post,
   pluginWrapper,
   notification,
-  reaction,
+  reaction;
+
+  static ResourceType byName(String name) => ResourceType.values.byName(name);
 }

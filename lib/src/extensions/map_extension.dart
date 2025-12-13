@@ -1,3 +1,7 @@
+import 'package:dmart/src/dmart.dart';
+
+import '../../dmart.dart';
+
 extension MapExtension on Map<String, dynamic> {
   Map<String, dynamic> withoutNulls() {
     final map = this;
@@ -11,5 +15,16 @@ extension MapExtension on Map<String, dynamic> {
       }
     });
     return newMap;
+  }
+}
+
+extension AttachementExtension on ActionResponseAttachments {
+  String? getUrl({
+    required String type,
+    String scope = "managed",
+    required String entitySubpath,
+    required String shortname,
+  }) {
+    return "${Dmart.dio?.options.baseUrl}/$scope/payload/media/$type/$entitySubpath/$shortname/${media?.first.attributes.payload?.body}";
   }
 }

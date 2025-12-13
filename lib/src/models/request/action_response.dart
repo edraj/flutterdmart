@@ -9,12 +9,7 @@ class ActionResponse extends ApiResponse {
   List<ActionResponseRecord>? records;
   Attributes? attributes;
 
-  ActionResponse({
-    required Status status,
-    Error? error,
-    this.records,
-    this.attributes,
-  }) : super(status: status, error: error);
+  ActionResponse({required super.status, super.error, this.records, this.attributes});
 
   factory ActionResponse.fromJson(Map<String, dynamic> json) {
     ActionResponse actionResponse = ActionResponse(
@@ -23,9 +18,7 @@ class ActionResponse extends ApiResponse {
     );
     if (json['records'] != null) {
       actionResponse.records =
-          (json['records'] as List<dynamic>)
-              .map((record) => ActionResponseRecord.fromJson(record))
-              .toList();
+          (json['records'] as List<dynamic>).map((record) => ActionResponseRecord.fromJson(record)).toList();
     }
     if (json['attributes'] != null) {
       actionResponse.attributes = Attributes.fromJson(json['attributes']);
@@ -35,6 +28,7 @@ class ActionResponse extends ApiResponse {
   }
 
   /// Converts the ActionResponse object to a JSON object.
+  @override
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['status'] = status.name;
@@ -64,21 +58,20 @@ class ActionResponseRecord extends ResponseRecord {
 
   factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
     var actionResponseRecord = ActionResponseRecord(
-      resourceType: ResourceType.values.byName(json['resource_type']),
+      resourceType: ResourceType.byName(json['resource_type']),
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
       attributes: ResponseRecordAttributes.fromJson(json['attributes']),
     );
     if (json['attachments'] != null) {
-      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(
-        json['attachments'],
-      );
+      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(json['attachments']);
     }
     return actionResponseRecord;
   }
 
   /// Converts the ActionResponseRecord object to a JSON object.
+  @override
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['resource_type'] = resourceType.name;
@@ -103,15 +96,11 @@ class ActionResponseAttachments {
     return ActionResponseAttachments(
       media:
           json['media'] != null
-              ? (json['media'] as List<dynamic>?)
-                  ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
-                  .toList()
+              ? (json['media'] as List<dynamic>?)?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord)).toList()
               : null,
       json:
           json['json'] != null
-              ? (json['json'] as List<dynamic>?)
-                  ?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord))
-                  .toList()
+              ? (json['json'] as List<dynamic>?)?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord)).toList()
               : null,
     );
   }

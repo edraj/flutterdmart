@@ -40,7 +40,7 @@ class Payload {
       lastValidated: json['last_validated'],
     );
     if (json['validation_status'] != null) {
-      payload.validationStatus = ValidationStatus.values.byName(json['validation_status']);
+      payload.validationStatus = ValidationStatus.byName(json['validation_status']);
     }
 
     return payload;

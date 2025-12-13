@@ -82,7 +82,7 @@ class QueryRequest {
   /// Converts the QueryRequest object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
-      'type': queryType.toString().split('.').last,
+      'type': queryType.string,
       'space_name': spaceName,
       'subpath': subpath,
       'filter_types': filterTypes?.map((type) => type.toString().split('.').last).toList(),

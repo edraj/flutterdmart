@@ -6,5 +6,7 @@ enum ActionType {
   delete,
   attach,
   move,
-  progressTicket,
+  progressTicket;
+
+  static ActionType byName(String name) => ActionType.values.byName(name);
 }

@@ -8,5 +8,9 @@ enum QueryType {
   counters,
   reports,
   attachments,
-  attachments_aggregation,
+  attachmentsAggregation;
+
+  String get string => this == attachmentsAggregation ? "attachments_aggregation" : name;
+
+  static QueryType byName(String name) => QueryType.values.byName(name);
 }

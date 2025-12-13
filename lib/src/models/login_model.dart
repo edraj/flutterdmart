@@ -43,7 +43,6 @@ class LoginRequest {
   }
 }
 
-
 class LoginResponse extends BaseResponse {
   String? token;
   UserType? type;
@@ -54,7 +53,7 @@ class LoginResponse extends BaseResponse {
 
   /// Converts the LoginResponse object to a JSON map.
   LoginResponse.fromJson(Map<String, dynamic> json) {
-    status = Status.values.byName(json['status']);
+    status = Status.byName(json['status']);
     if (status == Status.failed) {
       error = Error.fromJson(json['error']);
       return;
@@ -65,17 +64,15 @@ class LoginResponse extends BaseResponse {
       records?.add(record);
       LoginAttributes? attribute = LoginAttributes.fromJson(record.attributes);
       token = attribute.accessToken;
-      type = UserType.values.byName(attribute.type ?? 'web');
+      type = UserType.byName(attribute.type ?? 'web');
       displayname = attribute.displayname;
     }
   }
 
   /// Converts the LoginResponse object to a JSON map.
+  @override
   Map<String, dynamic> toJson() {
-    return {
-      'status': status?.name,
-      'records': records?.map((record) => record.toJson()).toList(),
-    };
+    return {'status': status?.name, 'records': records?.map((record) => record.toJson()).toList()};
   }
 }
 
@@ -90,18 +87,11 @@ class LoginAttributes {
   LoginAttributes.fromJson(Map<String, dynamic> json) {
     accessToken = json['access_token'];
     type = json['type'];
-    displayname =
-        json['displayname'] != null
-            ? Displayname.fromJson(json['displayname'])
-            : null;
+    displayname = json['displayname'] != null ? Displayname.fromJson(json['displayname']) : null;
   }
 
   /// Converts the LoginAttributes object to a JSON map.
   Map<String, dynamic> toJson() {
-    return {
-      'access_token': accessToken,
-      'type': type,
-      'displayname': displayname?.toJson(),
-    };
+    return {'access_token': accessToken, 'type': type, 'displayname': displayname?.toJson()};
   }
 }

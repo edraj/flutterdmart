@@ -7,24 +7,14 @@ class ApiQueryResponse extends ApiResponse {
   final List<ResponseRecord> records;
   final ApiQueryResponseAttributes attributes;
 
-  ApiQueryResponse({
-    required Status status,
-    Error? error,
-    required this.records,
-    required this.attributes,
-  }) : super(status: status, error: error);
+  ApiQueryResponse({required super.status, super.error, required this.records, required this.attributes});
 
   factory ApiQueryResponse.fromJson(Map<String, dynamic> json) {
     return ApiQueryResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
       error: json['error'] != null ? Error.fromJson(json['error']) : null,
-      records:
-          (json['records'] as List<dynamic>)
-              .map((record) => ResponseRecord.fromJson(record))
-              .toList(),
-      attributes: ApiQueryResponseAttributes.fromJson(
-        Map<String, dynamic>.from(json['attributes']),
-      ),
+      records: (json['records'] as List<dynamic>).map((record) => ResponseRecord.fromJson(record)).toList(),
+      attributes: ApiQueryResponseAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
     );
   }
 
@@ -50,17 +40,11 @@ class ApiQueryResponseAttributes {
   ApiQueryResponseAttributes({required this.total, required this.returned});
 
   factory ApiQueryResponseAttributes.fromJson(Map<String, dynamic> json) {
-    return ApiQueryResponseAttributes(
-      total: json['total'],
-      returned: json['returned'],
-    );
+    return ApiQueryResponseAttributes(total: json['total'], returned: json['returned']);
   }
 
   /// Converts the ApiQueryResponseAttributes object to a JSON object.
   Map<String, dynamic> toJson() {
-    return {
-      'total': total,
-      'returned': returned,
-    };
+    return {'total': total, 'returned': returned};
   }
 }

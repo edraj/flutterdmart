@@ -8,6 +8,7 @@ class Translation {
   factory Translation.fromJson(Map<String, dynamic> json) {
     return Translation(ar: json['ar'], en: json['en'], ku: json['ku']);
   }
+
   /// Converts the request to a JSON object.
   Map<String, dynamic> toJson() {
     return {'ar': ar, 'en': en, 'ku': ku};
