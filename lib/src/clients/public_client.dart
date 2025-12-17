@@ -1,5 +1,6 @@
 import 'package:dmart/src/clients/base_client.dart';
 import '../../dmart.dart';
+import '../enums/scope.dart';
 import '../extensions/map_extension.dart';
 import '../models/request/password_reset_request.dart';
 import '../models/request/send_otp_request.dart';
@@ -60,9 +61,10 @@ class DmartPublicApi extends DmartHttpClient {
     String subpath,
     String? resourceType,
     String? workflowShortname,
-    Map<String, dynamic> record,
-  ) {
-    var url = '/public/submit/$spaceName';
+    Map<String, dynamic> record, {
+    Scope scope = Scope.public,
+  }) {
+    var url = '/${scope.name}/submit/$spaceName';
     if (resourceType != null) url += '/$resourceType';
     if (workflowShortname != null) url += '/$workflowShortname';
     url += '/$schemaShortname/$subpath';
@@ -70,13 +72,13 @@ class DmartPublicApi extends DmartHttpClient {
     return execute(() => dio.post(url, data: record, options: buildOptions()), (data) => ActionResponse.fromJson(data));
   }
 
-  Future<ActionResponse> query(QueryRequest query, {Map<String, dynamic>? extra}) {
+  Future<ActionResponse> query(QueryRequest query, {Map<String, dynamic>? extra, Scope scope = Scope.public}) {
     query.sortType = query.sortType ?? SortyType.ascending;
     query.sortBy = query.sortBy ?? 'created_at';
     query.subpath = query.subpath.replaceAll(RegExp(r'/+'), '/');
 
     return execute(
-      () => dio.post('/public/query', data: query.toJson(), options: buildOptions().copyWith(extra: extra)),
+      () => dio.post('/${scope.name}/query', data: query.toJson(), options: buildOptions().copyWith(extra: extra)),
       (data) => ActionResponse.fromJson(data),
     );
   }

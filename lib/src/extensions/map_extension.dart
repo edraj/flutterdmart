@@ -22,6 +22,7 @@ extension AttachementExtension on ActionResponseAttachments {
   String? getUrl({
     required String type,
     String scope = "managed",
+    // {Scope scope = Scope.public}
     required String entitySubpath,
     required String shortname,
   }) {

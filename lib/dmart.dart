@@ -40,3 +40,9 @@ export 'src/models/status.dart';
 export 'src/models/translation.dart';
 
 // TODO: Export any libraries intended for clients of this package.
+
+
+// public or managed
+// attachments urls, thumbnail. etc
+// One class
+// Nested models

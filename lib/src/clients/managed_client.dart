@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:dmart/src/clients/base_client.dart';
 import 'package:http_parser/http_parser.dart';
 import '../../dmart.dart';
+import '../enums/scope.dart';
 import '../extensions/map_extension.dart';
 import '../models/request/confirm_otp_request.dart';
 
@@ -64,28 +65,28 @@ class DmartManagedApi extends DmartHttpClient {
     );
   }
 
-  Future<ActionResponse> query(QueryRequest query, {String scope = "managed", Map<String, dynamic>? extra}) {
+  Future<ActionResponse> query(QueryRequest query, {Scope scope = Scope.public, Map<String, dynamic>? extra}) {
     query.sortType = query.sortType ?? SortyType.ascending;
     query.sortBy = query.sortBy ?? 'created_at';
     query.subpath = query.subpath.replaceAll(RegExp(r'/+'), '/');
 
     return execute(
-      () => dio.post('/$scope/query', data: query.toJson(), options: _buildAuthOptions().copyWith(extra: extra)),
+      () => dio.post('/${scope.name}/query', data: query.toJson(), options: _buildAuthOptions().copyWith(extra: extra)),
       (data) => ActionResponse.fromJson(data),
     );
   }
 
-  Future<ActionResponse> request(ActionRequest action) {
+  Future<ActionResponse> request(ActionRequest action, {Scope scope = Scope.public}) {
     return execute(
-      () => dio.post('/managed/request', data: action.toJson(), options: _buildAuthOptions()),
+      () => dio.post('/${scope.name}/request', data: action.toJson(), options: _buildAuthOptions()),
       (data) => ActionResponse.fromJson(data),
     );
   }
 
-  Future<ResponseEntry> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"}) {
+  Future<ResponseEntry> retrieveEntry(RetrieveEntryRequest request, {Scope scope = Scope.public}) {
     String subpath = request.subpath == "/" ? "__root__" : request.subpath;
 
-    final url = '/$scope/entry/${request.resourceType.name}/${request.spaceName}/$subpath/${request.shortname}'
+    final url = '/${scope.name}/entry/${request.resourceType.name}/${request.spaceName}/$subpath/${request.shortname}'
             '?retrieve_json_payload=${request.retrieveJsonPayload}'
             '&retrieve_attachments=${request.retrieveAttachments}'
             '&validate_schema=${request.validateSchema}'
@@ -100,7 +101,7 @@ class DmartManagedApi extends DmartHttpClient {
     );
   }
 
-  Future<dynamic> getPayload(GetPayloadRequest request, {String scope = "managed"}) {
+  Future<dynamic> getPayload(GetPayloadRequest request, {Scope scope = Scope.public}) {
     return execute(
       () => dio.get(
         '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.schemaShortname}${request.ext}',
@@ -110,10 +111,10 @@ class DmartManagedApi extends DmartHttpClient {
     );
   }
 
-  Future<ApiQueryResponse> progressTicket(ProgressTicketRequest request) {
+  Future<ApiQueryResponse> progressTicket(ProgressTicketRequest request, {Scope scope = Scope.public}) {
     return execute(
       () => dio.put(
-        '/managed/progress-ticket/${request.spaceName}/${request.subpath}/${request.shortname}/${request.action}',
+        '/${scope.name}/progress-ticket/${request.spaceName}/${request.subpath}/${request.shortname}/${request.action}',
         data: {'resolution': request.resolution, 'comment': request.comment},
         options: _buildAuthOptions(),
       ),
@@ -130,7 +131,7 @@ class DmartManagedApi extends DmartHttpClient {
     ContentType contentType = ContentType.image,
     String resourceType = "media",
     bool isActive = true,
-    String scope = "managed",
+    Scope scope = Scope.public,
   }) async {
     Map<String, dynamic> payloadData = {
       'resource_type': resourceType,
@@ -159,7 +160,7 @@ class DmartManagedApi extends DmartHttpClient {
 
     return execute(
       () => dio.post(
-        '/$scope/resource_with_payload',
+        '/${scope.name}/resource_with_payload',
         data: formData,
         options: Options(
           contentType: 'multipart/form-data',

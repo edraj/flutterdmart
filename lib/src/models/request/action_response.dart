@@ -92,6 +92,20 @@ class ActionResponseAttachments {
 
   ActionResponseAttachments({required this.media, required this.json});
 
+  List<String> get AttachmentsUrls {
+    return [];
+  }
+  //   extension AttachementExtension on ActionResponseAttachments {
+  //   String? getUrl({
+  //     required String type,
+  //     String scope = "managed",
+  //     required String entitySubpath,
+  //     required String shortname,
+  //   }) {
+  //     return "${Dmart.dio?.options.baseUrl}/$scope/payload/media/$type/$entitySubpath/$shortname/${media?.first.attributes.payload?.body}";
+  //   }
+  // }
+
   factory ActionResponseAttachments.fromJson(Map<String, dynamic> json) {
     return ActionResponseAttachments(
       media:
