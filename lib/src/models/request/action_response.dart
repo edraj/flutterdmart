@@ -5,6 +5,9 @@ import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/query/response_record.dart';
 import 'package:dmart/src/models/status.dart';
 
+import '../../dmart.dart';
+import '../../enums/scope.dart';
+
 class ActionResponse extends ApiResponse {
   List<ActionResponseRecord>? records;
   Attributes? attributes;
@@ -55,6 +58,45 @@ class ActionResponseRecord extends ResponseRecord {
     required super.subpath,
     required super.attributes,
   });
+
+  bool get hasAttachment {
+    if (attachments == null) return false;
+    if (attachments!.media == null) return false;
+    if (attachments!.media!.isEmpty) return false;
+    return true;
+  }
+
+  List<String> attachmentsUrls({required String spaceName, Scope scope = Scope.public}) {
+    final List<ResponseRecord>? mediaBody = attachments?.media;
+
+    if (mediaBody == null) return [];
+    List<String> urlList = [];
+    String baseUrl = Dmart.dio?.options.baseUrl ?? Dmart.config!.baseUrl;
+
+    for (var media in mediaBody) {
+      String url =
+          "$baseUrl/${scope.name}/payload/media/$spaceName/$subpath/$shortname/${media.attributes.payload!.body}";
+      urlList.add(url);
+    }
+
+    return urlList;
+  }
+
+  String? getAttachementByShortname({
+    required String shortname,
+    required String spaceName,
+    Scope scope = Scope.public,
+  }) {
+    final List<ResponseRecord>? mediaBody = attachments?.media;
+
+    if (mediaBody == null) return null;
+
+    String baseUrl = Dmart.dio?.options.baseUrl ?? Dmart.config!.baseUrl;
+
+    ResponseRecord med = mediaBody.firstWhere((element) => element.shortname == shortname);
+
+    return "$baseUrl/${scope.name}/payload/media/$spaceName/$subpath/$shortname/${med.attributes.payload!.body}";
+  }
 
   factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
     var actionResponseRecord = ActionResponseRecord(

@@ -71,15 +71,4 @@ class DmartPublicApi extends DmartHttpClient {
 
     return execute(() => dio.post(url, data: record, options: buildOptions()), (data) => ActionResponse.fromJson(data));
   }
-
-  Future<ActionResponse> query(QueryRequest query, {Map<String, dynamic>? extra, Scope scope = Scope.public}) {
-    query.sortType = query.sortType ?? SortyType.ascending;
-    query.sortBy = query.sortBy ?? 'created_at';
-    query.subpath = query.subpath.replaceAll(RegExp(r'/+'), '/');
-
-    return execute(
-      () => dio.post('/${scope.name}/query', data: query.toJson(), options: buildOptions().copyWith(extra: extra)),
-      (data) => ActionResponse.fromJson(data),
-    );
-  }
 }
