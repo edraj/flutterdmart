@@ -71,7 +71,7 @@ class ActionResponseRecord extends ResponseRecord {
 
     if (mediaBody == null) return [];
     List<String> urlList = [];
-    String baseUrl = Dmart.dio?.options.baseUrl ?? Dmart.config!.baseUrl;
+    String baseUrl = Dmart.dio.options.baseUrl;
 
     for (var media in mediaBody) {
       String url =
@@ -91,7 +91,7 @@ class ActionResponseRecord extends ResponseRecord {
 
     if (mediaBody == null) return null;
 
-    String baseUrl = Dmart.dio?.options.baseUrl ?? Dmart.config!.baseUrl;
+    String baseUrl = Dmart.dio.options.baseUrl;
 
     ResponseRecord med = mediaBody.firstWhere((element) => element.shortname == shortname);
 
@@ -133,20 +133,6 @@ class ActionResponseAttachments {
   final List<ResponseRecord>? json;
 
   ActionResponseAttachments({required this.media, required this.json});
-
-  List<String> get AttachmentsUrls {
-    return [];
-  }
-  //   extension AttachementExtension on ActionResponseAttachments {
-  //   String? getUrl({
-  //     required String type,
-  //     String scope = "managed",
-  //     required String entitySubpath,
-  //     required String shortname,
-  //   }) {
-  //     return "${Dmart.dio?.options.baseUrl}/$scope/payload/media/$type/$entitySubpath/$shortname/${media?.first.attributes.payload?.body}";
-  //   }
-  // }
 
   factory ActionResponseAttachments.fromJson(Map<String, dynamic> json) {
     return ActionResponseAttachments(

@@ -26,6 +26,6 @@ extension AttachementExtension on ActionResponseAttachments {
     required String entitySubpath,
     required String shortname,
   }) {
-    return "${Dmart.dio?.options.baseUrl}/$scope/payload/media/$type/$entitySubpath/$shortname/${media?.first.attributes.payload?.body}";
+    return "${Dmart.dio.options.baseUrl}/$scope/payload/media/$type/$entitySubpath/$shortname/${media?.first.attributes.payload?.body}";
   }
 }
