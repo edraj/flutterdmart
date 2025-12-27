@@ -1,539 +1,343 @@
-// import 'dart:convert';
-// import 'dart:io';
+import 'dart:convert';
+import 'dart:io';
 
-// import 'package:dio/dio.dart';
-// import 'package:dmart/dmart.dart';
-// import 'package:dmart/src/enums/content_type.dart' as DmartContentType;
-// import 'package:dmart/src/exceptions.dart';
-// import 'package:dmart/src/extensions/map_extension.dart';
-// import 'package:http_parser/http_parser.dart';
+import 'package:dio/dio.dart';
+import 'package:dmart/src/exceptions.dart';
+import 'package:http_parser/http_parser.dart';
 
-// import 'models/request/confirm_otp_request.dart';
-// import 'models/request/password_reset_request.dart';
-// import 'models/request/send_otp_request.dart';
+import '../dmart.dart';
+import 'enums/scope.dart';
+import 'extensions/map_extension.dart';
+import 'models/request/confirm_otp_request.dart';
+import 'models/request/password_reset_request.dart';
+import 'models/request/send_otp_request.dart';
 
-// /// Dmart class that has all the methods to interact with the Dmart server.
-// class Dmart {
-//   /// The base url of the Dmart server.
-//   static String dmartServerUrl = "localhost:8282";
+/// Configuration for Dmart client
+class DmartConfig {
+  final String baseUrl;
+  final Duration connectTimeout;
+  final Duration receiveTimeout;
+  final Duration sendTimeout;
+  final bool verbose;
+  final Map<String, dynamic>? headers;
+  final Iterable<Interceptor> interceptors;
 
-//   /// The token that is used for authentication.
-//   static String? token;
+  const DmartConfig({
+    this.baseUrl = "localhost:8282",
+    this.connectTimeout = const Duration(seconds: 30),
+    this.receiveTimeout = const Duration(seconds: 30),
+    this.sendTimeout = const Duration(seconds: 30),
+    this.interceptors = const [],
+    this.verbose = false,
+    this.headers,
+  });
+}
 
-//   /// The instance of the Dio class.
-//   static Dio? _dioInstance;
+/// Main Dmart client (Singleton)
+class Dmart {
+  Dmart._();
 
-//   /// The instance of the Dio class.
-//   static Dio get _dio {
-//     if (_dioInstance == null) {
-//       throw DmartException(
-//         DmartExceptionEnum.NOT_INITIALIZED,
-//         DmartExceptionMessages.messages[DmartExceptionEnum.NOT_INITIALIZED]!,
-//       );
-//     }
-//     return _dioInstance!;
-//   }
+  static final Dmart _instance = Dmart._();
 
-//   static final Map<String, dynamic> headers = {"content-type": "application/json"};
+  late Dio _dio;
+  late DmartConfig _config;
+  String? _token;
 
-//   static DmartError _returnExceptionDmartError(DioException e) {
-//     if (e.response?.data?["error"] != null) {
-//       return DmartError.fromJson(e.response?.data["error"]);
-//     }
+  static Dio get dio {
+    _ensureInitialized();
+    return _instance._dio;
+  }
 
-//     return DmartError(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
-//   }
+  static DmartConfig get config => _instance._config;
+  static bool get isAuthenticated => _instance._token != null;
+  static String? get token {
+    _ensureAuthenticated();
+    return _instance._token;
+  }
 
-//   static void _isTokenNull() {
-//     if (token == null) {
-//       throw DmartException(
-//         DmartExceptionEnum.NOT_VALID_TOKEN,
-//         DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!,
-//       );
-//     }
-//   }
+  static void init({Dio? dio, DmartConfig configuration = const DmartConfig()}) {
+    _instance._config = configuration;
 
-//   /// Initializes the Dmart class with the base url of the Dmart server.
-//   /// `dio` is used to override the default instance of Dio.
-//   /// `dioConfig` is used to override the default configuration of Dio.
-//   /// `interceptors` is used to override the default interceptors of Dio.
-//   /// `isDioVerbose` is used to enable the verbose mode of Dio.
-//   static void initDmart({
-//     Dio? dio,
-//     BaseOptions? dioConfig,
-//     Iterable<Interceptor> interceptors = const [],
-//     bool isDioVerbose = false,
-//   }) async {
-//     if (dio != null) {
-//       _dioInstance = dio;
-//       dmartServerUrl = dio.options.baseUrl;
-//       if (dioConfig != null) {
-//         print('[WARNING] setting dioConfig will be ignored as dio is provided!');
-//       }
-//     } else {
-//       dioConfig ??= BaseOptions(
-//         baseUrl: dmartServerUrl,
-//         connectTimeout: const Duration(seconds: 30),
-//         receiveTimeout: const Duration(seconds: 30),
-//       );
+    final dioInstance =
+        dio ??
+        Dio(
+          BaseOptions(
+            baseUrl: _instance._config.baseUrl,
+            connectTimeout: _instance._config.connectTimeout,
+            receiveTimeout: _instance._config.receiveTimeout,
+          ),
+        );
 
-//       _dioInstance = Dio(dioConfig);
-//     }
+    if (_instance._config.verbose) {
+      dioInstance.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          requestHeader: true,
+          responseBody: true,
+          responseHeader: true,
+          logPrint: (o) => print(o),
+        ),
+      );
+    }
 
-//     if (isDioVerbose) {
-//       _dioInstance?.interceptors.add(
-//         LogInterceptor(requestBody: true, requestHeader: true, responseBody: true, responseHeader: true),
-//       );
-//       _dioInstance?.interceptors.add(LogInterceptor(logPrint: (o) => print(o.toString())));
-//     }
+    dioInstance.interceptors.addAll(_instance._config.interceptors);
+    _instance._dio = dioInstance;
+  }
 
-//     _dioInstance?.interceptors.addAll(interceptors);
-//   }
+  static void setToken(String token) => _instance._token = token;
 
-//   static Future<(dynamic, DmartError?)> checkExisting(CheckExistingParams params) async {
-//     try {
-//       final response = await Dmart._dio.get(
-//         '/user/check-existing',
-//         queryParameters: params.toQueryParams().withoutNulls(),
-//         options: Options(headers: headers),
-//       );
-//       return (response.data, null);
-//     } on DioException catch (e) {
-//       return (null, Dmart._returnExceptionDmartError(e));
-//     }
-//   }
+  static void clearToken() => _instance._token = null;
 
-//   /// Logs in the user with the given [loginRequest].
-//   static Future<(LoginResponse?, DmartError?)> login(LoginRequest loginRequest) async {
-//     try {
-//       final response = await _dio.post('/user/login', data: loginRequest.toJson(), options: Options(headers: headers));
-//       var loginResponse = LoginResponse.fromJson(response.data);
-//       token = loginResponse.token;
-//       return (loginResponse, null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  // ==================== Public Endpoints ====================
 
-//   /// Creates a user with the given [createUserRequest].
-//   static Future<(CreateUserResponse?, DmartError?)> createUser(CreateUserRequest createUserRequest) async {
-//     try {
-//       final response = await _dio.post(
-//         '/user/create',
-//         data: createUserRequest.toJson().withoutNulls(),
-//         options: Options(headers: headers),
-//       );
-//       return (CreateUserResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<dynamic> checkExisting(CheckExistingParams params) => _execute(
+    () => dio.get(
+      '/user/check-existing',
+      queryParameters: params.toQueryParams().withoutNulls(),
+      options: _buildOptions(Scope.public),
+    ),
+    (data) => data,
+  );
 
-//   /// Logs out the user.
-//   static Future<(ApiResponse?, DmartError?)> logout() async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.post(
-//         '/user/logout',
-//         data: {},
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
+  static Future<LoginResponse> login(LoginRequest request) => _execute(
+    () => dio.post('/user/login', data: request.toJson(), options: _buildOptions(Scope.public)),
+    (data) => LoginResponse.fromJson(data),
+  );
 
-//       return (ApiResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<CreateUserResponse> createUser(CreateUserRequest request) => _execute(
+    () => dio.post('/user/create', data: request.toJson().withoutNulls(), options: _buildOptions(Scope.public)),
+    (data) => CreateUserResponse.fromJson(data),
+  );
 
-//   /// Requests an OTP for the given [SendOTPRequest].
-//   static Future<(ApiResponse?, DmartError?)> otpRequest(SendOTPRequest request) async {
-//     try {
-//       final response = await _dio.post(
-//         '/user/otp-request',
-//         data: request.toJson().withoutNulls(),
-//         options: Options(headers: headers),
-//       );
-//       return (ApiResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ApiResponse> otpRequest(SendOTPRequest request) => _execute(
+    () => dio.post('/user/otp-request', data: request.toJson().withoutNulls(), options: _buildOptions(Scope.public)),
+    (data) => ApiResponse.fromJson(data),
+  );
 
-//   /// Requests an OTP for login with the given [SendOTPRequest].
-//   static Future<(ApiResponse?, DmartError?)> otpRequestLogin(SendOTPRequest request) async {
-//     try {
-//       final response = await _dio.post(
-//         '/user/otp-request-login',
-//         data: request.toJson().withoutNulls(),
-//         options: Options(headers: headers),
-//       );
-//       return (ApiResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ApiResponse> otpRequestLogin(SendOTPRequest request) => _execute(
+    () => dio.post(
+      '/user/otp-request-login',
+      data: request.toJson().withoutNulls(),
+      options: _buildOptions(Scope.public),
+    ),
+    (data) => ApiResponse.fromJson(data),
+  );
 
-//   /// Requests a password reset with the given [PasswordResetRequest].
-//   static Future<(ApiResponse?, DmartError?)> passwordResetRequest(PasswordResetRequest request) async {
-//     try {
-//       final response = await _dio.post(
-//         '/user/password-reset-request',
-//         data: request.toJson().withoutNulls(),
-//         options: Options(headers: headers),
-//       );
-//       return (ApiResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ApiResponse> passwordResetRequest(PasswordResetRequest request) => _execute(
+    () => dio.post(
+      '/user/password-reset-request',
+      data: request.toJson().withoutNulls(),
+      options: _buildOptions(Scope.public),
+    ),
+    (data) => ApiResponse.fromJson(data),
+  );
 
-//   /// Confirms OTP with the given [ConfirmOTPRequest].
-//   static Future<(ApiResponse?, DmartError?)> confirmOTP(ConfirmOTPRequest request) async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.post(
-//         '/user/otp-confirm',
-//         data: request.toJson().withoutNulls(),
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
-//       return (ApiResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ActionResponse<T>> submit<T>(
+    String spaceName,
+    String schemaShortname,
+    String subpath,
+    String? resourceType,
+    String? workflowShortname,
+    Map<String, dynamic> record, {
+    Scope scope = Scope.public,
+    T Function(dynamic)? parser,
+  }) {
+    String url =
+        '/${[scope.name, 'submit', spaceName, if (resourceType != null) resourceType, if (workflowShortname != null) workflowShortname, schemaShortname, subpath].join('/')}';
+    return _execute(
+      () => dio.post(url, data: record, options: _buildOptions(scope)),
+      (data) => ActionResponse<T>.fromJson(data, parser),
+    );
+  }
 
-//   /// Resets a user with the given [shortname].
-//   static Future<(ApiResponse?, DmartError?)> userReset(String shortname) async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.post(
-//         '/user/reset',
-//         data: {'shortname': shortname},
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
-//       return (ApiResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  // ==================== Managed Endpoints ====================
 
-//   /// Validates password for the authenticated user.
-//   static Future<(ApiResponse?, DmartError?)> validatePassword(String password) async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.post(
-//         '/user/validate_password',
-//         data: {'password': password},
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
-//       return (ApiResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ApiResponse> logout() => _execute(
+    () => dio.post('/user/logout', data: {}, options: _buildOptions(Scope.managed)),
+    (data) => ApiResponse.fromJson(data),
+  );
 
-//   /// Retrieves the profile of the user.
-//   static Future<(ProfileResponse?, DmartError?)> getProfile() async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.get(
-//         '/user/profile',
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
+  static Future<ApiResponse> confirmOTP(ConfirmOTPRequest request) => _execute(
+    () => dio.post('/user/otp-confirm', data: request.toJson().withoutNulls(), options: _buildOptions(Scope.managed)),
+    (data) => ApiResponse.fromJson(data),
+  );
 
-//       final profileResponse = ProfileResponse.fromJson(response.data);
-//       if (profileResponse.status == Status.success &&
-//           profileResponse.records != null &&
-//           profileResponse.records!.isNotEmpty) {
-//         return (profileResponse, null);
-//       }
+  static Future<ApiResponse> userReset(String shortname) => _execute(
+    () => dio.post('/user/reset', data: {'shortname': shortname}, options: _buildOptions(Scope.managed)),
+    (data) => ApiResponse.fromJson(data),
+  );
 
-//       return (
-//         null,
-//         DmartError(
-//           type: 'unknown',
-//           code: 0,
-//           info: [profileResponse.error?.toJson() ?? {}],
-//           message: "Unable to retrieve the profile.",
-//         ),
-//       );
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ApiResponse> validatePassword(String password) => _execute(
+    () => dio.post('/user/validate_password', data: {'password': password}, options: _buildOptions(Scope.managed)),
+    (data) => ApiResponse.fromJson(data),
+  );
 
-//   /// Update the profile of the user.
-//   static Future<(ProfileResponse?, DmartError?)> updateProfile(ActionRequestRecord profile) async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.post(
-//         '/user/profile',
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//         data: profile.toJson(),
-//       );
+  static Future<ProfileResponse> getProfile() => _execute(
+    () => dio.get('/user/profile', options: _buildOptions(Scope.managed)),
+    (data) => ProfileResponse.fromJson(data),
+  );
 
-//       final profileResponse = ProfileResponse.fromJson(response.data);
-//       if (profileResponse.status == Status.success &&
-//           profileResponse.records != null &&
-//           profileResponse.records!.isNotEmpty) {
-//         return (profileResponse, null);
-//       }
+  static Future<ProfileResponse> updateProfile(ActionRequestRecord profile) => _execute(
+    () => dio.post('/user/profile', data: profile.toJson(), options: _buildOptions(Scope.managed)),
+    (data) => ProfileResponse.fromJson(data),
+  );
 
-//       return (
-//         null,
-//         DmartError(
-//           type: 'unknown',
-//           code: 0,
-//           info: [profileResponse.error?.toJson() ?? {}],
-//           message: "Unable to retrieve the profile.",
-//         ),
-//       );
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ActionResponse<T>> query<T>(
+    QueryRequest query, {
+    Scope scope = Scope.public,
+    Map<String, dynamic>? extra,
+    T Function(dynamic)? parser,
+  }) {
+    query.subpath = query.subpath.replaceAll(RegExp(r'/+'), '/');
 
-//   /// Retrieves the user with the given [QueryRequest].
-//   static Future<(ActionResponse?, DmartError?)> query(
-//     QueryRequest query, {
-//     String scope = "managed",
-//     Map<String, dynamic>? extra,
-//   }) async {
-//     if (token == null && scope == "managed") {
-//       throw DmartException(
-//         DmartExceptionEnum.NOT_VALID_TOKEN,
-//         DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!,
-//       );
-//     }
-//     try {
-//       query.sortType = query.sortType ?? SortyType.ascending;
-//       query.sortBy = query.sortBy ?? 'created_at';
-//       query.subpath = query.subpath.replaceAll(RegExp(r'/+'), '/');
+    return _execute(
+      () => dio.post(
+        buildScopedUrl(scope, 'query'),
+        data: query.toJson(),
+        options: _buildOptions(scope, extraHeaders: extra),
+      ),
+      (data) => ActionResponse<T>.fromJson(data, parser),
+    );
+  }
 
-//       final response = await _dio.post(
-//         '/$scope/query',
-//         data: query.toJson(),
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}, extra: extra),
-//       );
+  static Future<ActionResponse<T>> request<T>(
+    ActionRequest action, {
+    Scope scope = Scope.managed,
+    T Function(dynamic)? parser,
+  }) => _execute(
+    () => dio.post(buildScopedUrl(scope, 'request'), data: action.toJson(), options: _buildOptions(scope)),
+    (data) => ActionResponse<T>.fromJson(data, parser),
+  );
 
-//       return (ActionResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       print(e);
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ResponseEntry> retrieveEntry(RetrieveEntryRequest request, {Scope scope = Scope.public}) => _execute(
+    () => dio.get(request.url(scope), options: _buildOptions(scope)),
+    (data) => ResponseEntry.fromJson(data),
+  );
 
-//   /// Requests an action with the given [ActionRequest].
-//   static Future<(ActionResponse?, DmartError?)> request(ActionRequest action) async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.post(
-//         '/managed/request',
-//         data: action.toJson(),
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
-//       return (ActionResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ActionResponse<dynamic>> getSpaces() => query<dynamic>(
+    QueryRequest(queryType: QueryType.spaces, spaceName: "management", subpath: "/", search: "", limit: 100),
+  );
 
-//   /// Retrieves the entry with the given [RetrieveEntryRequest].
-//   static Future<(ResponseEntry?, DmartError?)> retrieveEntry(
-//     RetrieveEntryRequest request, {
-//     String scope = "managed",
-//   }) async {
-//     if (token == null && scope == "managed") {
-//       throw DmartException(
-//         DmartExceptionEnum.NOT_VALID_TOKEN,
-//         DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!,
-//       );
-//     }
-//     String? subpath = request.subpath;
-//     try {
-//       if (subpath == "/") subpath = "__root__";
-//       final response = await _dio.get(
-//         '/$scope/entry/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}?retrieve_json_payload=${request.retrieveJsonPayload}&retrieve_attachments=${request.retrieveAttachments}&validate_schema=${request.validateSchema}'
-//             .replaceAll(RegExp(r'/+'), '/'),
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
+  static Future<dynamic> getPayload(GetPayloadRequest request, {Scope scope = Scope.public}) => _execute(
+    () => dio.get(request.url(scope), options: _buildOptions(scope)),
+    (data) => ResponseEntry.fromJson(data),
+  );
 
-//       return (ResponseEntry.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<ApiQueryResponse> progressTicket(ProgressTicketRequest request, {Scope scope = Scope.public}) =>
+      _execute(
+        () => dio.put(
+          request.url(scope),
+          data: {'resolution': request.resolution, 'comment': request.comment},
+          options: _buildOptions(scope),
+        ),
+        (data) => ApiQueryResponse.fromJson(data),
+      );
 
-//   // /// Creates a space with the given [ActionRequest].
-//   // static Future<(ActionResponse?, DmartError?)> createSpace(
-//   //   ActionRequest action,
-//   // ) async {
-//   //   _isTokenNull();
-//   //   try {
-//   //     final response = await _dio.post(
-//   //       '/managed/space',
-//   //       data: action.toJson(),
-//   //       options: Options(
-//   //         headers: {...headers, "Authorization": "Bearer $token"},
-//   //       ),
-//   //     );
-//   //     return (ActionResponse.fromJson(response.data), null);
-//   //   } on DioException catch (e) {
-//   //     return (null, _returnExceptionDmartError(e));
-//   //   }
-//   // }
+  static Future<dynamic> createAttachment({
+    required String spaceName,
+    required String entitySubpath,
+    required String entityShortname,
+    required String attachmentShortname,
+    required File attachmentBinary,
+    ContentType contentType = ContentType.image,
+    String resourceType = "media",
+    bool isActive = true,
+    Scope scope = Scope.public,
+  }) async {
+    final payloadData = {
+      'resource_type': resourceType,
+      'shortname': attachmentShortname,
+      'subpath': "$entitySubpath/$entityShortname",
+      'attributes': {
+        'is_active': isActive,
+        'payload': {'content_type': contentType.name, 'body': {}},
+      },
+    };
 
-//   /// Retrieves the spaces.
-//   static Future<(ActionResponse?, DmartError?)> getSpaces() async {
-//     return await query(
-//       QueryRequest(queryType: QueryType.spaces, spaceName: "management", subpath: "/", search: "", limit: 100),
-//     );
-//   }
+    final formData =
+        FormData()
+          ..files.add(
+            MapEntry(
+              'payload_file',
+              await MultipartFile.fromFile(
+                attachmentBinary.path,
+                contentType: MediaType.parse(contentType.getMediaType),
+              ),
+            ),
+          )
+          ..files.add(
+            MapEntry(
+              'request_record',
+              MultipartFile.fromBytes(utf8.encode(json.encode(payloadData)), filename: 'payload.json'),
+            ),
+          )
+          ..fields.add(MapEntry('space_name', spaceName));
 
-//   /// Retrieves the space with the given [GetPayloadRequest].
-//   static Future<dynamic> getPayload(GetPayloadRequest request, {String scope = "managed"}) async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.get(
-//         '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.schemaShortname}${request.ext}',
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
+    return _execute(
+      () => dio.post(
+        buildScopedUrl(scope, 'resource_with_payload'),
+        data: formData,
+        options: _buildOptions(scope, contentType: 'multipart/form-data'),
+      ),
+      (data) => ResponseEntry.fromJson(data),
+    );
+  }
 
-//       return (ResponseEntry.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static Future<dynamic> getManifest() =>
+      _execute(() => dio.get('/info/manifest', options: _buildOptions(Scope.managed)), (data) => data);
 
-//   /// Progresses the ticket with the given [ProgressTicketRequest].
-//   static Future<(ApiQueryResponse?, DmartError?)> progressTicket(ProgressTicketRequest request) async {
-//     _isTokenNull();
-//     try {
-//       final response = await _dio.put(
-//         '/managed/progress-ticket/${request.spaceName}/${request.subpath}/${request.shortname}/${request.action}',
-//         data: {'resolution': request.resolution, 'comment': request.comment},
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
+  static Future<dynamic> getSettings() =>
+      _execute(() => dio.get('/info/settings', options: _buildOptions(Scope.managed)), (data) => data);
 
-//       return (ApiQueryResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  // ==================== Private Helpers ====================
 
-//   /// Creates an attachment
-//   /// providing [spaceName], [entitySubpath], [entityShortname], [attachmentShortname], [attachmentBinary], [resourceType] and [isActive].
-//   static Future<(dynamic, DmartError?)> createAttachment({
-//     required String spaceName,
-//     required String entitySubpath,
-//     required String entityShortname,
-//     required String attachmentShortname,
-//     required File attachmentBinary,
-//     DmartContentType.ContentType contentType = DmartContentType.ContentType.image,
-//     String resourceType = "media",
-//     bool isActive = true,
-//     String scope = "managed",
-//   }) async {
-//     _isTokenNull();
+  static Future<T> _execute<T>(Future<Response> Function() request, T Function(dynamic) parser) async {
+    try {
+      final response = await request();
+      return parser(response.data);
+    } on DioException catch (e) {
+      throw _parseDmartError(e);
+    }
+  }
 
-//     Map<String, dynamic> payloadData = {
-//       'resource_type': resourceType,
-//       'shortname': attachmentShortname,
-//       'subpath': "$entitySubpath/$entityShortname",
-//       'attributes': {
-//         'is_active': isActive,
-//         "payload": {'content_type': contentType.name, 'body': {}},
-//       },
-//     };
-//     var payloadJson = json.encode(payloadData);
+  static DmartError _parseDmartError(DioException e) {
+    if (e.response?.data?["error"] != null) {
+      return DmartError.fromJson(e.response?.data["error"]);
+    }
+    return DmartError(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
+  }
 
-//     FormData formData = FormData();
-//     formData.files.add(
-//       MapEntry(
-//         'payload_file',
-//         await MultipartFile.fromFile(attachmentBinary.path, contentType: MediaType.parse(contentType.getMediaType)),
-//       ),
-//     );
-//     formData.files.add(
-//       MapEntry('request_record', MultipartFile.fromBytes(utf8.encode(payloadJson), filename: 'payload.json')),
-//     );
-//     formData.fields.add(MapEntry('space_name', spaceName));
+  static Options _buildOptions(Scope scope, {Map<String, dynamic>? extraHeaders, String? contentType}) {
+    final baseHeaders = _instance._config.headers ?? {'content-type': contentType ?? 'application/json'};
 
-//     try {
-//       Response? response = await _dio.post(
-//         '/$scope/resource_with_payload',
-//         data: formData,
-//         options: Options(contentType: 'multipart/form-data', headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
+    return Options(
+      headers: {
+        ...baseHeaders,
+        ...?extraHeaders,
+        if (scope == Scope.managed && _instance._token != null) 'Authorization': 'Bearer ${_instance._token}',
+      },
+    );
+  }
 
-//       return (ResponseEntry.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
+  static String buildScopedUrl(Scope scope, String path) => '/${scope.name}/$path'.replaceAll(RegExp(r'/+'), '/');
 
-//   /// Submits a record with the given [spaceName], [schemaShortname], [subpath], and [record].
-//   static Future<(ActionResponse?, DmartError?)> submit(
-//     String spaceName,
-//     String schemaShortname,
-//     String subpath,
-//     String? resourceType,
-//     String? workflowShortname,
-//     Map<String, dynamic> record,
-//   ) async {
-//     try {
-//       var url = '/public/submit/$spaceName';
-//       if (resourceType != null) {
-//         url += '/$resourceType';
-//       }
-//       if (workflowShortname != null) {
-//         url += '/$workflowShortname';
-//       }
-//       url += '/$schemaShortname/$subpath';
+  static void _ensureInitialized() {
+    try {
+      _instance._dio;
+    } catch (e) {
+      throw DmartException(
+        DmartExceptionEnum.NOT_INITIALIZED,
+        DmartExceptionMessages.messages[DmartExceptionEnum.NOT_INITIALIZED]!,
+      );
+    }
+  }
 
-//       final response = await _dio.post(url, data: record, options: Options(headers: headers));
-//       return (ActionResponse.fromJson(response.data), null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
-
-//   /// Constructs the attachment url with the given [resourceType], [spaceName], [entitySubpath], [entityShortname], [attachmentShortname], and [ext].
-//   static String getAttachmentUrl(
-//     String resourceType,
-//     String spaceName,
-//     String entitySubpath,
-//     String entityShortname,
-//     String attachmentShortname,
-//     String ext,
-//   ) {
-//     return '$dmartServerUrl/managed/payload/$resourceType/$spaceName/${entitySubpath.replaceAll(RegExp(r'/+$'), '')}/$entityShortname/$attachmentShortname.$ext'
-//         .replaceAll('..', '.');
-//   }
-
-//   /// Retrieves the manifest.
-//   static Future<dynamic> getManifest() async {
-//     try {
-//       final response = await _dio.get(
-//         '/info/manifest',
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
-//       return (response.data, null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
-
-//   /// Retrieves the settings.
-//   static Future<dynamic> getSettings() async {
-//     try {
-//       final response = await _dio.get(
-//         '/info/settings',
-//         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-//       );
-//       return (response.data, null);
-//     } on DioException catch (e) {
-//       return (null, _returnExceptionDmartError(e));
-//     }
-//   }
-// }
+  static void _ensureAuthenticated() {
+    if (_instance._token == null) {
+      throw DmartException(
+        DmartExceptionEnum.NOT_VALID_TOKEN,
+        DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!,
+      );
+    }
+  }
+}
