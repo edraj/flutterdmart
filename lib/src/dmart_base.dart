@@ -94,41 +94,33 @@ class Dmart {
     () => dio.get(
       '/user/check-existing',
       queryParameters: params.toQueryParams().withoutNulls(),
-      options: _buildOptions(Scope.public),
+      options: _buildOptions(),
     ),
     (data) => data,
   );
 
   static Future<LoginResponse> login(LoginRequest request) => _execute(
-    () => dio.post('/user/login', data: request.toJson(), options: _buildOptions(Scope.public)),
+    () => dio.post('/user/login', data: request.toJson(), options: _buildOptions()),
     (data) => LoginResponse.fromJson(data),
   );
 
   static Future<CreateUserResponse> createUser(CreateUserRequest request) => _execute(
-    () => dio.post('/user/create', data: request.toJson().withoutNulls(), options: _buildOptions(Scope.public)),
+    () => dio.post('/user/create', data: request.toJson().withoutNulls(), options: _buildOptions()),
     (data) => CreateUserResponse.fromJson(data),
   );
 
   static Future<ApiResponse> otpRequest(SendOTPRequest request) => _execute(
-    () => dio.post('/user/otp-request', data: request.toJson().withoutNulls(), options: _buildOptions(Scope.public)),
+    () => dio.post('/user/otp-request', data: request.toJson().withoutNulls(), options: _buildOptions()),
     (data) => ApiResponse.fromJson(data),
   );
 
   static Future<ApiResponse> otpRequestLogin(SendOTPRequest request) => _execute(
-    () => dio.post(
-      '/user/otp-request-login',
-      data: request.toJson().withoutNulls(),
-      options: _buildOptions(Scope.public),
-    ),
+    () => dio.post('/user/otp-request-login', data: request.toJson().withoutNulls(), options: _buildOptions()),
     (data) => ApiResponse.fromJson(data),
   );
 
   static Future<ApiResponse> passwordResetRequest(PasswordResetRequest request) => _execute(
-    () => dio.post(
-      '/user/password-reset-request',
-      data: request.toJson().withoutNulls(),
-      options: _buildOptions(Scope.public),
-    ),
+    () => dio.post('/user/password-reset-request', data: request.toJson().withoutNulls(), options: _buildOptions()),
     (data) => ApiResponse.fromJson(data),
   );
 
@@ -145,7 +137,7 @@ class Dmart {
     String url =
         '/${[scope.name, 'submit', spaceName, if (resourceType != null) resourceType, if (workflowShortname != null) workflowShortname, schemaShortname, subpath].join('/')}';
     return _execute(
-      () => dio.post(url, data: record, options: _buildOptions(scope)),
+      () => dio.post(url, data: record, options: _buildOptions()),
       (data) => ActionResponse<T>.fromJson(data, parser),
     );
   }
@@ -153,32 +145,30 @@ class Dmart {
   // ==================== Managed Endpoints ====================
 
   static Future<ApiResponse> logout() => _execute(
-    () => dio.post('/user/logout', data: {}, options: _buildOptions(Scope.managed)),
+    () => dio.post('/user/logout', data: {}, options: _buildOptions()),
     (data) => ApiResponse.fromJson(data),
   );
 
   static Future<ApiResponse> confirmOTP(ConfirmOTPRequest request) => _execute(
-    () => dio.post('/user/otp-confirm', data: request.toJson().withoutNulls(), options: _buildOptions(Scope.managed)),
+    () => dio.post('/user/otp-confirm', data: request.toJson().withoutNulls(), options: _buildOptions()),
     (data) => ApiResponse.fromJson(data),
   );
 
   static Future<ApiResponse> userReset(String shortname) => _execute(
-    () => dio.post('/user/reset', data: {'shortname': shortname}, options: _buildOptions(Scope.managed)),
+    () => dio.post('/user/reset', data: {'shortname': shortname}, options: _buildOptions()),
     (data) => ApiResponse.fromJson(data),
   );
 
   static Future<ApiResponse> validatePassword(String password) => _execute(
-    () => dio.post('/user/validate_password', data: {'password': password}, options: _buildOptions(Scope.managed)),
+    () => dio.post('/user/validate_password', data: {'password': password}, options: _buildOptions()),
     (data) => ApiResponse.fromJson(data),
   );
 
-  static Future<ProfileResponse> getProfile() => _execute(
-    () => dio.get('/user/profile', options: _buildOptions(Scope.managed)),
-    (data) => ProfileResponse.fromJson(data),
-  );
+  static Future<ProfileResponse> getProfile() =>
+      _execute(() => dio.get('/user/profile', options: _buildOptions()), (data) => ProfileResponse.fromJson(data));
 
   static Future<ProfileResponse> updateProfile(ActionRequestRecord profile) => _execute(
-    () => dio.post('/user/profile', data: profile.toJson(), options: _buildOptions(Scope.managed)),
+    () => dio.post('/user/profile', data: profile.toJson(), options: _buildOptions()),
     (data) => ProfileResponse.fromJson(data),
   );
 
@@ -191,11 +181,7 @@ class Dmart {
     query.subpath = query.subpath.replaceAll(RegExp(r'/+'), '/');
 
     return _execute(
-      () => dio.post(
-        buildScopedUrl(scope, 'query'),
-        data: query.toJson(),
-        options: _buildOptions(scope, extraHeaders: extra),
-      ),
+      () => dio.post(buildScopedUrl(scope, 'query'), data: query.toJson(), options: _buildOptions(extraHeaders: extra)),
       (data) => ActionResponse<T>.fromJson(data, parser),
     );
   }
@@ -205,30 +191,26 @@ class Dmart {
     Scope scope = Scope.managed,
     T Function(dynamic)? parser,
   }) => _execute(
-    () => dio.post(buildScopedUrl(scope, 'request'), data: action.toJson(), options: _buildOptions(scope)),
+    () => dio.post(buildScopedUrl(scope, 'request'), data: action.toJson(), options: _buildOptions()),
     (data) => ActionResponse<T>.fromJson(data, parser),
   );
 
-  static Future<ResponseEntry> retrieveEntry(RetrieveEntryRequest request, {Scope scope = Scope.public}) => _execute(
-    () => dio.get(request.url(scope), options: _buildOptions(scope)),
-    (data) => ResponseEntry.fromJson(data),
-  );
+  static Future<ResponseEntry> retrieveEntry(RetrieveEntryRequest request, {Scope scope = Scope.public}) =>
+      _execute(() => dio.get(request.url(scope), options: _buildOptions()), (data) => ResponseEntry.fromJson(data));
 
   static Future<ActionResponse<dynamic>> getSpaces() => query<dynamic>(
     QueryRequest(queryType: QueryType.spaces, spaceName: "management", subpath: "/", search: "", limit: 100),
   );
 
-  static Future<dynamic> getPayload(GetPayloadRequest request, {Scope scope = Scope.public}) => _execute(
-    () => dio.get(request.url(scope), options: _buildOptions(scope)),
-    (data) => ResponseEntry.fromJson(data),
-  );
+  static Future<dynamic> getPayload(GetPayloadRequest request, {Scope scope = Scope.public}) =>
+      _execute(() => dio.get(request.url(scope), options: _buildOptions()), (data) => ResponseEntry.fromJson(data));
 
   static Future<ApiQueryResponse> progressTicket(ProgressTicketRequest request, {Scope scope = Scope.public}) =>
       _execute(
         () => dio.put(
           request.url(scope),
           data: {'resolution': request.resolution, 'comment': request.comment},
-          options: _buildOptions(scope),
+          options: _buildOptions(),
         ),
         (data) => ApiQueryResponse.fromJson(data),
       );
@@ -277,17 +259,17 @@ class Dmart {
       () => dio.post(
         buildScopedUrl(scope, 'resource_with_payload'),
         data: formData,
-        options: _buildOptions(scope, contentType: 'multipart/form-data'),
+        options: _buildOptions(contentType: 'multipart/form-data'),
       ),
       (data) => ResponseEntry.fromJson(data),
     );
   }
 
   static Future<dynamic> getManifest() =>
-      _execute(() => dio.get('/info/manifest', options: _buildOptions(Scope.managed)), (data) => data);
+      _execute(() => dio.get('/info/manifest', options: _buildOptions()), (data) => data);
 
   static Future<dynamic> getSettings() =>
-      _execute(() => dio.get('/info/settings', options: _buildOptions(Scope.managed)), (data) => data);
+      _execute(() => dio.get('/info/settings', options: _buildOptions()), (data) => data);
 
   // ==================== Private Helpers ====================
 
@@ -307,14 +289,14 @@ class Dmart {
     return DmartError(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
   }
 
-  static Options _buildOptions(Scope scope, {Map<String, dynamic>? extraHeaders, String? contentType}) {
+  static Options _buildOptions({Map<String, dynamic>? extraHeaders, String? contentType}) {
     final baseHeaders = _instance._config.headers ?? {'content-type': contentType ?? 'application/json'};
 
     return Options(
       headers: {
         ...baseHeaders,
         ...?extraHeaders,
-        if (scope == Scope.managed && _instance._token != null) 'Authorization': 'Bearer ${_instance._token}',
+        if (_instance._token != null) 'Authorization': 'Bearer ${_instance._token}',
       },
     );
   }
