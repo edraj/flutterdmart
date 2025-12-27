@@ -256,11 +256,7 @@ class Dmart {
           ..fields.add(MapEntry('space_name', spaceName));
 
     return _execute(
-      () => dio.post(
-        buildScopedUrl(scope, 'resource_with_payload'),
-        data: formData,
-        options: _buildOptions(contentType: 'multipart/form-data'),
-      ),
+      () => dio.post(buildScopedUrl(scope, 'resource_with_payload'), data: formData, options: _buildOptions()),
       (data) => ResponseEntry.fromJson(data),
     );
   }

@@ -4,61 +4,71 @@ A Dart implementation of the Dmart that depends on dio.
 
 ## APIs
 
-Properties:
-* `String dmartServerUrl` - The base URL of the Dmart instance.
-* `String token` - The token to be used for authentication.
-
 Methods:
-* `void initDmart({Dio? dio, BaseOptions? dioConfig, Iterable<Interceptor> interceptors = const [], bool isDioVerbose = false,})` - Initializes the Dio networking instance.
-* * if `dio` is set:
-* * * `dioConfig` will not take effect.
-* * * `isDioVerbose` will still extend the interceptor.
-* * * `interceptors` will still extend the interceptor.
-* `Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
-* `Future<dynamic> getSettings()` - Retrieves the Dmart settings.
-* `Future<(LoginResponse?, DmartError?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
-* `Future<(CreateUserResponse?, DmartError?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
-* `Future<(ApiResponse?, DmartError?)> logout()` - Logs the user out.
-* `Future<(ApiResponse?, DmartError?)> otpRequest(SendOTPRequest request)` - Sends an OTP request for authentication.
-* `Future<(ApiResponse?, DmartError?)> otpRequestLogin(SendOTPRequest request)` - Sends an OTP request for login.
-* `Future<(ApiResponse?, DmartError?)> passwordResetRequest(PasswordResetRequest request)` - Sends a password reset request.
-* `Future<(ApiResponse?, DmartError?)> confirmOTP(ConfirmOTPRequest request)` - Confirms the OTP for login or password reset.
-* `Future<(ApiResponse?, DmartError?)> userReset(String shortname)` - Resets a user's password.
-* `Future<(ApiResponse?, DmartError?)> validatePassword(String password)` - Validates the user's password.
-* `Future<(ProfileResponse?, DmartError?)> getProfile()` - Retrieves the current user's profile.
-* `Future<(ProfileResponse?, DmartError?)> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
-* `Future<ActionResponse<T>> query<T>(QueryRequest query, {Scope scope = Scope.public, Map<String, dynamic>? extra, T Function(dynamic)? parser})` - Executes a query and returns typed response.
-* `Future<ActionResponse<T>> request<T>(ActionRequest action, {Scope scope = Scope.managed, T Function(dynamic)? parser})` - Performs an action and returns typed response.
-* `Future<(ResponseEntry?, DmartError?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
-* `Future<(ActionResponse?, DmartError?)> createSpace(ActionRequest action)` - Creates a new space.
-* `Future<(ApiQueryResponse?, DmartError?)> getSpaces()` - Retrieves a list of spaces.
-* `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
-* `Future<(ApiQueryResponse?, DmartError?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
-* `Future<(Response?, DmartError?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
-* `Future<ActionResponse<T>> submit<T>(String spaceName, String schemaShortname, String subpath, String? resourceType, String? workflowShortname, Map<String, dynamic> record, {Scope scope = Scope.public, T Function(dynamic)? parser})` - Submits a record and returns typed response.
-* `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
-* `String getMediaTypeFromDmartContentType(DmartContentType.ContentType contentType)` - Returns the media type from a Dmart content type.
+* `static void init({Dio? dio, DmartConfig configuration = const DmartConfig()})` - Initializes the Dmart instance.
+* `static void setToken(String token)` - Sets the authentication token.
+* `static void clearToken()` - Clears the authentication token.
+* `static Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
+* `static Future<dynamic> getSettings()` - Retrieves the Dmart settings.
+* `static Future<LoginResponse> login(LoginRequest request)` - Authenticates a user.
+* `static Future<CreateUserResponse> createUser(CreateUserRequest request)` - Creates a new user.
+* `static Future<ApiResponse> logout()` - Logs the user out.
+* `static Future<ApiResponse> otpRequest(SendOTPRequest request)` - Sends an OTP request.
+* `static Future<ApiResponse> otpRequestLogin(SendOTPRequest request)` - Sends an OTP request for login.
+* `static Future<ApiResponse> passwordResetRequest(PasswordResetRequest request)` - Sends a password reset request.
+* `static Future<ApiResponse> confirmOTP(ConfirmOTPRequest request)` - Confirms the OTP.
+* `static Future<ApiResponse> userReset(String shortname)` - Resets a user's password.
+* `static Future<ApiResponse> validatePassword(String password)` - Validates the user's password.
+* `static Future<ProfileResponse> getProfile()` - Retrieves the current user's profile.
+* `static Future<ProfileResponse> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
+* `static Future<ActionResponse<T>> query<T>(QueryRequest query, {Scope scope = Scope.public, Map<String, dynamic>? extra, T Function(dynamic)? parser})` - Executes a query.
+* `static Future<ActionResponse<T>> request<T>(ActionRequest action, {Scope scope = Scope.managed, T Function(dynamic)? parser})` - Performs an action.
+* `static Future<ResponseEntry> retrieveEntry(RetrieveEntryRequest request, {Scope scope = Scope.public})` - Fetches a specific entry.
+* `static Future<ActionResponse<dynamic>> getSpaces()` - Retrieves a list of spaces.
+* `static Future<dynamic> getPayload(GetPayloadRequest request, {Scope scope = Scope.public})` - Retrieves payload data.
+* `static Future<ApiQueryResponse> progressTicket(ProgressTicketRequest request, {Scope scope = Scope.public})` - Updates a progress ticket.
+* `static Future<dynamic> createAttachment({...})` - Uploads an attachment.
+* `static Future<ActionResponse<T>> submit<T>(...)` - Submits a record.
 
 ## Basic Usage
 
 * Always initialize the Dmart instance before using it.
 
 ```dart
-Dmart.initDmart();
-// Or with dio verbose for debugging purposes
-Dmart.initDmart(isDioVerbose: true);
+// Option 1: with DmartConfig
+Dmart.init(
+  configuration: DmartConfig(
+    baseUrl: 'https://api.dmart.cc',
+    connectTimeout: const Duration(seconds: 30),
+  ),
+);
+
+// Option 2: with custom Dio instance
+Dmart.init(
+  dio: Dio(
+    BaseOptions(
+      baseUrl: 'https://api.dmart.cc',
+    ),
+  ),
+);
 ```
 
-* Getting manifests and settings
+* Authenticate by setting the token:
+
+```dart
+Dmart.setToken('your_token');
+```
+
+* Getting manifests and settings:
 
 ```dart
 // Get manifests
-var (respManifests, _) = await Dmart.getManifest();
+dynamic responseManifests = await Dmart.getManifest();
 // Get settings
-var (respSettings, _) = await Dmart.getSettings();
+dynamic responseSettings = await Dmart.getSettings();
 ```
 
-* User creation
+* User creation:
 
 ```dart
 final CreateUserAttributes createUserAttributes = CreateUserAttributes(
@@ -67,78 +77,37 @@ final CreateUserAttributes createUserAttributes = CreateUserAttributes(
     password: '@Jimmy123_',
     roles: ['super_admin'],
 );
-var (responseCreateUser, error) = await Dmart.createUser(CreateUserRequest(
-    shortname: 'jimmy',
-    attributes: createUserAttributes,
-));
+CreateUserResponse responseCreateUser = await Dmart.createUser(
+  CreateUserRequest(shortname: 'jimmy', attributes: createUserAttributes),
+);
 ```
 
-* User login
+* User login:
 
 ```dart
-// By using shortname and password
-var (responseLogin, _) = await Dmart.login(
+LoginResponse responseLogin = await Dmart.login(
   LoginRequest(shortname: 'jimmy', password: '@Jimmy123_'),
 );
-
-// By using email or msisdn instead of shortname
-LoginRequest.withEmail
-LoginRequest.withMsisdn
-
-// By passing directly a token
-Dmart.token = 'xxx.yyy.zzz';
 ```
 
-* Get user profile
+* Get user profile:
 
 ```dart
-var (respProfile, _) = await Dmart.getProfile();
+ProfileResponse responseProfile = await Dmart.getProfile();
+print(responseProfile.records?.first.shortname);
 ```
 
-* Update user profile
+* Get all spaces:
 
 ```dart
-var (respProfile, _) = await Dmart.updateProfile(
-    ActionRequestRecord(
-        shortname: 'dmart',
-        resourceType: ResourceType.user,
-        subpath: 'users',
-        attributes: {'language': 'kurdish'},
-    ),
-);
+ActionResponse responseSpaces = await Dmart.getSpaces();
+print(responseSpaces.records?.length);
 ```
 
-* Get all spaces
+* Querying a subpath:
 
 ```dart
-var (respSpaces, _) = await Dmart.getSpaces();
-```
-
-* Create a space
-
-```dart
-ActionRequest createSpaceActionRequest = ActionRequest(
-    spaceName: 'my_space',
-    requestType: RequestType.create,
-    records: [
-      ActionRequestRecord(
-        resourceType: ResourceType.space,
-        shortname: 'my_space',
-        subpath: '/',
-        attributes: {
-          'displayname': {'en': 'Space'},
-          'shortname': 'space',
-        },
-      ),
-    ]);
-
-var (respCreateSpace, _) = await Dmart.createSpace(createSpaceActionRequest);
-```
-
-* Querying a subpath
-
-```dart
-var (respQuery, _) = await Dmart.query(
+ActionResponse responseQuery = await Dmart.query(
     QueryRequest(
         queryType: QueryType.subpath,
         spaceName: 'management',
@@ -146,151 +115,28 @@ var (respQuery, _) = await Dmart.query(
         retrieveJsonPayload: true,
     ),
 );
-for (var record in respQuery?.records ?? []) {
+
+for (ActionResponseRecord record in responseQuery.records ?? []) {
   print(record.shortname);
 }
 ```
 
-*Retrieve entry
-```dart
-var (respEntry, _) = await Dmart.retrieveEntry(
-  RetrieveEntryRequest(
-      resourceType: ResourceType.user,
-      spaceName: 'management',
-      subpath: 'users',
-      shortname: 'jimmy',
-      retrieveJsonPayload: true,
-  )
-);
-```
-
-* Get entry payload
+* Accessing record attachments:
 
 ```dart
-var (respEntryPayload, _) = await Dmart.getPayload(GetPayloadRequest(
-  resourceType: ResourceType.content,
-  spaceName: 'myspace',
-  subpath: 'mysubpath',
-  shortname: 'myentry'
-));
-```
-
-* Content creation
-
-```dart
-// folder creation
-ActionRequestRecord actionRequestRecord = ActionRequestRecord(
-  resourceType: ResourceType.folder,
-  subpath: '/',
-  shortname: 'my_subpath',
-  attributes: subpathAttributes,
-);
-ActionRequest action = ActionRequest(
-  spaceName: 'my_space',
-  requestType: RequestType.create,
-  records: [actionRequestRecord],
-);
-var (respRequestFolder, err) = await Dmart.request(action);
-
-// content creation
-ActionRequestRecord actionRequestRecord = ActionRequestRecord(
-    resourceType: ResourceType.content,
-    subpath: 'my_subpath',
-    shortname: 'my_content',
-    attributes: {
-        "is_active": true,
-        "relationships": [],
-        "payload": {
-            "content_type": "json",
-            "schema_shortname": null,
-            "body": {
-              "isAlive": true
-            }
-        }
-    },
-);
-ActionRequest action = ActionRequest(
-    spaceName: 'my_space',
-    requestType: RequestType.create,
-    records: [actionRequestRecord],
-);
-var (respRequestContent, err) = await Dmart.request(action);
-
-// attachment creation
-ActionRequestRecord actionRequestRecord = ActionRequestRecord(
-    resourceType: ResourceType.json,
-    subpath: 'my_subpath/my_content',
-    shortname: 'auto',
-    attributes: {
-        "is_active": true,
-        "payload": {
-            "content_type": "json",
-            "schema_shortname": null,
-            "body": {
-                "attachmentName": "my attachment",
-                "isImportant": "very important"
-            }
-        }
-    },
-);
-ActionRequest action = ActionRequest(
-    spaceName: 'my_space',
-    requestType: RequestType.create,
-    records: [actionRequestRecord],
-);
-var (respRequestAttachment, err) = await Dmart.request(action);
-```
-
-* Progress a ticket
-
-```dart
-var (respProgression, _) = await Dmart.progressTicket(
-  ProgressTicketRequest(
-    spaceName: "myspace",
-    subpath: "test",
-    shortname: "myticket",
-    action: "rejected",
-  )
-);
-```
-
-* Create attachment
-
-```dart
-File img = File("/path/to/myimg.jpg");
-var (respAttachmentCreation, _) = await Dmart.createAttachment(
-    spaceName: "myspace",
-    entitySubpath: "mysubpath",
-    entityShortname: "myshortname",
-    attachmentShortname: "auto",
-    attachmentBinary: img,
-);
-```
-
-* Get attachment url
-```dart
-String attachmentURL = await Dmart.getAttachmentUrl(
-    spaceName: "myspace",
-    entitySubpath: "mysubpath",
-    entityShortname: "myshortname",
-    attachmentShortname: "myAttachment",
-);
-```
-
-* Submit an entry
-```dart
-var respSubmitEntry = await Dmart.submit(
-    "applications",
-    "log",
-    "logs",
-    null,
-    null,
-    {
-      "shortname": "myentry",
-      "resource_type": ResourceType.content.name,
-      "state": "awesome entry it is !"
-    },
-);
+for (ActionResponseRecord record in responseQuery.records ?? []) {
+  // check if record has attachments
+  if (record.hasAttachment) {
+    // Get all media attachment URLs
+    List<String> urls = record.attachmentsUrls(spaceName: "management");
+    
+    // Get a specific attachment by its shortname
+    String? thumb = record.getAttachementByShortname(
+      shortname: "thumbnail", 
+      spaceName: "management"
+    );
+  }
+}
 ```
 
 ## Generic Usage & Type Safety
@@ -315,41 +161,30 @@ class Order {
   }
 }
 
-// 2. Perform a generic query/request/submit
-final response = await Dmart.query<Order>(
+// 2. Perform a generic query
+ActionResponse<Order> response = await Dmart.query<Order>(
   QueryRequest(
-    queryType: QueryType.search,
-    spaceName: "personal",
-    subpath: "people/964788198314/private/orders",
-    search: "",
+    queryType: QueryType.subpath,
+    spaceName: "management",
+    subpath: "users",
+    retrieveJsonPayload: true,
   ),
   parser: (json) => Order.fromJson(json),
 );
 
-// 3. Access typed body and use attachment helpers
+// 3. Access typed body
 if (response.records != null && response.records!.isNotEmpty) {
   ActionResponseRecord<Order> record = response.records!.first;
   
-  if (record.hasAttachment) {
-    // Get all media attachment URLs
-    List<String> urls = record.attachmentsUrls(spaceName: "mySpace");
-    
-    // Get a specific attachment by its shortname
-    String? thumb = record.getAttachementByShortname(
-      shortname: "thumbnail", 
-      spaceName: "mySpace"
-    );
-  }
-
-  // Access the correctly typed body
-  Order? order = record.attributes.payload?.body;
+  // Access the correctly typed body via the .body getter
+  Order? order = record.body;
   print("Order ID: ${order?.combinedOrderId}");
 }
 ```
 
-* Logout
+* Logout:
 
 ```dart
-var (respLogout, _) = await Dmart.logout();
+ApiResponse responseLogout = await Dmart.logout();
 ```
 

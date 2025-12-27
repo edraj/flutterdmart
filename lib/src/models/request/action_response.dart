@@ -48,6 +48,10 @@ class ActionResponse<T> extends ApiResponse {
 class ActionResponseRecord<T> extends ResponseRecord<T> {
   late final ActionResponseAttachments? attachments;
 
+  T? get body {
+    return attributes.payload?.body;
+  }
+
   ActionResponseRecord({
     required super.resourceType,
     required super.uuid,
