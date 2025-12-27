@@ -16,26 +16,26 @@ Methods:
 * * * `interceptors` will still extend the interceptor.
 * `Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
 * `Future<dynamic> getSettings()` - Retrieves the Dmart settings.
-* `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
-* `Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
-* `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
-* `Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request)` - Sends an OTP request for authentication.
-* `Future<(ApiResponse?, Error?)> otpRequestLogin(SendOTPRequest request)` - Sends an OTP request for login.
-* `Future<(ApiResponse?, Error?)> passwordResetRequest(PasswordResetRequest request)` - Sends a password reset request.
-* `Future<(ApiResponse?, Error?)> confirmOTP(ConfirmOTPRequest request)` - Confirms the OTP for login or password reset.
-* `Future<(ApiResponse?, Error?)> userReset(String shortname)` - Resets a user's password.
-* `Future<(ApiResponse?, Error?)> validatePassword(String password)` - Validates the user's password.
-* `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
-* `Future<(ProfileResponse?, Error?)> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
-* `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
-* `Future<(ActionResponse?, Error?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
-* `Future<(ResponseEntry?, Error?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
-* `Future<(ActionResponse?, Error?)> createSpace(ActionRequest action)` - Creates a new space.
-* `Future<(ApiQueryResponse?, Error?)> getSpaces()` - Retrieves a list of spaces.
+* `Future<(LoginResponse?, DmartError?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
+* `Future<(CreateUserResponse?, DmartError?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
+* `Future<(ApiResponse?, DmartError?)> logout()` - Logs the user out.
+* `Future<(ApiResponse?, DmartError?)> otpRequest(SendOTPRequest request)` - Sends an OTP request for authentication.
+* `Future<(ApiResponse?, DmartError?)> otpRequestLogin(SendOTPRequest request)` - Sends an OTP request for login.
+* `Future<(ApiResponse?, DmartError?)> passwordResetRequest(PasswordResetRequest request)` - Sends a password reset request.
+* `Future<(ApiResponse?, DmartError?)> confirmOTP(ConfirmOTPRequest request)` - Confirms the OTP for login or password reset.
+* `Future<(ApiResponse?, DmartError?)> userReset(String shortname)` - Resets a user's password.
+* `Future<(ApiResponse?, DmartError?)> validatePassword(String password)` - Validates the user's password.
+* `Future<(ProfileResponse?, DmartError?)> getProfile()` - Retrieves the current user's profile.
+* `Future<(ProfileResponse?, DmartError?)> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
+* `Future<(ApiQueryResponse?, DmartError?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
+* `Future<(ActionResponse?, DmartError?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
+* `Future<(ResponseEntry?, DmartError?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
+* `Future<(ActionResponse?, DmartError?)> createSpace(ActionRequest action)` - Creates a new space.
+* `Future<(ApiQueryResponse?, DmartError?)> getSpaces()` - Retrieves a list of spaces.
 * `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
-* `Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
-* `Future<(Response?, Error?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
-* `Future<(ActionResponse?, Error?)> submit(String spaceName, String schemaShortname, String subpath, Map<String, dynamic> record)` - Submits a record (log/feedback) to Dmart.
+* `Future<(ApiQueryResponse?, DmartError?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
+* `Future<(Response?, DmartError?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
+* `Future<(ActionResponse?, DmartError?)> submit(String spaceName, String schemaShortname, String subpath, Map<String, dynamic> record)` - Submits a record (log/feedback) to Dmart.
 * `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
 * `String getMediaTypeFromDmartContentType(DmartContentType.ContentType contentType)` - Returns the media type from a Dmart content type.
 

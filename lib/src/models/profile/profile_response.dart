@@ -14,7 +14,7 @@ class ProfileResponse extends ApiResponse {
   factory ProfileResponse.fromJson(Map<String, dynamic> json) {
     ProfileResponse profileResponse = ProfileResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
-      error: json['error'] != null ? Error.fromJson(json['error']) : null,
+      error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
     if (json['records'] != null) {
       profileResponse.records =

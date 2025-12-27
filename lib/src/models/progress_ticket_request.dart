@@ -1,3 +1,5 @@
+import '../enums/scope.dart';
+
 class ProgressTicketRequest {
   final String spaceName;
   final String subpath;
@@ -14,6 +16,8 @@ class ProgressTicketRequest {
     this.resolution,
     this.comment,
   });
+  String url(Scope scope) => '/${[scope.name, 'progress-ticket', spaceName, subpath, shortname, action].join('/')}'
+      .replaceAll(RegExp(r'/+'), '/');
 
   /// Converts the request to a JSON object.
   Map<String, dynamic> toJson() {

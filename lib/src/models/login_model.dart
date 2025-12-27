@@ -47,7 +47,7 @@ class LoginResponse extends BaseResponse {
   String? token;
   UserType? type;
   Displayname? displayname;
-  Error? error;
+  DmartError? error;
 
   LoginResponse({this.token, required super.status, super.records});
 
@@ -55,7 +55,7 @@ class LoginResponse extends BaseResponse {
   LoginResponse.fromJson(Map<String, dynamic> json) {
     status = Status.byName(json['status']);
     if (status == Status.failed) {
-      error = Error.fromJson(json['error']);
+      error = DmartError.fromJson(json['error']);
       return;
     }
     if (json['records'] != null && json['records']!.isNotEmpty) {

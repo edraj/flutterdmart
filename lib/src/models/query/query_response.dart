@@ -12,7 +12,7 @@ class ApiQueryResponse extends ApiResponse {
   factory ApiQueryResponse.fromJson(Map<String, dynamic> json) {
     return ApiQueryResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
-      error: json['error'] != null ? Error.fromJson(json['error']) : null,
+      error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
       records: (json['records'] as List<dynamic>).map((record) => ResponseRecord.fromJson(record)).toList(),
       attributes: ApiQueryResponseAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
     );

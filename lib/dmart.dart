@@ -45,6 +45,8 @@ export 'src/models/translation.dart';
 //X public or managed 
 //X attachments urls, thumbnail. etc (attachmentsUrls ,getAttachementByShortname)
 //X One class
+//X Error renamed to DmartError as the naming conflicts with flutter's predifined error object
+//X user headers
 // Generic models
 // example
 

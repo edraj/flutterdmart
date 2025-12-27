@@ -1,5 +1,7 @@
 import 'package:dmart/src/enums/resource_type.dart';
 
+import '../enums/scope.dart';
+
 class GetPayloadRequest {
   final ResourceType resourceType;
   final String spaceName;
@@ -16,6 +18,10 @@ class GetPayloadRequest {
     this.schemaShortname = "",
     this.ext = '.json',
   });
+
+  String url(Scope scope) =>
+      '/${[scope.name, 'payload', resourceType.name, spaceName, subpath, shortname + schemaShortname + ext].join('/')}'
+          .replaceAll(RegExp(r'/+'), '/');
 
   /// Converts the request to a JSON object.
   Map<String, dynamic> toJson() {

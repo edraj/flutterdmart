@@ -13,15 +13,15 @@ abstract class DmartHttpClient {
       final response = await request();
       return parser(response.data);
     } on DioException catch (e) {
-      throw parseError(e);
+      throw parseDmartError(e);
     }
   }
 
-  Error parseError(DioException e) {
+  DmartError parseDmartError(DioException e) {
     if (e.response?.data?["error"] != null) {
-      return Error.fromJson(e.response?.data["error"]);
+      return DmartError.fromJson(e.response?.data["error"]);
     }
-    return Error(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
+    return DmartError(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
   }
 
   Options buildOptions({Map<String, dynamic>? extraHeaders}) {

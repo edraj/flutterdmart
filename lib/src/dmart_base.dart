@@ -36,12 +36,12 @@
 
 //   static final Map<String, dynamic> headers = {"content-type": "application/json"};
 
-//   static Error _returnExceptionError(DioException e) {
+//   static DmartError _returnExceptionDmartError(DioException e) {
 //     if (e.response?.data?["error"] != null) {
-//       return Error.fromJson(e.response?.data["error"]);
+//       return DmartError.fromJson(e.response?.data["error"]);
 //     }
 
-//     return Error(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
+//     return DmartError(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
 //   }
 
 //   static void _isTokenNull() {
@@ -90,7 +90,7 @@
 //     _dioInstance?.interceptors.addAll(interceptors);
 //   }
 
-//   static Future<(dynamic, Error?)> checkExisting(CheckExistingParams params) async {
+//   static Future<(dynamic, DmartError?)> checkExisting(CheckExistingParams params) async {
 //     try {
 //       final response = await Dmart._dio.get(
 //         '/user/check-existing',
@@ -99,24 +99,24 @@
 //       );
 //       return (response.data, null);
 //     } on DioException catch (e) {
-//       return (null, Dmart._returnExceptionError(e));
+//       return (null, Dmart._returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Logs in the user with the given [loginRequest].
-//   static Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest) async {
+//   static Future<(LoginResponse?, DmartError?)> login(LoginRequest loginRequest) async {
 //     try {
 //       final response = await _dio.post('/user/login', data: loginRequest.toJson(), options: Options(headers: headers));
 //       var loginResponse = LoginResponse.fromJson(response.data);
 //       token = loginResponse.token;
 //       return (loginResponse, null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Creates a user with the given [createUserRequest].
-//   static Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest) async {
+//   static Future<(CreateUserResponse?, DmartError?)> createUser(CreateUserRequest createUserRequest) async {
 //     try {
 //       final response = await _dio.post(
 //         '/user/create',
@@ -125,12 +125,12 @@
 //       );
 //       return (CreateUserResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Logs out the user.
-//   static Future<(ApiResponse?, Error?)> logout() async {
+//   static Future<(ApiResponse?, DmartError?)> logout() async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.post(
@@ -141,12 +141,12 @@
 
 //       return (ApiResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Requests an OTP for the given [SendOTPRequest].
-//   static Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request) async {
+//   static Future<(ApiResponse?, DmartError?)> otpRequest(SendOTPRequest request) async {
 //     try {
 //       final response = await _dio.post(
 //         '/user/otp-request',
@@ -155,12 +155,12 @@
 //       );
 //       return (ApiResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Requests an OTP for login with the given [SendOTPRequest].
-//   static Future<(ApiResponse?, Error?)> otpRequestLogin(SendOTPRequest request) async {
+//   static Future<(ApiResponse?, DmartError?)> otpRequestLogin(SendOTPRequest request) async {
 //     try {
 //       final response = await _dio.post(
 //         '/user/otp-request-login',
@@ -169,12 +169,12 @@
 //       );
 //       return (ApiResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Requests a password reset with the given [PasswordResetRequest].
-//   static Future<(ApiResponse?, Error?)> passwordResetRequest(PasswordResetRequest request) async {
+//   static Future<(ApiResponse?, DmartError?)> passwordResetRequest(PasswordResetRequest request) async {
 //     try {
 //       final response = await _dio.post(
 //         '/user/password-reset-request',
@@ -183,12 +183,12 @@
 //       );
 //       return (ApiResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Confirms OTP with the given [ConfirmOTPRequest].
-//   static Future<(ApiResponse?, Error?)> confirmOTP(ConfirmOTPRequest request) async {
+//   static Future<(ApiResponse?, DmartError?)> confirmOTP(ConfirmOTPRequest request) async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.post(
@@ -198,12 +198,12 @@
 //       );
 //       return (ApiResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Resets a user with the given [shortname].
-//   static Future<(ApiResponse?, Error?)> userReset(String shortname) async {
+//   static Future<(ApiResponse?, DmartError?)> userReset(String shortname) async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.post(
@@ -213,12 +213,12 @@
 //       );
 //       return (ApiResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Validates password for the authenticated user.
-//   static Future<(ApiResponse?, Error?)> validatePassword(String password) async {
+//   static Future<(ApiResponse?, DmartError?)> validatePassword(String password) async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.post(
@@ -228,12 +228,12 @@
 //       );
 //       return (ApiResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Retrieves the profile of the user.
-//   static Future<(ProfileResponse?, Error?)> getProfile() async {
+//   static Future<(ProfileResponse?, DmartError?)> getProfile() async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.get(
@@ -250,7 +250,7 @@
 
 //       return (
 //         null,
-//         Error(
+//         DmartError(
 //           type: 'unknown',
 //           code: 0,
 //           info: [profileResponse.error?.toJson() ?? {}],
@@ -258,12 +258,12 @@
 //         ),
 //       );
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Update the profile of the user.
-//   static Future<(ProfileResponse?, Error?)> updateProfile(ActionRequestRecord profile) async {
+//   static Future<(ProfileResponse?, DmartError?)> updateProfile(ActionRequestRecord profile) async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.post(
@@ -281,7 +281,7 @@
 
 //       return (
 //         null,
-//         Error(
+//         DmartError(
 //           type: 'unknown',
 //           code: 0,
 //           info: [profileResponse.error?.toJson() ?? {}],
@@ -289,12 +289,12 @@
 //         ),
 //       );
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Retrieves the user with the given [QueryRequest].
-//   static Future<(ActionResponse?, Error?)> query(
+//   static Future<(ActionResponse?, DmartError?)> query(
 //     QueryRequest query, {
 //     String scope = "managed",
 //     Map<String, dynamic>? extra,
@@ -319,12 +319,12 @@
 //       return (ActionResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
 //       print(e);
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Requests an action with the given [ActionRequest].
-//   static Future<(ActionResponse?, Error?)> request(ActionRequest action) async {
+//   static Future<(ActionResponse?, DmartError?)> request(ActionRequest action) async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.post(
@@ -334,12 +334,12 @@
 //       );
 //       return (ActionResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Retrieves the entry with the given [RetrieveEntryRequest].
-//   static Future<(ResponseEntry?, Error?)> retrieveEntry(
+//   static Future<(ResponseEntry?, DmartError?)> retrieveEntry(
 //     RetrieveEntryRequest request, {
 //     String scope = "managed",
 //   }) async {
@@ -360,12 +360,12 @@
 
 //       return (ResponseEntry.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   // /// Creates a space with the given [ActionRequest].
-//   // static Future<(ActionResponse?, Error?)> createSpace(
+//   // static Future<(ActionResponse?, DmartError?)> createSpace(
 //   //   ActionRequest action,
 //   // ) async {
 //   //   _isTokenNull();
@@ -379,12 +379,12 @@
 //   //     );
 //   //     return (ActionResponse.fromJson(response.data), null);
 //   //   } on DioException catch (e) {
-//   //     return (null, _returnExceptionError(e));
+//   //     return (null, _returnExceptionDmartError(e));
 //   //   }
 //   // }
 
 //   /// Retrieves the spaces.
-//   static Future<(ActionResponse?, Error?)> getSpaces() async {
+//   static Future<(ActionResponse?, DmartError?)> getSpaces() async {
 //     return await query(
 //       QueryRequest(queryType: QueryType.spaces, spaceName: "management", subpath: "/", search: "", limit: 100),
 //     );
@@ -401,12 +401,12 @@
 
 //       return (ResponseEntry.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Progresses the ticket with the given [ProgressTicketRequest].
-//   static Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request) async {
+//   static Future<(ApiQueryResponse?, DmartError?)> progressTicket(ProgressTicketRequest request) async {
 //     _isTokenNull();
 //     try {
 //       final response = await _dio.put(
@@ -417,13 +417,13 @@
 
 //       return (ApiQueryResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Creates an attachment
 //   /// providing [spaceName], [entitySubpath], [entityShortname], [attachmentShortname], [attachmentBinary], [resourceType] and [isActive].
-//   static Future<(dynamic, Error?)> createAttachment({
+//   static Future<(dynamic, DmartError?)> createAttachment({
 //     required String spaceName,
 //     required String entitySubpath,
 //     required String entityShortname,
@@ -468,12 +468,12 @@
 
 //       return (ResponseEntry.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
 //   /// Submits a record with the given [spaceName], [schemaShortname], [subpath], and [record].
-//   static Future<(ActionResponse?, Error?)> submit(
+//   static Future<(ActionResponse?, DmartError?)> submit(
 //     String spaceName,
 //     String schemaShortname,
 //     String subpath,
@@ -494,7 +494,7 @@
 //       final response = await _dio.post(url, data: record, options: Options(headers: headers));
 //       return (ActionResponse.fromJson(response.data), null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
@@ -520,7 +520,7 @@
 //       );
 //       return (response.data, null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 
@@ -533,7 +533,7 @@
 //       );
 //       return (response.data, null);
 //     } on DioException catch (e) {
-//       return (null, _returnExceptionError(e));
+//       return (null, _returnExceptionDmartError(e));
 //     }
 //   }
 // }

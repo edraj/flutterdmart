@@ -1,5 +1,7 @@
 import 'package:dmart/src/enums/resource_type.dart';
 
+import '../enums/scope.dart';
+
 /// RetrieveEntryRequest is a class that represents a request to the API to retrieve an entry from a resource.
 class RetrieveEntryRequest {
   /// The type of resource to retrieve.
@@ -32,6 +34,15 @@ class RetrieveEntryRequest {
     this.retrieveAttachments = false,
     this.validateSchema = true,
   });
+
+  String getSubpath() => subpath == '/' ? '__root__' : subpath;
+
+  String url(Scope scope) =>
+      '/${[scope.name, 'entry', resourceType.name, spaceName, getSubpath(), shortname].join('/')}'
+              '?retrieve_json_payload=$retrieveJsonPayload'
+              '&retrieve_attachments=$retrieveAttachments'
+              '&validate_schema=$validateSchema'
+          .replaceAll(RegExp(r'/+'), '/');
 
   /// Converts the request to a JSON object.
   Map<String, dynamic> toJson() {

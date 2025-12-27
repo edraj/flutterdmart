@@ -86,7 +86,7 @@ class CreateUserAttributes {
 class CreateUserResponse {
   late String status;
   late List<ActionRequestRecord> records;
-  Error? error;
+  DmartError? error;
 
   CreateUserResponse({required this.status, required this.records, this.error});
 
@@ -94,7 +94,7 @@ class CreateUserResponse {
     return CreateUserResponse(
       status: json['status'],
       records: (json['records'] as List).map((e) => ActionRequestRecord.fromJson(e)).toList(),
-      error: json['error'] != null ? Error.fromJson(json['error']) : null,
+      error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
   }
 
