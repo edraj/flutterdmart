@@ -132,7 +132,7 @@ class Dmart {
     (data) => ApiResponse.fromJson(data),
   );
 
-  static Future<ActionResponse> submit(
+  static Future<ActionResponse<T>> submit<T>(
     String spaceName,
     String schemaShortname,
     String subpath,
@@ -140,12 +140,13 @@ class Dmart {
     String? workflowShortname,
     Map<String, dynamic> record, {
     Scope scope = Scope.public,
+    T Function(dynamic)? parser,
   }) {
     String url =
         '/${[scope.name, 'submit', spaceName, if (resourceType != null) resourceType, if (workflowShortname != null) workflowShortname, schemaShortname, subpath].join('/')}';
     return _execute(
       () => dio.post(url, data: record, options: _buildOptions(scope)),
-      (data) => ActionResponse.fromJson(data),
+      (data) => ActionResponse<T>.fromJson(data, parser),
     );
   }
 
@@ -181,7 +182,12 @@ class Dmart {
     (data) => ProfileResponse.fromJson(data),
   );
 
-  static Future<ActionResponse> query(QueryRequest query, {Scope scope = Scope.public, Map<String, dynamic>? extra}) {
+  static Future<ActionResponse<T>> query<T>(
+    QueryRequest query, {
+    Scope scope = Scope.public,
+    Map<String, dynamic>? extra,
+    T Function(dynamic)? parser,
+  }) {
     query.subpath = query.subpath.replaceAll(RegExp(r'/+'), '/');
 
     return _execute(
@@ -190,13 +196,17 @@ class Dmart {
         data: query.toJson(),
         options: _buildOptions(scope, extraHeaders: extra),
       ),
-      (data) => ActionResponse.fromJson(data),
+      (data) => ActionResponse<T>.fromJson(data, parser),
     );
   }
 
-  static Future<ActionResponse> request(ActionRequest action, {Scope scope = Scope.managed}) => _execute(
+  static Future<ActionResponse<T>> request<T>(
+    ActionRequest action, {
+    Scope scope = Scope.managed,
+    T Function(dynamic)? parser,
+  }) => _execute(
     () => dio.post(buildScopedUrl(scope, 'request'), data: action.toJson(), options: _buildOptions(scope)),
-    (data) => ActionResponse.fromJson(data),
+    (data) => ActionResponse<T>.fromJson(data, parser),
   );
 
   static Future<ResponseEntry> retrieveEntry(RetrieveEntryRequest request, {Scope scope = Scope.public}) => _execute(
@@ -204,8 +214,9 @@ class Dmart {
     (data) => ResponseEntry.fromJson(data),
   );
 
-  static Future<ActionResponse> getSpaces() =>
-      query(QueryRequest(queryType: QueryType.spaces, spaceName: "management", subpath: "/", search: "", limit: 100));
+  static Future<ActionResponse<dynamic>> getSpaces() => query<dynamic>(
+    QueryRequest(queryType: QueryType.spaces, spaceName: "management", subpath: "/", search: "", limit: 100),
+  );
 
   static Future<dynamic> getPayload(GetPayloadRequest request, {Scope scope = Scope.public}) => _execute(
     () => dio.get(request.url(scope), options: _buildOptions(scope)),

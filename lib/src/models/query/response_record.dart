@@ -2,12 +2,12 @@ import 'package:dmart/src/enums/resource_type.dart';
 import 'package:dmart/src/models/payload.dart';
 import 'package:dmart/src/models/translation.dart';
 
-class ResponseRecord {
+class ResponseRecord<T> {
   final ResourceType resourceType;
   final String uuid;
   final String shortname;
   final String subpath;
-  final ResponseRecordAttributes attributes;
+  final ResponseRecordAttributes<T> attributes;
 
   ResponseRecord({
     required this.resourceType,
@@ -17,13 +17,13 @@ class ResponseRecord {
     required this.attributes,
   });
 
-  factory ResponseRecord.fromJson(Map<String, dynamic> json) {
-    return ResponseRecord(
+  factory ResponseRecord.fromJson(Map<String, dynamic> json, [T Function(dynamic)? fromJsonT]) {
+    return ResponseRecord<T>(
       resourceType: ResourceType.byName(json['resource_type']),
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
-      attributes: ResponseRecordAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
+      attributes: ResponseRecordAttributes<T>.fromJson(Map<String, dynamic>.from(json['attributes']), fromJsonT),
     );
   }
 
@@ -39,7 +39,7 @@ class ResponseRecord {
   }
 }
 
-class ResponseRecordAttributes {
+class ResponseRecordAttributes<T> {
   final bool isActive;
   Translation? displayname;
   Translation? description;
@@ -47,7 +47,7 @@ class ResponseRecordAttributes {
   final String createdAt;
   final String updatedAt;
   final String ownerShortname;
-  final Payload? payload;
+  final Payload<T>? payload;
 
   ResponseRecordAttributes({
     required this.isActive,
@@ -60,14 +60,15 @@ class ResponseRecordAttributes {
     this.payload,
   });
 
-  factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
-    ResponseRecordAttributes responseRecordAttributes = ResponseRecordAttributes(
+  factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json, [T Function(dynamic)? fromJsonT]) {
+    ResponseRecordAttributes<T> responseRecordAttributes = ResponseRecordAttributes<T>(
       isActive: json['is_active'],
       tags: Set<String>.from(json['tags'] ?? []),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       ownerShortname: json['owner_shortname'],
-      payload: json['payload'] != null ? Payload.fromJson(Map<String, dynamic>.from(json['payload'])) : null,
+      payload:
+          json['payload'] != null ? Payload<T>.fromJson(Map<String, dynamic>.from(json['payload']), fromJsonT) : null,
     );
 
     if (json['displayname'] != null) {

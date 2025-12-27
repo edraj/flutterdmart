@@ -8,20 +8,22 @@ import 'package:dmart/src/models/status.dart';
 import '../../dmart.dart';
 import '../../enums/scope.dart';
 
-class ActionResponse extends ApiResponse {
-  List<ActionResponseRecord>? records;
+class ActionResponse<T> extends ApiResponse {
+  List<ActionResponseRecord<T>>? records;
   Attributes? attributes;
 
   ActionResponse({required super.status, super.error, this.records, this.attributes});
 
-  factory ActionResponse.fromJson(Map<String, dynamic> json) {
-    ActionResponse actionResponse = ActionResponse(
+  factory ActionResponse.fromJson(Map<String, dynamic> json, [T Function(dynamic)? fromJsonT]) {
+    ActionResponse<T> actionResponse = ActionResponse<T>(
       status: json['status'] == 'success' ? Status.success : Status.failed,
       error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
     if (json['records'] != null) {
       actionResponse.records =
-          (json['records'] as List<dynamic>).map((record) => ActionResponseRecord.fromJson(record)).toList();
+          (json['records'] as List<dynamic>)
+              .map((record) => ActionResponseRecord<T>.fromJson(record, fromJsonT))
+              .toList();
     }
     if (json['attributes'] != null) {
       actionResponse.attributes = Attributes.fromJson(json['attributes']);
@@ -48,7 +50,7 @@ class ActionResponse extends ApiResponse {
   }
 }
 
-class ActionResponseRecord extends ResponseRecord {
+class ActionResponseRecord<T> extends ResponseRecord<T> {
   late final ActionResponseAttachments? attachments;
 
   ActionResponseRecord({
@@ -98,13 +100,13 @@ class ActionResponseRecord extends ResponseRecord {
     return "$baseUrl/${scope.name}/payload/media/$spaceName/$subpath/$shortname/${med.attributes.payload!.body}";
   }
 
-  factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
-    var actionResponseRecord = ActionResponseRecord(
+  factory ActionResponseRecord.fromJson(Map<String, dynamic> json, [T Function(dynamic)? fromJsonT]) {
+    var actionResponseRecord = ActionResponseRecord<T>(
       resourceType: ResourceType.byName(json['resource_type']),
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
-      attributes: ResponseRecordAttributes.fromJson(json['attributes']),
+      attributes: ResponseRecordAttributes<T>.fromJson(Map<String, dynamic>.from(json['attributes']), fromJsonT),
     );
     if (json['attachments'] != null) {
       actionResponseRecord.attachments = ActionResponseAttachments.fromJson(json['attachments']);
@@ -129,8 +131,8 @@ class ActionResponseRecord extends ResponseRecord {
 }
 
 class ActionResponseAttachments {
-  final List<ResponseRecord>? media;
-  final List<ResponseRecord>? json;
+  final List<ResponseRecord<dynamic>>? media;
+  final List<ResponseRecord<dynamic>>? json;
 
   ActionResponseAttachments({required this.media, required this.json});
 
@@ -138,11 +140,15 @@ class ActionResponseAttachments {
     return ActionResponseAttachments(
       media:
           json['media'] != null
-              ? (json['media'] as List<dynamic>?)?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord)).toList()
+              ? (json['media'] as List<dynamic>?)
+                  ?.map((mediaRecord) => ResponseRecord<dynamic>.fromJson(mediaRecord))
+                  .toList()
               : null,
       json:
           json['json'] != null
-              ? (json['json'] as List<dynamic>?)?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord)).toList()
+              ? (json['json'] as List<dynamic>?)
+                  ?.map((jsonRecord) => ResponseRecord<dynamic>.fromJson(jsonRecord))
+                  .toList()
               : null,
     );
   }

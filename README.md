@@ -27,15 +27,15 @@ Methods:
 * `Future<(ApiResponse?, DmartError?)> validatePassword(String password)` - Validates the user's password.
 * `Future<(ProfileResponse?, DmartError?)> getProfile()` - Retrieves the current user's profile.
 * `Future<(ProfileResponse?, DmartError?)> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
-* `Future<(ApiQueryResponse?, DmartError?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
-* `Future<(ActionResponse?, DmartError?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
+* `Future<ActionResponse<T>> query<T>(QueryRequest query, {Scope scope = Scope.public, Map<String, dynamic>? extra, T Function(dynamic)? parser})` - Executes a query and returns typed response.
+* `Future<ActionResponse<T>> request<T>(ActionRequest action, {Scope scope = Scope.managed, T Function(dynamic)? parser})` - Performs an action and returns typed response.
 * `Future<(ResponseEntry?, DmartError?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
 * `Future<(ActionResponse?, DmartError?)> createSpace(ActionRequest action)` - Creates a new space.
 * `Future<(ApiQueryResponse?, DmartError?)> getSpaces()` - Retrieves a list of spaces.
 * `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
 * `Future<(ApiQueryResponse?, DmartError?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
 * `Future<(Response?, DmartError?)> createAttachment({required String shortname, required String entitySubpath, required File payloadFile, required String spaceName, bool isActive = true, String resourceType = "media"})` - Uploads an attachment.
-* `Future<(ActionResponse?, DmartError?)> submit(String spaceName, String schemaShortname, String subpath, Map<String, dynamic> record)` - Submits a record (log/feedback) to Dmart.
+* `Future<ActionResponse<T>> submit<T>(String spaceName, String schemaShortname, String subpath, String? resourceType, String? workflowShortname, Map<String, dynamic> record, {Scope scope = Scope.public, T Function(dynamic)? parser})` - Submits a record and returns typed response.
 * `String getAttachmentUrl(String resourceType, String spaceName, String subpath, String parentShortname, String shortname, String ext)` - Constructs an attachment URL.
 * `String getMediaTypeFromDmartContentType(DmartContentType.ContentType contentType)` - Returns the media type from a Dmart content type.
 
@@ -279,16 +279,72 @@ String attachmentURL = await Dmart.getAttachmentUrl(
 
 * Submit an entry
 ```dart
-var (respSubmitEntry, _) = await Dmart.submit(
+var respSubmitEntry = await Dmart.submit(
     "applications",
     "log",
     "logs",
+    null,
+    null,
     {
       "shortname": "myentry",
       "resource_type": ResourceType.content.name,
       "state": "awesome entry it is !"
     },
 );
+```
+
+## Generic Usage & Type Safety
+
+You can now use `ActionResponse` with generic types for the payload body. This improves type safety and avoids manual casting.
+
+```dart
+// 1. Define your model
+class Order {
+  final String info;
+  final String payment;
+  final int combinedOrderId;
+
+  Order({required this.info, required this.payment, required this.combinedOrderId});
+
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      info: json['info'] ?? '',
+      payment: json['payment'] ?? '',
+      combinedOrderId: json['combined_order_id'] ?? 0,
+    );
+  }
+}
+
+// 2. Perform a generic query/request/submit
+final response = await Dmart.query<Order>(
+  QueryRequest(
+    queryType: QueryType.search,
+    spaceName: "personal",
+    subpath: "people/964788198314/private/orders",
+    search: "",
+  ),
+  parser: (json) => Order.fromJson(json),
+);
+
+// 3. Access typed body and use attachment helpers
+if (response.records != null && response.records!.isNotEmpty) {
+  ActionResponseRecord<Order> record = response.records!.first;
+  
+  if (record.hasAttachment) {
+    // Get all media attachment URLs
+    List<String> urls = record.attachmentsUrls(spaceName: "mySpace");
+    
+    // Get a specific attachment by its shortname
+    String? thumb = record.getAttachementByShortname(
+      shortname: "thumbnail", 
+      spaceName: "mySpace"
+    );
+  }
+
+  // Access the correctly typed body
+  Order? order = record.attributes.payload?.body;
+  print("Order ID: ${order?.combinedOrderId}");
+}
 ```
 
 * Logout
