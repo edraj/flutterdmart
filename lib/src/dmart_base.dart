@@ -428,14 +428,16 @@ class Dmart {
 
   /// Retrieves the space with the given [GetPayloadRequest].
   static Future<dynamic> getPayload(GetPayloadRequest request, {String scope = "managed"}) async {
-    _isTokenNull();
+    if(scope == 'managed'){
+      _isTokenNull();
+    }
     try {
       final response = await _dio.get(
         '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.schemaShortname}${request.ext}',
         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
-      return (ResponseEntry.fromJson(response.data), null);
+      return (response.data?['attributes'], null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));
     }
@@ -545,8 +547,9 @@ class Dmart {
     String entityShortname,
     String attachmentShortname,
     String ext,
+    {String scope = 'managed'}
   ) {
-    return '$dmartServerUrl/managed/payload/$resourceType/$spaceName/${entitySubpath.replaceAll(RegExp(r'/+$'), '')}/$entityShortname/$attachmentShortname.$ext'
+    return '$dmartServerUrl/$scope/payload/$resourceType/$spaceName/${entitySubpath.replaceAll(RegExp(r'/+$'), '')}/$entityShortname/$attachmentShortname.$ext'
         .replaceAll('..', '.');
   }
 
