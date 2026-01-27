@@ -6,5 +6,5 @@ enum ActionType {
   delete,
   attach,
   move,
-  progressTicket,
+  progress_ticket,
 }
