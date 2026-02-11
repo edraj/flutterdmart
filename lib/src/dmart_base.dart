@@ -8,10 +8,6 @@ import 'package:dmart/src/exceptions.dart';
 import 'package:dmart/src/extensions/map_extension.dart';
 import 'package:http_parser/http_parser.dart';
 
-import 'models/request/confirm_otp_request.dart';
-import 'models/request/password_reset_request.dart';
-import 'models/request/send_otp_request.dart';
-
 /// Dmart class that has all the methods to interact with the Dmart server.
 class Dmart {
   /// The base url of the Dmart server.
@@ -574,6 +570,21 @@ class Dmart {
         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (response.data, null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+  /// Attaches a record to a space with the given [spaceName] and [record].
+  static Future<(ActionResponse?, Error?)> attach({
+    required String spaceName,
+    required Record record,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/attach/$spaceName',
+        data: record.toJson(),
+      );
+      return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));
     }

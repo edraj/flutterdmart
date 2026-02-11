@@ -29,6 +29,8 @@ class ActionResponse extends ApiResponse {
     }
     if (json['attributes'] != null) {
       actionResponse.attributes = Attributes.fromJson(json['attributes']);
+    } else {
+      actionResponse.attributes = Attributes(returned: 0, total: 0);
     }
 
     return actionResponse;
