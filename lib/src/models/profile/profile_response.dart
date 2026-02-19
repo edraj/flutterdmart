@@ -1,6 +1,7 @@
 import 'package:dmart/src/enums/language.dart';
 import 'package:dmart/src/enums/resource_type.dart';
 import 'package:dmart/src/models/api_response.dart';
+import 'package:dmart/src/models/description.dart';
 import 'package:dmart/src/models/displayname.dart';
 import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/profile/permission.dart';
@@ -50,6 +51,7 @@ class ProfileResponseRecordAttributes {
   final String? email;
   final String? msisdn;
   final Displayname? displayname;
+  final Description? description;
   final String type;
   final String? firebaseToken;
   final Language? language;
@@ -64,6 +66,7 @@ class ProfileResponseRecordAttributes {
     this.msisdn,
     this.firebaseToken,
     this.displayname,
+    this.description,
     required this.type,
     this.language,
     required this.isEmailVerified,
@@ -80,6 +83,8 @@ class ProfileResponseRecordAttributes {
       firebaseToken: json['firebase_token'],
       displayname:
           json['displayname'] != null ? Displayname.fromJson(Map<String, dynamic>.from(json['displayname'])) : null,
+      description:
+        json['description'] != null ? Description.fromJson(Map<String, dynamic>.from(json['description'])) : null,
       type: json['type'],
       language: Language.values.byName(json['language']),
       isEmailVerified: json['is_email_verified'],
