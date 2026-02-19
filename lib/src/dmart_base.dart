@@ -468,7 +468,9 @@ class Dmart {
     bool isActive = true,
     String scope = "managed",
   }) async {
-    _isTokenNull();
+    if(scope == 'managed'){
+      _isTokenNull();
+    }
 
     Map<String, dynamic> payloadData = {
       'resource_type': resourceType,
@@ -574,15 +576,38 @@ class Dmart {
       return (null, _returnExceptionError(e));
     }
   }
-  /// Attaches a record to a space with the given [spaceName] and [record].
+  /// Attaches a record to a space with the given [spaceName], [record], and optional [payloadFile].
+  ///
+  /// The [record] is sent as a JSON-encoded form field, and [payloadFile] is sent as
+  /// a multipart file upload if provided.
   static Future<(ActionResponse?, Error?)> attach({
     required String spaceName,
     required Record record,
+    File? payloadFile,
   }) async {
+    _isTokenNull();
     try {
+      final formData = FormData();
+      formData.fields.add(
+        MapEntry('record', json.encode(record.toJson())),
+      );
+
+      if (payloadFile != null) {
+        formData.files.add(
+          MapEntry(
+            'payload_file',
+            await MultipartFile.fromFile(payloadFile.path),
+          ),
+        );
+      }
+
       final response = await _dio.post(
         '/attach/$spaceName',
-        data: record.toJson(),
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+          headers: {...headers, "Authorization": "Bearer $token"},
+        ),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {

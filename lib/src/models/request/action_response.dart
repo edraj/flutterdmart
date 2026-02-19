@@ -65,12 +65,23 @@ class ActionResponseRecord extends ResponseRecord {
   });
 
   factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
+    final attributes = json['attributes'] != null
+        ? ResponseRecordAttributes.fromJson(json['attributes'])
+        : ResponseRecordAttributes.fromJson({
+            'is_active': json['is_active'],
+            'payload': json['payload'],
+            'tags': json['tags'],
+            'created_at': json['created_at'],
+            'updated_at': json['updated_at'],
+            'owner_shortname': json['owner_shortname'],
+          });
+
     var actionResponseRecord = ActionResponseRecord(
       resourceType: ResourceType.values.byName(json['resource_type']),
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
-      attributes: ResponseRecordAttributes.fromJson(json['attributes']),
+      attributes: attributes,
     );
     if (json['attachments'] != null) {
       actionResponseRecord.attachments = ActionResponseAttachments.fromJson(
