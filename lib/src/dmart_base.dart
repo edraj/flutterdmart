@@ -51,6 +51,16 @@ class Dmart {
 
   static String getMediaTypeFromDmartContentType(DmartContentType.ContentType contentType) {
     switch (contentType) {
+      case DmartContentType.ContentType.imageSVG:
+        return "image/svg+xml";
+      case DmartContentType.ContentType.imageJpeg:
+        return "image/jpeg";
+      case DmartContentType.ContentType.imagePng:
+        return "image/png";
+      case DmartContentType.ContentType.imageGif:
+        return "image/gif";
+      case DmartContentType.ContentType.imageWebp:
+        return "image/webp";
       case DmartContentType.ContentType.image:
         return "image/*";
       case DmartContentType.ContentType.text:
@@ -424,7 +434,7 @@ class Dmart {
 
   /// Retrieves the space with the given [GetPayloadRequest].
   static Future<dynamic> getPayload(GetPayloadRequest request, {String scope = "managed"}) async {
-    if(scope == 'managed'){
+    if (scope == 'managed') {
       _isTokenNull();
     }
     try {
@@ -544,9 +554,9 @@ class Dmart {
     String entitySubpath,
     String entityShortname,
     String attachmentShortname,
-    String ext,
-    {String scope = 'managed'}
-  ) {
+    String ext, {
+    String scope = 'managed',
+  }) {
     return '$dmartServerUrl/$scope/payload/$resourceType/$spaceName/${entitySubpath.replaceAll(RegExp(r'/+$'), '')}/$entityShortname/$attachmentShortname.$ext'
         .replaceAll('..', '.');
   }
