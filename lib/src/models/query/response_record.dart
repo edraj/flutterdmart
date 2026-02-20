@@ -51,7 +51,7 @@ class ResponseRecordAttributes {
   final String updatedAt;
   final String ownerShortname;
   final Payload? payload;
-  final String slug;
+  final String? slug;
 
   ResponseRecordAttributes({
     required this.isActive,
@@ -62,7 +62,7 @@ class ResponseRecordAttributes {
     required this.updatedAt,
     required this.ownerShortname,
     this.payload,
-    required this.slug,
+    this.slug,
   });
 
   factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
@@ -101,7 +101,10 @@ class ResponseRecordAttributes {
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['owner_shortname'] = ownerShortname;
-    data['slug'] = slug;
+
+    if (slug != null) {
+      data['slug'] = slug;
+    }
     if (payload != null) {
       data['payload'] = payload!.toJson();
     }
