@@ -7,7 +7,7 @@ class ResponseRecord {
   final String uuid;
   final String shortname;
   final String subpath;
-  final String slug;
+
   final ResponseRecordAttributes attributes;
 
   ResponseRecord({
@@ -16,7 +16,6 @@ class ResponseRecord {
     required this.shortname,
     required this.subpath,
     required this.attributes,
-    required this.slug,
   });
 
   factory ResponseRecord.fromJson(Map<String, dynamic> json) {
@@ -25,7 +24,7 @@ class ResponseRecord {
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
-      slug: json['slug'],
+
       attributes: ResponseRecordAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
     );
   }
@@ -38,7 +37,7 @@ class ResponseRecord {
     data['shortname'] = shortname;
     data['subpath'] = subpath;
     data['attributes'] = attributes.toJson();
-    data['slug'] = slug;
+
     return data;
   }
 }
@@ -52,6 +51,7 @@ class ResponseRecordAttributes {
   final String updatedAt;
   final String ownerShortname;
   final Payload? payload;
+  final String slug;
 
   ResponseRecordAttributes({
     required this.isActive,
@@ -62,6 +62,7 @@ class ResponseRecordAttributes {
     required this.updatedAt,
     required this.ownerShortname,
     this.payload,
+    required this.slug,
   });
 
   factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
@@ -70,6 +71,7 @@ class ResponseRecordAttributes {
       tags: Set<String>.from(json['tags'] ?? []),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
+      slug: json['slug'],
       ownerShortname: json['owner_shortname'],
       payload: json['payload'] != null ? Payload.fromJson(Map<String, dynamic>.from(json['payload'])) : null,
     );
@@ -99,6 +101,7 @@ class ResponseRecordAttributes {
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['owner_shortname'] = ownerShortname;
+    data['slug'] = slug;
     if (payload != null) {
       data['payload'] = payload!.toJson();
     }
