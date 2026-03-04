@@ -60,7 +60,7 @@ class ProfileResponseRecordAttributes {
   final bool forcePasswordChange;
   final Map<String, Permission> permissions;
   final Map<String, dynamic>? payload;
-  final List<String> groups;
+  final List<dynamic> groups;
 
   ProfileResponseRecordAttributes({
     this.email,
