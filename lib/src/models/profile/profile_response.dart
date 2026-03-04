@@ -60,6 +60,7 @@ class ProfileResponseRecordAttributes {
   final bool forcePasswordChange;
   final Map<String, Permission> permissions;
   final Map<String, dynamic>? payload;
+  final List<String> groups;
 
   ProfileResponseRecordAttributes({
     this.email,
@@ -74,6 +75,7 @@ class ProfileResponseRecordAttributes {
     required this.forcePasswordChange,
     required this.permissions,
     this.payload,
+    required this.groups,
   });
 
   factory ProfileResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
@@ -84,7 +86,7 @@ class ProfileResponseRecordAttributes {
       displayname:
           json['displayname'] != null ? Displayname.fromJson(Map<String, dynamic>.from(json['displayname'])) : null,
       description:
-        json['description'] != null ? Description.fromJson(Map<String, dynamic>.from(json['description'])) : null,
+          json['description'] != null ? Description.fromJson(Map<String, dynamic>.from(json['description'])) : null,
       type: json['type'],
       language: Language.values.byName(json['language']),
       isEmailVerified: json['is_email_verified'],
@@ -94,6 +96,7 @@ class ProfileResponseRecordAttributes {
       permissions: Map<String, Permission>.from(
         json['permissions'].map((key, value) => MapEntry(key, Permission.fromJson(value))),
       ),
+      groups: json['groups'] ?? [],
     );
   }
 
@@ -110,6 +113,7 @@ class ProfileResponseRecordAttributes {
       'is_msisdn_verified': isMsisdnVerified,
       'force_password_change': forcePasswordChange,
       'permissions': permissions.map((key, value) => MapEntry(key, value.toJson())),
+      'groups': groups,
     };
   }
 }
