@@ -96,7 +96,7 @@ class ProfileResponseRecordAttributes {
       permissions: Map<String, Permission>.from(
         json['permissions'].map((key, value) => MapEntry(key, Permission.fromJson(value))),
       ),
-      groups: json['groups'] ?? [],
+      groups: List<String>.from(json['groups'] ?? []),
     );
   }
 
