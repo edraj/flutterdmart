@@ -302,7 +302,7 @@ class Dmart {
   }
 
   /// Update the profile of the user.
-  static Future<Error?> updateProfile(ActionRequestRecord profile) async {
+  static Future<(bool?, Error?)> updateProfile(ActionRequestRecord profile) async {
     _isTokenNull();
     try {
       final response = await _dio.post(
@@ -313,8 +313,9 @@ class Dmart {
 
       final profileResponse = ProfileResponse.fromJson(response.data);
       if (profileResponse.status == Status.success) {
-        return null;
+        return (true, null);
       }
+
       return (
         null,
         Error(
