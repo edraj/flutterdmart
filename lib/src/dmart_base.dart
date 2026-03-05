@@ -145,11 +145,7 @@ class Dmart {
   /// Logs in the user with the given [loginRequest].
   static Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest) async {
     try {
-      final response = await _dio.post(
-        '/user/login',
-        data: loginRequest.toJson(),
-        options: Options(headers: headers),
-      );
+      final response = await _dio.post('/user/login', data: loginRequest.toJson(), options: Options(headers: headers));
       var loginResponse = LoginResponse.fromJson(response.data);
       token = loginResponse.token;
       return (loginResponse, null);
@@ -306,7 +302,7 @@ class Dmart {
   }
 
   /// Update the profile of the user.
-  static Future<Error?> updateProfile(ActionRequestRecord profile) async {
+  static Future<(bool?, Error?)> updateProfile(ActionRequestRecord profile) async {
     _isTokenNull();
     try {
       final response = await _dio.post(
@@ -317,16 +313,20 @@ class Dmart {
 
       final profileResponse = ProfileResponse.fromJson(response.data);
       if (profileResponse.status == Status.success) {
-        return null;
+        return (true, null);
       }
-      return Error(
-        type: 'unknown',
-        code: 0,
-        info: [profileResponse.error?.toJson() ?? {}],
-        message: "Unable to retrieve the profile.",
+
+      return (
+        null,
+        Error(
+          type: 'unknown',
+          code: 0,
+          info: [profileResponse.error?.toJson() ?? {}],
+          message: "Unable to retrieve the profile.",
+        ),
       );
     } on DioException catch (e) {
-      return _returnExceptionError(e);
+      return (null, _returnExceptionError(e));
     }
   }
 
@@ -538,11 +538,7 @@ class Dmart {
       }
       url += '/$schemaShortname/$subpath';
 
-      final response = await _dio.post(
-        url,
-        data: record,
-        options: Options(headers: headers),
-      );
+      final response = await _dio.post(url, data: record, options: Options(headers: headers));
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));
