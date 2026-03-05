@@ -302,7 +302,7 @@ class Dmart {
   }
 
   /// Update the profile of the user.
-  static Future<(ProfileResponse?, Error?)> updateProfile(ActionRequestRecord profile) async {
+  static Future<Error?> updateProfile(ActionRequestRecord profile) async {
     _isTokenNull();
     try {
       final response = await _dio.post(
@@ -312,12 +312,9 @@ class Dmart {
       );
 
       final profileResponse = ProfileResponse.fromJson(response.data);
-      if (profileResponse.status == Status.success &&
-          profileResponse.records != null &&
-          profileResponse.records!.isNotEmpty) {
-        return (profileResponse, null);
+      if (profileResponse.status == Status.success) {
+        return null;
       }
-
       return (
         null,
         Error(
@@ -478,7 +475,7 @@ class Dmart {
     bool isActive = true,
     String scope = "managed",
   }) async {
-    if(scope == 'managed'){
+    if (scope == 'managed') {
       _isTokenNull();
     }
 
@@ -586,6 +583,7 @@ class Dmart {
       return (null, _returnExceptionError(e));
     }
   }
+
   /// Attaches a record to a space with the given [spaceName], [record], and optional [payloadFile].
   ///
   /// The [record] is sent as a JSON-encoded form field, and [payloadFile] is sent as
@@ -598,26 +596,16 @@ class Dmart {
     _isTokenNull();
     try {
       final formData = FormData();
-      formData.fields.add(
-        MapEntry('record', json.encode(record.toJson())),
-      );
+      formData.fields.add(MapEntry('record', json.encode(record.toJson())));
 
       if (payloadFile != null) {
-        formData.files.add(
-          MapEntry(
-            'payload_file',
-            await MultipartFile.fromFile(payloadFile.path),
-          ),
-        );
+        formData.files.add(MapEntry('payload_file', await MultipartFile.fromFile(payloadFile.path)));
       }
 
       final response = await _dio.post(
         '/attach/$spaceName',
         data: formData,
-        options: Options(
-          contentType: 'multipart/form-data',
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(contentType: 'multipart/form-data', headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
