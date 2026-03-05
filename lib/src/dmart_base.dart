@@ -30,21 +30,14 @@ class Dmart {
     return _dioInstance!;
   }
 
-  static final Map<String, dynamic> headers = {
-    "content-type": "application/json",
-  };
+  static final Map<String, dynamic> headers = {"content-type": "application/json"};
 
   static Error _returnExceptionError(DioException e) {
     if (e.response?.data?["error"] != null) {
       return Error.fromJson(e.response?.data["error"]);
     }
 
-    return Error(
-      type: 'unknown',
-      code: 0,
-      info: [],
-      message: e.message ?? e.error.toString(),
-    );
+    return Error(type: 'unknown', code: 0, info: [], message: e.message ?? e.error.toString());
   }
 
   static void _isTokenNull() {
@@ -56,9 +49,7 @@ class Dmart {
     }
   }
 
-  static String getMediaTypeFromDmartContentType(
-    DmartContentType.ContentType contentType,
-  ) {
+  static String getMediaTypeFromDmartContentType(DmartContentType.ContentType contentType) {
     switch (contentType) {
       case DmartContentType.ContentType.imageSVG:
         return "image/svg+xml";
@@ -116,9 +107,7 @@ class Dmart {
       _dioInstance = dio;
       dmartServerUrl = dio.options.baseUrl;
       if (dioConfig != null) {
-        print(
-          '[WARNING] setting dioConfig will be ignored as dio is provided!',
-        );
+        print('[WARNING] setting dioConfig will be ignored as dio is provided!');
       }
     } else {
       dioConfig ??= BaseOptions(
@@ -132,24 +121,15 @@ class Dmart {
 
     if (isDioVerbose) {
       _dioInstance?.interceptors.add(
-        LogInterceptor(
-          requestBody: true,
-          requestHeader: true,
-          responseBody: true,
-          responseHeader: true,
-        ),
+        LogInterceptor(requestBody: true, requestHeader: true, responseBody: true, responseHeader: true),
       );
-      _dioInstance?.interceptors.add(
-        LogInterceptor(logPrint: (o) => print(o.toString())),
-      );
+      _dioInstance?.interceptors.add(LogInterceptor(logPrint: (o) => print(o.toString())));
     }
 
     _dioInstance?.interceptors.addAll(interceptors);
   }
 
-  static Future<(dynamic, Error?)> checkExisting(
-    CheckExistingParams params,
-  ) async {
+  static Future<(dynamic, Error?)> checkExisting(CheckExistingParams params) async {
     try {
       final response = await Dmart._dio.get(
         '/user/check-existing',
@@ -163,9 +143,7 @@ class Dmart {
   }
 
   /// Logs in the user with the given [loginRequest].
-  static Future<(LoginResponse?, Error?)> login(
-    LoginRequest loginRequest,
-  ) async {
+  static Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest) async {
     try {
       final response = await _dio.post(
         '/user/login',
@@ -181,9 +159,7 @@ class Dmart {
   }
 
   /// Creates a user with the given [createUserRequest].
-  static Future<(CreateUserResponse?, Error?)> createUser(
-    CreateUserRequest createUserRequest,
-  ) async {
+  static Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest) async {
     try {
       final response = await _dio.post(
         '/user/create',
@@ -203,9 +179,7 @@ class Dmart {
       final response = await _dio.post(
         '/user/logout',
         data: {},
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ApiResponse.fromJson(response.data), null);
@@ -215,9 +189,7 @@ class Dmart {
   }
 
   /// Requests an OTP for the given [SendOTPRequest].
-  static Future<(ApiResponse?, Error?)> otpRequest(
-    SendOTPRequest request,
-  ) async {
+  static Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request) async {
     try {
       final response = await _dio.post(
         '/user/otp-request',
@@ -231,9 +203,7 @@ class Dmart {
   }
 
   /// Requests an OTP for login with the given [SendOTPRequest].
-  static Future<(ApiResponse?, Error?)> otpRequestLogin(
-    SendOTPRequest request,
-  ) async {
+  static Future<(ApiResponse?, Error?)> otpRequestLogin(SendOTPRequest request) async {
     try {
       final response = await _dio.post(
         '/user/otp-request-login',
@@ -247,9 +217,7 @@ class Dmart {
   }
 
   /// Requests a password reset with the given [PasswordResetRequest].
-  static Future<(ApiResponse?, Error?)> passwordResetRequest(
-    PasswordResetRequest request,
-  ) async {
+  static Future<(ApiResponse?, Error?)> passwordResetRequest(PasswordResetRequest request) async {
     try {
       final response = await _dio.post(
         '/user/password-reset-request',
@@ -263,17 +231,13 @@ class Dmart {
   }
 
   /// Confirms OTP with the given [ConfirmOTPRequest].
-  static Future<(ApiResponse?, Error?)> confirmOTP(
-    ConfirmOTPRequest request,
-  ) async {
+  static Future<(ApiResponse?, Error?)> confirmOTP(ConfirmOTPRequest request) async {
     _isTokenNull();
     try {
       final response = await _dio.post(
         '/user/otp-confirm',
         data: request.toJson().withoutNulls(),
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ApiResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -288,9 +252,7 @@ class Dmart {
       final response = await _dio.post(
         '/user/reset',
         data: {'shortname': shortname},
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ApiResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -299,17 +261,13 @@ class Dmart {
   }
 
   /// Validates password for the authenticated user.
-  static Future<(ApiResponse?, Error?)> validatePassword(
-    String password,
-  ) async {
+  static Future<(ApiResponse?, Error?)> validatePassword(String password) async {
     _isTokenNull();
     try {
       final response = await _dio.post(
         '/user/validate_password',
         data: {'password': password},
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ApiResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -323,9 +281,7 @@ class Dmart {
     try {
       final response = await _dio.get(
         '/user/profile',
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       final profileResponse = ProfileResponse.fromJson(response.data);
@@ -355,9 +311,7 @@ class Dmart {
     try {
       final response = await _dio.post(
         '/user/profile',
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
         data: profile.toJson(),
       );
 
@@ -396,10 +350,7 @@ class Dmart {
       final response = await _dio.post(
         '/$scope/query',
         data: query.toJson(),
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-          extra: extra,
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}, extra: extra),
       );
 
       return (ActionResponse.fromJson(response.data), null);
@@ -416,9 +367,7 @@ class Dmart {
       final response = await _dio.post(
         '/managed/request',
         data: action.toJson(),
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       if (action.requestType == RequestType.delete) {
         return (null, null);
@@ -446,9 +395,7 @@ class Dmart {
       final response = await _dio.get(
         '/$scope/entry/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}?retrieve_json_payload=${request.retrieveJsonPayload}&retrieve_attachments=${request.retrieveAttachments}&validate_schema=${request.validateSchema}'
             .replaceAll(RegExp(r'/+'), '/'),
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ResponseEntry.fromJson(response.data), null);
@@ -479,30 +426,19 @@ class Dmart {
   /// Retrieves the spaces.
   static Future<(ActionResponse?, Error?)> getSpaces() async {
     return await query(
-      QueryRequest(
-        queryType: QueryType.spaces,
-        spaceName: "management",
-        subpath: "/",
-        search: "",
-        limit: 100,
-      ),
+      QueryRequest(queryType: QueryType.spaces, spaceName: "management", subpath: "/", search: "", limit: 100),
     );
   }
 
   /// Retrieves the space with the given [GetPayloadRequest].
-  static Future<dynamic> getPayload(
-    GetPayloadRequest request, {
-    String scope = "managed",
-  }) async {
+  static Future<dynamic> getPayload(GetPayloadRequest request, {String scope = "managed"}) async {
     if (scope == 'managed') {
       _isTokenNull();
     }
     try {
       final response = await _dio.get(
         '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.schemaShortname}${request.ext}',
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (response.data?['attributes'], null);
@@ -512,17 +448,13 @@ class Dmart {
   }
 
   /// Progresses the ticket with the given [ProgressTicketRequest].
-  static Future<(ApiQueryResponse?, Error?)> progressTicket(
-    ProgressTicketRequest request,
-  ) async {
+  static Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request) async {
     _isTokenNull();
     try {
       final response = await _dio.put(
         '/managed/progress-ticket/${request.spaceName}/${request.subpath}/${request.shortname}/${request.action}',
         data: {'resolution': request.resolution, 'comment': request.comment},
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ApiQueryResponse.fromJson(response.data), null);
@@ -539,8 +471,7 @@ class Dmart {
     required String entityShortname,
     required String attachmentShortname,
     required File attachmentBinary,
-    DmartContentType.ContentType contentType =
-        DmartContentType.ContentType.image,
+    DmartContentType.ContentType contentType = DmartContentType.ContentType.image,
     String resourceType = "media",
     bool isActive = true,
     String scope = "managed",
@@ -566,20 +497,12 @@ class Dmart {
         'payload_file',
         await MultipartFile.fromFile(
           attachmentBinary.path,
-          contentType: MediaType.parse(
-            getMediaTypeFromDmartContentType(contentType),
-          ),
+          contentType: MediaType.parse(getMediaTypeFromDmartContentType(contentType)),
         ),
       ),
     );
     formData.files.add(
-      MapEntry(
-        'request_record',
-        MultipartFile.fromBytes(
-          utf8.encode(payloadJson),
-          filename: 'payload.json',
-        ),
-      ),
+      MapEntry('request_record', MultipartFile.fromBytes(utf8.encode(payloadJson), filename: 'payload.json')),
     );
     formData.fields.add(MapEntry('space_name', spaceName));
 
@@ -587,10 +510,7 @@ class Dmart {
       Response? response = await _dio.post(
         '/$scope/resource_with_payload',
         data: formData,
-        options: Options(
-          contentType: 'multipart/form-data',
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(contentType: 'multipart/form-data', headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
       return (ResponseEntry.fromJson(response.data), null);
@@ -648,9 +568,7 @@ class Dmart {
     try {
       final response = await _dio.get(
         '/info/manifest',
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (response.data, null);
     } on DioException catch (e) {
@@ -663,9 +581,7 @@ class Dmart {
     try {
       final response = await _dio.get(
         '/info/settings',
-        options: Options(
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (response.data, null);
     } on DioException catch (e) {
@@ -688,21 +604,13 @@ class Dmart {
       formData.fields.add(MapEntry('record', json.encode(record.toJson())));
 
       if (payloadFile != null) {
-        formData.files.add(
-          MapEntry(
-            'payload_file',
-            await MultipartFile.fromFile(payloadFile.path),
-          ),
-        );
+        formData.files.add(MapEntry('payload_file', await MultipartFile.fromFile(payloadFile.path)));
       }
 
       final response = await _dio.post(
         '/attach/$spaceName',
         data: formData,
-        options: Options(
-          contentType: 'multipart/form-data',
-          headers: {...headers, "Authorization": "Bearer $token"},
-        ),
+        options: Options(contentType: 'multipart/form-data', headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
