@@ -46,8 +46,6 @@ class ActionRequestRecord {
   /// The attachments to perform the action with.
   final Map<ResourceType, List<dynamic>>? attachments;
 
-   /// The state of the resource.
-  final bool isActive;
 
   ActionRequestRecord({
     required this.resourceType,
@@ -55,7 +53,6 @@ class ActionRequestRecord {
     required this.subpath,
     required this.attributes,
     this.attachments,
-    this.isActive = false,
   });
 
   factory ActionRequestRecord.fromJson(Map<String, dynamic> json) {
@@ -68,7 +65,6 @@ class ActionRequestRecord {
           json['attachments'] != null
               ? Map<ResourceType, List<dynamic>>.from(json['attachments'])
               : null,
-      isActive: json['is_active'] ?? false,
     );
   }
 
@@ -79,7 +75,6 @@ class ActionRequestRecord {
       "shortname": shortname,
       "subpath": subpath,
       "attributes": attributes,
-      "is_active": isActive,
     };
   }
 }
