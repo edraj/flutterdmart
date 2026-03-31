@@ -11,6 +11,7 @@ class LoginRequest {
   String? otp;
   String? invitation;
   String? firebaseToken;
+  String? deviceID;
   String? msisdn;
   String? password;
 
@@ -34,6 +35,7 @@ class LoginRequest {
       'email': email,
       'msisdn': msisdn,
       'firebase_token': firebaseToken,
+      'device_id': deviceID,
       'otp': otp,
       'invitation': invitation,
       'password': password,
@@ -42,7 +44,6 @@ class LoginRequest {
     return data;
   }
 }
-
 
 class LoginResponse extends BaseResponse {
   String? token;
@@ -72,10 +73,7 @@ class LoginResponse extends BaseResponse {
 
   /// Converts the LoginResponse object to a JSON map.
   Map<String, dynamic> toJson() {
-    return {
-      'status': status?.name,
-      'records': records?.map((record) => record.toJson()).toList(),
-    };
+    return {'status': status?.name, 'records': records?.map((record) => record.toJson()).toList()};
   }
 }
 
@@ -90,18 +88,11 @@ class LoginAttributes {
   LoginAttributes.fromJson(Map<String, dynamic> json) {
     accessToken = json['access_token'];
     type = json['type'];
-    displayname =
-        json['displayname'] != null
-            ? Displayname.fromJson(json['displayname'])
-            : null;
+    displayname = json['displayname'] != null ? Displayname.fromJson(json['displayname']) : null;
   }
 
   /// Converts the LoginAttributes object to a JSON map.
   Map<String, dynamic> toJson() {
-    return {
-      'access_token': accessToken,
-      'type': type,
-      'displayname': displayname?.toJson(),
-    };
+    return {'access_token': accessToken, 'type': type, 'displayname': displayname?.toJson()};
   }
 }
