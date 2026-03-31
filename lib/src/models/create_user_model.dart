@@ -28,6 +28,7 @@ class CreateUserAttributes {
   late List<String>? roles;
   late List<String>? groups;
   late String? firebaseToken;
+  late String? deviceID;
   late String? language;
   late bool? isEmailVerified;
   late bool? isMsisdnVerified;
@@ -45,6 +46,7 @@ class CreateUserAttributes {
     this.roles,
     this.groups,
     this.firebaseToken,
+    this.deviceID,
     this.language,
     this.isEmailVerified,
     this.isMsisdnVerified,
@@ -72,7 +74,8 @@ class CreateUserAttributes {
     'password': password,
     'roles': roles,
     'groups': groups,
-    'firebaseToken': firebaseToken,
+    'firebase_token': firebaseToken,
+    'device_id': deviceID,
     'language': language,
     'isEmailVerified': isEmailVerified,
     'isMsisdnVerified': isMsisdnVerified,
