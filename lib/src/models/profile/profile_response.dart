@@ -7,30 +7,25 @@ import 'package:dmart/src/models/status.dart';
 import 'package:dmart/src/models/translation.dart';
 
 class ProfileResponse extends ApiResponse {
-  List<ProfileResponseRecord>? records;
-
-  ProfileResponse({required Status status, DmartError? error, this.records})
-    : super(status: status, error: error);
+  ProfileResponse({required super.status, super.error, this.records});
 
   factory ProfileResponse.fromJson(Map<String, dynamic> json) {
-    ProfileResponse profileResponse = ProfileResponse(
+    final ProfileResponse profileResponse = ProfileResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
       error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
     if (json['records'] != null) {
-      profileResponse.records = (json['records'] as List<dynamic>)
-          .map((record) => ProfileResponseRecord.fromJson(record))
-          .toList();
+      profileResponse.records =
+          (json['records'] as List<dynamic>)
+              .map((record) => ProfileResponseRecord.fromJson(record))
+              .toList();
     }
     return profileResponse;
   }
+  List<ProfileResponseRecord>? records;
 }
 
 class ProfileResponseRecord {
-  String shortname;
-  ResourceType resourceType;
-  final ProfileResponseRecordAttributes attributes;
-
   ProfileResponseRecord({
     required this.resourceType,
     required this.shortname,
@@ -48,23 +43,12 @@ class ProfileResponseRecord {
       ),
     );
   }
+  String shortname;
+  ResourceType resourceType;
+  final ProfileResponseRecordAttributes attributes;
 }
 
 class ProfileResponseRecordAttributes {
-  final String? email;
-  final String? msisdn;
-  final Translation? displayname;
-  final Translation? description;
-  final String type;
-  final String? firebaseToken;
-  final Language? language;
-  final bool isEmailVerified;
-  final bool isMsisdnVerified;
-  final bool forcePasswordChange;
-  final Map<String, Permission> permissions;
-  final Map<String, dynamic>? payload;
-  final List<String> groups;
-
   ProfileResponseRecordAttributes({
     this.email,
     this.msisdn,
@@ -86,12 +70,18 @@ class ProfileResponseRecordAttributes {
       email: json['email'],
       msisdn: json['msisdn'],
       firebaseToken: json['firebase_token'],
-      displayname: json['displayname'] != null
-          ? Translation.fromJson(Map<String, dynamic>.from(json['displayname']))
-          : null,
-      description: json['description'] != null
-          ? Translation.fromJson(Map<String, dynamic>.from(json['description']))
-          : null,
+      displayname:
+          json['displayname'] != null
+              ? Translation.fromJson(
+                Map<String, dynamic>.from(json['displayname']),
+              )
+              : null,
+      description:
+          json['description'] != null
+              ? Translation.fromJson(
+                Map<String, dynamic>.from(json['description']),
+              )
+              : null,
       type: json['type'],
       language: Language.values.byName(json['language']),
       isEmailVerified: json['is_email_verified'],
@@ -106,6 +96,19 @@ class ProfileResponseRecordAttributes {
       groups: List<String>.from(json['groups'] ?? []),
     );
   }
+  final String? email;
+  final String? msisdn;
+  final Translation? displayname;
+  final Translation? description;
+  final String type;
+  final String? firebaseToken;
+  final Language? language;
+  final bool isEmailVerified;
+  final bool isMsisdnVerified;
+  final bool forcePasswordChange;
+  final Map<String, Permission> permissions;
+  final Map<String, dynamic>? payload;
+  final List<String> groups;
 
   /// Converts the ProfileResponseRecordAttributes object to a JSON object.
   Map<String, dynamic> toJson() {

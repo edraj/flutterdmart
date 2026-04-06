@@ -6,15 +6,6 @@ import 'package:dmart/src/models/status.dart';
 import 'package:dmart/src/models/translation.dart';
 
 class LoginRequest {
-  String? shortname;
-  String? email;
-  String? otp;
-  String? invitation;
-  String? firebaseToken;
-  String? deviceID;
-  String? msisdn;
-  String? password;
-
   LoginRequest({required this.shortname, required this.password});
 
   LoginRequest.withShortnameAndOTP({
@@ -34,6 +25,14 @@ class LoginRequest {
   LoginRequest.withMSISDN({required this.msisdn, required this.password});
 
   LoginRequest.withMSISDNAndOTP({required this.msisdn, required this.otp});
+  String? shortname;
+  String? email;
+  String? otp;
+  String? invitation;
+  String? firebaseToken;
+  String? deviceID;
+  String? msisdn;
+  String? password;
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
@@ -52,11 +51,6 @@ class LoginRequest {
 }
 
 class LoginResponse extends BaseResponse {
-  String? token;
-  UserType? type;
-  Translation? displayname;
-  DmartError? error;
-
   LoginResponse({this.token, required super.status, super.records});
 
   /// Converts the LoginResponse object to a JSON map.
@@ -68,16 +62,23 @@ class LoginResponse extends BaseResponse {
     }
     if (json['records'] != null && json['records']!.isNotEmpty) {
       records = [];
-      Record? record = Record.fromJson(json['records'][0]);
+      final Record record = Record.fromJson(json['records'][0]);
       records?.add(record);
-      LoginAttributes? attribute = LoginAttributes.fromJson(record.attributes);
+      final LoginAttributes attribute = LoginAttributes.fromJson(
+        record.attributes,
+      );
       token = attribute.accessToken;
       type = UserType.values.byName(attribute.type ?? 'web');
       displayname = attribute.displayname;
     }
   }
+  String? token;
+  UserType? type;
+  Translation? displayname;
+  DmartError? error;
 
   /// Converts the LoginResponse object to a JSON map.
+  @override
   Map<String, dynamic> toJson() {
     return {
       'status': status?.name,
@@ -87,20 +88,20 @@ class LoginResponse extends BaseResponse {
 }
 
 class LoginAttributes {
-  String? accessToken;
-  String? type;
-  Translation? displayname;
-
   LoginAttributes({this.accessToken, this.type, this.displayname});
 
   /// Converts the LoginAttributes object to a JSON map.
   LoginAttributes.fromJson(Map<String, dynamic> json) {
     accessToken = json['access_token'];
     type = json['type'];
-    displayname = json['displayname'] != null
-        ? Translation.fromJson(json['displayname'])
-        : null;
+    displayname =
+        json['displayname'] != null
+            ? Translation.fromJson(json['displayname'])
+            : null;
   }
+  String? accessToken;
+  String? type;
+  Translation? displayname;
 
   /// Converts the LoginAttributes object to a JSON map.
   Map<String, dynamic> toJson() {

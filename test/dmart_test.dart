@@ -26,7 +26,7 @@ void main() {
       expect(loginError, isNull);
       expect(loginResponse, isNotNull);
 
-      var (profile, profileError) = await Dmart.getProfile();
+      final (profile, profileError) = await Dmart.getProfile();
       expect(profileError, isNull);
       expect(profile, isNotNull);
       expect(profile?.records, isNotEmpty);

@@ -2,6 +2,16 @@ import 'package:dmart/src/enums/resource_type.dart';
 
 /// RetrieveEntryRequest is a class that represents a request to the API to retrieve an entry from a resource.
 class RetrieveEntryRequest {
+  RetrieveEntryRequest({
+    required this.resourceType,
+    required this.spaceName,
+    required this.subpath,
+    required this.shortname,
+    this.retrieveJsonPayload = false,
+    this.retrieveAttachments = false,
+    this.validateSchema = true,
+  });
+
   /// The type of resource to retrieve.
   final ResourceType resourceType;
 
@@ -22,16 +32,6 @@ class RetrieveEntryRequest {
 
   /// Whether to validate the schema of the resource.
   final bool validateSchema;
-
-  RetrieveEntryRequest({
-    required this.resourceType,
-    required this.spaceName,
-    required this.subpath,
-    required this.shortname,
-    this.retrieveJsonPayload = false,
-    this.retrieveAttachments = false,
-    this.validateSchema = true,
-  });
 
   /// Converts the request to a JSON object.
   Map<String, dynamic> toJson() {

@@ -3,9 +3,6 @@ import 'package:dmart/src/models/status.dart';
 
 /// Base response class for Dmart API responses.
 class ApiResponse {
-  final Status status;
-  final DmartError? error;
-
   ApiResponse({required this.status, this.error});
 
   factory ApiResponse.fromJson(Map<String, dynamic> json) {
@@ -14,6 +11,8 @@ class ApiResponse {
       error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
   }
+  final Status status;
+  final DmartError? error;
 
   /// Converts the ApiResponse object to a JSON object.
   Map<String, dynamic> toJson() {

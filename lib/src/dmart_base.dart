@@ -3,8 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dmart/dmart.dart';
-import 'package:dmart/src/enums/content_type.dart' as DmartContentType;
-import 'package:dmart/src/exceptions.dart';
+import 'package:dmart/src/enums/content_type.dart' as dmart_content_type;
 import 'package:dmart/src/extensions/map_extension.dart';
 import 'package:http_parser/http_parser.dart';
 
@@ -14,10 +13,13 @@ import 'package:http_parser/http_parser.dart';
 /// Authentication is managed via [login] which stores the token internally.
 class Dmart {
   /// The base url of the Dmart server.
-  static String dmartServerUrl = "localhost:8282";
+  static String dmartServerUrl = 'localhost:8282';
 
   /// The token that is used for authentication.
   static String? token;
+
+  // ignore: avoid_print
+  static void _defaultLogPrint(String message) => print(message);
 
   /// Pre-compiled regex for collapsing multiple consecutive slashes.
   static final RegExp _multiSlashRegExp = RegExp(r'/+');
@@ -32,26 +34,26 @@ class Dmart {
   static Dio get _dio {
     if (_dioInstance == null) {
       throw DmartException(
-        DmartExceptionEnum.NOT_INITIALIZED,
-        DmartExceptionMessages.messages[DmartExceptionEnum.NOT_INITIALIZED]!,
+        DmartExceptionEnum.notInitialized,
+        DmartExceptionMessages.messages[DmartExceptionEnum.notInitialized]!,
       );
     }
     return _dioInstance!;
   }
 
   static final Map<String, dynamic> headers = {
-    "content-type": "application/json",
+    'content-type': 'application/json',
   };
 
   /// Returns headers with the Authorization bearer token included.
   static Map<String, dynamic> get _authHeaders => {
     ...headers,
-    "Authorization": "Bearer $token",
+    'Authorization': 'Bearer $token',
   };
 
   static DmartError _returnExceptionError(DioException e) {
-    if (e.response?.data?["error"] != null) {
-      return DmartError.fromJson(e.response?.data["error"]);
+    if (e.response?.data?['error'] != null) {
+      return DmartError.fromJson(e.response?.data['error']);
     }
 
     return DmartError(
@@ -65,54 +67,55 @@ class Dmart {
   static void _isTokenNull() {
     if (token == null) {
       throw DmartException(
-        DmartExceptionEnum.NOT_VALID_TOKEN,
-        DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!,
+        DmartExceptionEnum.notValidToken,
+        DmartExceptionMessages.messages[DmartExceptionEnum.notValidToken]!,
       );
     }
   }
 
-  static String getMediaTypeFromDmartContentType(
-    DmartContentType.ContentType contentType,
+  /// Returns the MIME type string for a given [ContentType].
+  static String getMediaTypeFromContentType(
+    dmart_content_type.ContentType contentType,
   ) {
     switch (contentType) {
-      case DmartContentType.ContentType.imageSVG:
-        return "image/svg+xml";
-      case DmartContentType.ContentType.imageJpeg:
-        return "image/jpeg";
-      case DmartContentType.ContentType.imagePng:
-        return "image/png";
-      case DmartContentType.ContentType.imageGif:
-        return "image/gif";
-      case DmartContentType.ContentType.imageWebp:
-        return "image/webp";
-      case DmartContentType.ContentType.image:
-        return "image/*";
-      case DmartContentType.ContentType.text:
-        return "text/*";
-      case DmartContentType.ContentType.html:
-        return "text/html";
-      case DmartContentType.ContentType.markdown:
-        return "text/markdown";
-      case DmartContentType.ContentType.json:
-        return "application/json";
-      case DmartContentType.ContentType.python:
-        return "application/*";
-      case DmartContentType.ContentType.pdf:
-        return "application/pdf";
-      case DmartContentType.ContentType.audio:
-        return "audio/*";
-      case DmartContentType.ContentType.video:
-        return "video/*";
-      case DmartContentType.ContentType.jsonl:
-        return "application/octet-stream";
-      case DmartContentType.ContentType.csv:
-        return "text/csv";
-      case DmartContentType.ContentType.sqlite:
-        return "application/octet-stream";
-      case DmartContentType.ContentType.parquet:
-        return "application/octet-stream";
-      case DmartContentType.ContentType.apk:
-        return "application/vnd.android.package-archive";
+      case dmart_content_type.ContentType.imageSVG:
+        return 'image/svg+xml';
+      case dmart_content_type.ContentType.imageJpeg:
+        return 'image/jpeg';
+      case dmart_content_type.ContentType.imagePng:
+        return 'image/png';
+      case dmart_content_type.ContentType.imageGif:
+        return 'image/gif';
+      case dmart_content_type.ContentType.imageWebp:
+        return 'image/webp';
+      case dmart_content_type.ContentType.image:
+        return 'image/*';
+      case dmart_content_type.ContentType.text:
+        return 'text/*';
+      case dmart_content_type.ContentType.html:
+        return 'text/html';
+      case dmart_content_type.ContentType.markdown:
+        return 'text/markdown';
+      case dmart_content_type.ContentType.json:
+        return 'application/json';
+      case dmart_content_type.ContentType.python:
+        return 'application/*';
+      case dmart_content_type.ContentType.pdf:
+        return 'application/pdf';
+      case dmart_content_type.ContentType.audio:
+        return 'audio/*';
+      case dmart_content_type.ContentType.video:
+        return 'video/*';
+      case dmart_content_type.ContentType.jsonl:
+        return 'application/octet-stream';
+      case dmart_content_type.ContentType.csv:
+        return 'text/csv';
+      case dmart_content_type.ContentType.sqlite:
+        return 'application/octet-stream';
+      case dmart_content_type.ContentType.parquet:
+        return 'application/octet-stream';
+      case dmart_content_type.ContentType.apk:
+        return 'application/vnd.android.package-archive';
     }
   }
 
@@ -127,6 +130,7 @@ class Dmart {
     BaseOptions? dioConfig,
     Iterable<Interceptor> interceptors = const [],
     bool isDioVerbose = false,
+    void Function(String) verboseLogPrint = _defaultLogPrint,
   }) async {
     if (dio != null) {
       _dioInstance = dio;
@@ -148,7 +152,7 @@ class Dmart {
           requestHeader: true,
           responseBody: true,
           responseHeader: true,
-          logPrint: (o) => print(o.toString()),
+          logPrint: (o) => verboseLogPrint(o.toString()),
         ),
       );
     }
@@ -182,7 +186,7 @@ class Dmart {
         data: loginRequest.toJson(),
         options: Options(headers: headers),
       );
-      var loginResponse = LoginResponse.fromJson(response.data);
+      final loginResponse = LoginResponse.fromJson(response.data);
       token = loginResponse.token;
       return (loginResponse, null);
     } on DioException catch (e) {
@@ -341,7 +345,7 @@ class Dmart {
           type: 'unknown',
           code: 0,
           info: [profileResponse.error?.toJson() ?? {}],
-          message: "Unable to retrieve the profile.",
+          message: 'Unable to retrieve the profile.',
         ),
       );
     } on DioException catch (e) {
@@ -372,7 +376,7 @@ class Dmart {
           type: 'unknown',
           code: 0,
           info: [profileResponse.error?.toJson() ?? {}],
-          message: "Unable to update the profile.",
+          message: 'Unable to update the profile.',
         ),
       );
     } on DioException catch (e) {
@@ -383,13 +387,13 @@ class Dmart {
   /// Queries resources with the given [QueryRequest].
   static Future<(ActionResponse?, DmartError?)> query(
     QueryRequest query, {
-    String scope = "managed",
+    String scope = 'managed',
     Map<String, dynamic>? extra,
   }) async {
-    if (token == null && scope == "managed") {
+    if (token == null && scope == 'managed') {
       throw DmartException(
-        DmartExceptionEnum.NOT_VALID_TOKEN,
-        DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!,
+        DmartExceptionEnum.notValidToken,
+        DmartExceptionMessages.messages[DmartExceptionEnum.notValidToken]!,
       );
     }
     try {
@@ -435,16 +439,16 @@ class Dmart {
   /// Retrieves the entry with the given [RetrieveEntryRequest].
   static Future<(ResponseEntry?, DmartError?)> retrieveEntry(
     RetrieveEntryRequest request, {
-    String scope = "managed",
+    String scope = 'managed',
   }) async {
-    if (token == null && scope == "managed") {
+    if (token == null && scope == 'managed') {
       throw DmartException(
-        DmartExceptionEnum.NOT_VALID_TOKEN,
-        DmartExceptionMessages.messages[DmartExceptionEnum.NOT_VALID_TOKEN]!,
+        DmartExceptionEnum.notValidToken,
+        DmartExceptionMessages.messages[DmartExceptionEnum.notValidToken]!,
       );
     }
     try {
-      final subpath = request.subpath == "/" ? "__root__" : request.subpath;
+      final subpath = request.subpath == '/' ? '__root__' : request.subpath;
       final response = await _dio.get(
         '/$scope/entry/${request.resourceType.name}/${request.spaceName}/$subpath/${request.shortname}?retrieve_json_payload=${request.retrieveJsonPayload}&retrieve_attachments=${request.retrieveAttachments}&validate_schema=${request.validateSchema}'
             .replaceAll(_multiSlashRegExp, '/'),
@@ -462,9 +466,9 @@ class Dmart {
     return await query(
       QueryRequest(
         queryType: QueryType.spaces,
-        spaceName: "management",
-        subpath: "/",
-        search: "",
+        spaceName: 'management',
+        subpath: '/',
+        search: '',
         limit: 100,
       ),
     );
@@ -473,7 +477,7 @@ class Dmart {
   /// Retrieves the payload for the given [GetPayloadRequest].
   static Future<(dynamic, DmartError?)> getPayload(
     GetPayloadRequest request, {
-    String scope = "managed",
+    String scope = 'managed',
   }) async {
     if (scope == 'managed') {
       _isTokenNull();
@@ -518,35 +522,35 @@ class Dmart {
     required String entityShortname,
     required String attachmentShortname,
     required File attachmentBinary,
-    DmartContentType.ContentType contentType =
-        DmartContentType.ContentType.image,
-    String resourceType = "media",
+    dmart_content_type.ContentType contentType =
+        dmart_content_type.ContentType.image,
+    String resourceType = 'media',
     bool isActive = true,
-    String scope = "managed",
+    String scope = 'managed',
   }) async {
     if (scope == 'managed') {
       _isTokenNull();
     }
 
-    Map<String, dynamic> payloadData = {
+    final Map<String, dynamic> payloadData = {
       'resource_type': resourceType,
       'shortname': attachmentShortname,
-      'subpath': "$entitySubpath/$entityShortname",
+      'subpath': '$entitySubpath/$entityShortname',
       'attributes': {
         'is_active': isActive,
-        "payload": {'content_type': contentType.name, 'body': {}},
+        'payload': {'content_type': contentType.name, 'body': {}},
       },
     };
-    var payloadJson = json.encode(payloadData);
+    final payloadJson = json.encode(payloadData);
 
-    FormData formData = FormData();
+    final FormData formData = FormData();
     formData.files.add(
       MapEntry(
         'payload_file',
         await MultipartFile.fromFile(
           attachmentBinary.path,
           contentType: MediaType.parse(
-            getMediaTypeFromDmartContentType(contentType),
+            getMediaTypeFromContentType(contentType),
           ),
         ),
       ),
@@ -563,7 +567,7 @@ class Dmart {
     formData.fields.add(MapEntry('space_name', spaceName));
 
     try {
-      Response? response = await _dio.post(
+      final Response response = await _dio.post(
         '/$scope/resource_with_payload',
         data: formData,
         options: Options(

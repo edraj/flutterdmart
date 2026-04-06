@@ -1,14 +1,4 @@
 class MetaExtended {
-  final String? email;
-  final String? msisdn;
-  final bool? isEmailVerified;
-  final bool? isMsisdnVerified;
-  final bool? forcePasswordChange;
-  final String? password;
-  final String? workflowShortname;
-  final String? state;
-  final bool? isOpen;
-
   MetaExtended({
     this.email,
     this.msisdn,
@@ -35,6 +25,15 @@ class MetaExtended {
       isOpen: json['is_open'],
     );
   }
+  final String? email;
+  final String? msisdn;
+  final bool? isEmailVerified;
+  final bool? isMsisdnVerified;
+  final bool? forcePasswordChange;
+  final String? password;
+  final String? workflowShortname;
+  final String? state;
+  final bool? isOpen;
 
   /// Converts the object to a JSON object.
   Map<String, dynamic> toJson() {

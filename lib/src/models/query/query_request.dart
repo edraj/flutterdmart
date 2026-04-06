@@ -4,6 +4,27 @@ import 'package:dmart/src/enums/sort_type.dart';
 
 /// QueryRequest is a class that represents a request to the API to query resources.
 class QueryRequest {
+  QueryRequest({
+    required this.queryType,
+    required this.spaceName,
+    required this.subpath,
+    this.search,
+    this.filterTypes,
+    this.filterSchemaNames,
+    this.filterShortnames,
+    this.fromDate,
+    this.toDate,
+    this.sortBy,
+    this.sortType,
+    this.retrieveJsonPayload,
+    this.retrieveAttachments,
+    this.validateSchema,
+    this.jqFilter,
+    this.exactSubpath,
+    this.limit,
+    this.offset,
+  });
+
   /// The type of query to perform.
   QueryType queryType;
 
@@ -58,43 +79,20 @@ class QueryRequest {
   /// The offset of the resources to retrieve.
   int? offset;
 
-  QueryRequest({
-    required this.queryType,
-    required this.spaceName,
-    required this.subpath,
-    this.search,
-    this.filterTypes,
-    this.filterSchemaNames,
-    this.filterShortnames,
-    this.fromDate,
-    this.toDate,
-    this.sortBy,
-    this.sortType,
-    this.retrieveJsonPayload,
-    this.retrieveAttachments,
-    this.validateSchema,
-    this.jqFilter,
-    this.exactSubpath,
-    this.limit,
-    this.offset,
-  });
-
   /// Converts the QueryRequest object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
-      'type': queryType.toString().split('.').last,
+      'type': queryType.jsonValue,
       'space_name': spaceName,
       'subpath': subpath,
-      'filter_types': filterTypes
-          ?.map((type) => type.toString().split('.').last)
-          .toList(),
+      'filter_types': filterTypes?.map((type) => type.name).toList(),
       'filter_schema_names': filterSchemaNames,
       'filter_shortnames': filterShortnames,
       'search': search,
       'from_date': fromDate,
       'to_date': toDate,
       'sort_by': sortBy,
-      'sort_type': sortType?.toString().split('.').last,
+      'sort_type': sortType?.name,
       'retrieve_json_payload': retrieveJsonPayload,
       'retrieve_attachments': retrieveAttachments,
       'validate_schema': validateSchema,

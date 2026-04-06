@@ -1,11 +1,4 @@
 class ProgressTicketRequest {
-  final String spaceName;
-  final String subpath;
-  final String shortname;
-  final String action;
-  final String? resolution;
-  final String? comment;
-
   ProgressTicketRequest({
     required this.spaceName,
     required this.subpath,
@@ -14,6 +7,12 @@ class ProgressTicketRequest {
     this.resolution,
     this.comment,
   });
+  final String spaceName;
+  final String subpath;
+  final String shortname;
+  final String action;
+  final String? resolution;
+  final String? comment;
 
   /// Converts the request to a JSON object.
   Map<String, dynamic> toJson() {

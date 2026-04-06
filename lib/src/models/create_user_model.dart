@@ -3,39 +3,21 @@ import 'package:dmart/src/models/request/action_request.dart';
 import 'package:dmart/src/models/translation.dart';
 
 class CreateUserRequest {
+  CreateUserRequest({this.shortname = 'auto', required this.attributes});
   late CreateUserAttributes attributes;
 
   String shortname;
 
-  CreateUserRequest({this.shortname = "auto", required this.attributes});
-
   /// Converts the CreateUserRequest object to a JSON object.
   Map<String, dynamic> toJson() => {
     'shortname': shortname,
-    'subpath': "users",
-    'resource_type': "user",
+    'subpath': 'users',
+    'resource_type': 'user',
     'attributes': attributes.toJson(),
   };
 }
 
 class CreateUserAttributes {
-  late String invitation;
-  late Translation displayname;
-  late String? email;
-  late String? profilePicUrl;
-  late String? msisdn;
-  late String? password;
-  late List<String>? roles;
-  late List<String>? groups;
-  late String? firebaseToken;
-  late String? deviceID;
-  late String? language;
-  late bool? isEmailVerified;
-  late bool? isMsisdnVerified;
-  late bool? forcePasswordChange;
-  late String? msisdnOTP;
-  late String? emailOTP;
-
   CreateUserAttributes({
     required this.invitation,
     required this.displayname,
@@ -64,9 +46,8 @@ class CreateUserAttributes {
         msisdn: json['msisdn'],
         password: json['password'],
         roles: json['roles'] != null ? List<String>.from(json['roles']) : null,
-        groups: json['groups'] != null
-            ? List<String>.from(json['groups'])
-            : null,
+        groups:
+            json['groups'] != null ? List<String>.from(json['groups']) : null,
         firebaseToken: json['firebase_token'],
         deviceID: json['device_id'],
         language: json['language'],
@@ -76,6 +57,22 @@ class CreateUserAttributes {
         msisdnOTP: json['msisdn_otp'],
         emailOTP: json['email_otp'],
       );
+  late String invitation;
+  late Translation displayname;
+  late String? email;
+  late String? profilePicUrl;
+  late String? msisdn;
+  late String? password;
+  late List<String>? roles;
+  late List<String>? groups;
+  late String? firebaseToken;
+  late String? deviceID;
+  late String? language;
+  late bool? isEmailVerified;
+  late bool? isMsisdnVerified;
+  late bool? forcePasswordChange;
+  late String? msisdnOTP;
+  late String? emailOTP;
 
   /// Converts the CreateUserAttributes object to a JSON object.
   Map<String, dynamic> toJson() => {
@@ -100,21 +97,21 @@ class CreateUserAttributes {
 }
 
 class CreateUserResponse {
-  late String status;
-  late List<ActionRequestRecord> records;
-  DmartError? error;
-
   CreateUserResponse({required this.status, required this.records, this.error});
 
   factory CreateUserResponse.fromJson(Map<String, dynamic> json) {
     return CreateUserResponse(
       status: json['status'],
-      records: (json['records'] as List)
-          .map((e) => ActionRequestRecord.fromJson(e))
-          .toList(),
+      records:
+          (json['records'] as List)
+              .map((e) => ActionRequestRecord.fromJson(e))
+              .toList(),
       error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
   }
+  late String status;
+  late List<ActionRequestRecord> records;
+  DmartError? error;
 
   /// Converts the CreateUserResponse object to a JSON object.
   Map<String, dynamic> toJson() => {'status': status, 'error': error?.toJson()};
