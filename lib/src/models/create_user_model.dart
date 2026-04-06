@@ -1,41 +1,23 @@
-import 'package:dmart/src/models/displayname.dart';
 import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/request/action_request.dart';
+import 'package:dmart/src/models/translation.dart';
 
 class CreateUserRequest {
+  CreateUserRequest({this.shortname = 'auto', required this.attributes});
   late CreateUserAttributes attributes;
 
   String shortname;
 
-  CreateUserRequest({this.shortname = "auto", required this.attributes});
-
   /// Converts the CreateUserRequest object to a JSON object.
   Map<String, dynamic> toJson() => {
     'shortname': shortname,
-    'subpath': "users",
-    'resource_type': "user",
+    'subpath': 'users',
+    'resource_type': 'user',
     'attributes': attributes.toJson(),
   };
 }
 
 class CreateUserAttributes {
-  late String invitation;
-  late Displayname displayname;
-  late String? email;
-  late String? profilePicUrl;
-  late String? msisdn;
-  late String? password;
-  late List<String>? roles;
-  late List<String>? groups;
-  late String? firebaseToken;
-  late String? deviceID;
-  late String? language;
-  late bool? isEmailVerified;
-  late bool? isMsisdnVerified;
-  late bool? forcePasswordChange;
-  late String? msisdnOTP;
-  late String? emailOTP;
-
   CreateUserAttributes({
     required this.invitation,
     required this.displayname,
@@ -55,14 +37,42 @@ class CreateUserAttributes {
     this.emailOTP,
   });
 
-  factory CreateUserAttributes.fromJson(Map<String, dynamic> json) => CreateUserAttributes(
-    invitation: json['invitation'],
-    displayname: Displayname.fromJson(json['displayname']),
-    email: json['email'],
-    profilePicUrl: json['profile_pic_url'],
-    msisdn: json['msisdn'],
-    password: json['password'],
-  );
+  factory CreateUserAttributes.fromJson(Map<String, dynamic> json) =>
+      CreateUserAttributes(
+        invitation: json['invitation'],
+        displayname: Translation.fromJson(json['displayname']),
+        email: json['email'],
+        profilePicUrl: json['profile_pic_url'],
+        msisdn: json['msisdn'],
+        password: json['password'],
+        roles: json['roles'] != null ? List<String>.from(json['roles']) : null,
+        groups:
+            json['groups'] != null ? List<String>.from(json['groups']) : null,
+        firebaseToken: json['firebase_token'],
+        deviceID: json['device_id'],
+        language: json['language'],
+        isEmailVerified: json['is_email_verified'],
+        isMsisdnVerified: json['is_msisdn_verified'],
+        forcePasswordChange: json['force_password_change'],
+        msisdnOTP: json['msisdn_otp'],
+        emailOTP: json['email_otp'],
+      );
+  late String invitation;
+  late Translation displayname;
+  late String? email;
+  late String? profilePicUrl;
+  late String? msisdn;
+  late String? password;
+  late List<String>? roles;
+  late List<String>? groups;
+  late String? firebaseToken;
+  late String? deviceID;
+  late String? language;
+  late bool? isEmailVerified;
+  late bool? isMsisdnVerified;
+  late bool? forcePasswordChange;
+  late String? msisdnOTP;
+  late String? emailOTP;
 
   /// Converts the CreateUserAttributes object to a JSON object.
   Map<String, dynamic> toJson() => {
@@ -77,9 +87,9 @@ class CreateUserAttributes {
     'firebase_token': firebaseToken,
     'device_id': deviceID,
     'language': language,
-    'isEmailVerified': isEmailVerified,
-    'isMsisdnVerified': isMsisdnVerified,
-    'forcePasswordChange': forcePasswordChange,
+    'is_email_verified': isEmailVerified,
+    'is_msisdn_verified': isMsisdnVerified,
+    'force_password_change': forcePasswordChange,
     'is_active': true,
     'msisdn_otp': msisdnOTP,
     'email_otp': emailOTP,
@@ -87,19 +97,21 @@ class CreateUserAttributes {
 }
 
 class CreateUserResponse {
-  late String status;
-  late List<ActionRequestRecord> records;
-  Error? error;
-
   CreateUserResponse({required this.status, required this.records, this.error});
 
   factory CreateUserResponse.fromJson(Map<String, dynamic> json) {
     return CreateUserResponse(
       status: json['status'],
-      records: (json['records'] as List).map((e) => ActionRequestRecord.fromJson(e)).toList(),
-      error: json['error'] != null ? Error.fromJson(json['error']) : null,
+      records:
+          (json['records'] as List)
+              .map((e) => ActionRequestRecord.fromJson(e))
+              .toList(),
+      error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
   }
+  late String status;
+  late List<ActionRequestRecord> records;
+  DmartError? error;
 
   /// Converts the CreateUserResponse object to a JSON object.
   Map<String, dynamic> toJson() => {'status': status, 'error': error?.toJson()};

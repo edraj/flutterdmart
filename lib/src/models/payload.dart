@@ -3,6 +3,33 @@ import 'package:dmart/src/enums/validation_status.dart';
 
 /// Payload is a class that represents the payload of a resource.
 class Payload {
+  Payload({
+    required this.contentType,
+    this.schemaShortname,
+    required this.checksum,
+    required this.body,
+    required this.lastValidated,
+    this.validationStatus,
+  });
+
+  /// Converts a JSON object to a Payload object.
+  factory Payload.fromJson(Map<String, dynamic> json) {
+    final Payload payload = Payload(
+      contentType: ContentType.parse(json['content_type']),
+      schemaShortname: json['schema_shortname'],
+      checksum: json['checksum'],
+      body: json['body'],
+      lastValidated: json['last_validated'],
+    );
+    if (json['validation_status'] != null) {
+      payload.validationStatus = ValidationStatus.values.byName(
+        json['validation_status'],
+      );
+    }
+
+    return payload;
+  }
+
   /// The type of content in the payload.
   final ContentType contentType;
 
@@ -20,31 +47,6 @@ class Payload {
 
   /// The status of the validation of the payload.
   ValidationStatus? validationStatus;
-
-  Payload({
-    required this.contentType,
-    this.schemaShortname,
-    required this.checksum,
-    required this.body,
-    required this.lastValidated,
-    this.validationStatus,
-  });
-
-  /// Converts a JSON object to a Payload object.
-  factory Payload.fromJson(Map<String, dynamic> json) {
-    Payload payload = Payload(
-      contentType: ContentType.get(json['content_type']),
-      schemaShortname: json['schema_shortname'],
-      checksum: json['checksum'],
-      body: json['body'],
-      lastValidated: json['last_validated'],
-    );
-    if (json['validation_status'] != null) {
-      payload.validationStatus = ValidationStatus.values.byName(json['validation_status']);
-    }
-
-    return payload;
-  }
 
   /// Converts the Payload object to a JSON object.
   Map<String, dynamic> toJson() {

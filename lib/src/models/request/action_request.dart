@@ -3,6 +3,12 @@ import 'package:dmart/src/enums/resource_type.dart';
 
 /// ActionRequest is a class that represents a request to the API to perform an action on a resource.
 class ActionRequest {
+  ActionRequest({
+    required this.spaceName,
+    required this.requestType,
+    required this.records,
+  });
+
   /// The name of the space in which the resource resides.
   final String spaceName;
 
@@ -12,17 +18,11 @@ class ActionRequest {
   /// The records to perform the action on.
   final List<ActionRequestRecord> records;
 
-  ActionRequest({
-    required this.spaceName,
-    required this.requestType,
-    required this.records,
-  });
-
   /// Converts the ActionRequest object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
       'space_name': spaceName,
-      'request_type': requestType.name,
+      'request_type': requestType.jsonValue,
       'records':
           records.map((ActionRequestRecord record) => record.toJson()).toList(),
     };
@@ -31,24 +31,6 @@ class ActionRequest {
 
 /// ActionRequestRecord is a class that represents a record in an ActionRequest.
 class ActionRequestRecord {
-  /// The type of resource to perform the action on.
-  final ResourceType resourceType;
-
-  /// The shortname of the resource.
-  String shortname;
-
-  /// The subpath of the resource.
-  final String subpath;
-
-  /// The attributes to perform the action with.
-  final Map<String, dynamic> attributes;
-
-  /// The attachments to perform the action with.
-  final Map<ResourceType, List<dynamic>>? attachments;
-
-   /// The state of the resource.
-  final bool isActive;
-
   ActionRequestRecord({
     required this.resourceType,
     this.shortname = 'auto',
@@ -72,14 +54,32 @@ class ActionRequestRecord {
     );
   }
 
+  /// The type of resource to perform the action on.
+  final ResourceType resourceType;
+
+  /// The shortname of the resource.
+  String shortname;
+
+  /// The subpath of the resource.
+  final String subpath;
+
+  /// The attributes to perform the action with.
+  final Map<String, dynamic> attributes;
+
+  /// The attachments to perform the action with.
+  final Map<ResourceType, List<dynamic>>? attachments;
+
+  /// The state of the resource.
+  final bool isActive;
+
   /// Converts the ActionRequestRecord object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
-      "resource_type": resourceType.name,
-      "shortname": shortname,
-      "subpath": subpath,
-      "attributes": attributes,
-      "is_active": isActive,
+      'resource_type': resourceType.name,
+      'shortname': shortname,
+      'subpath': subpath,
+      'attributes': attributes,
+      'is_active': isActive,
     };
   }
 }

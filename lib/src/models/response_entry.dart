@@ -3,30 +3,16 @@ import 'package:dmart/src/models/payload.dart';
 import 'package:dmart/src/models/translation.dart';
 
 class ResponseEntry extends MetaExtended {
-  final String? uuid;
-  final String? shortname;
-  final String? subpath;
-  final bool? isActive;
-  Translation? displayname;
-  Translation? description;
-  final Set<String>? tags;
-  final String? createdAt;
-  final String? updatedAt;
-  final String? ownerShortname;
-  final Payload? payload;
-  final List<dynamic>? acl;
-  final Map<String, dynamic>? attachments;
-
   ResponseEntry({
-    String? email,
-    String? msisdn,
-    bool? isEmailVerified,
-    bool? isMsisdnVerified,
-    bool? forcePasswordChange,
-    String? password,
-    bool? isOpen,
-    String? workflowShortname,
-    String? state,
+    super.email,
+    super.msisdn,
+    super.isEmailVerified,
+    super.isMsisdnVerified,
+    super.forcePasswordChange,
+    super.password,
+    super.isOpen,
+    super.workflowShortname,
+    super.state,
     required this.uuid,
     required this.shortname,
     required this.subpath,
@@ -40,21 +26,10 @@ class ResponseEntry extends MetaExtended {
     this.payload,
     this.acl,
     this.attachments,
-  }) : super(
-         email: email,
-         msisdn: msisdn,
-         isEmailVerified: isEmailVerified,
-         isMsisdnVerified: isMsisdnVerified,
-         forcePasswordChange: forcePasswordChange,
-         password: password,
-         workflowShortname: workflowShortname,
-         state: state,
-         isOpen: isOpen,
-       );
+  });
 
   factory ResponseEntry.fromJson(Map<String, dynamic> json) {
-    print(json);
-    ResponseEntry responseEntry = ResponseEntry(
+    final ResponseEntry responseEntry = ResponseEntry(
       email: json['email'],
       msisdn: json['msisdn'],
       isEmailVerified: json['is_email_verified'],
@@ -96,8 +71,22 @@ class ResponseEntry extends MetaExtended {
 
     return responseEntry;
   }
+  final String? uuid;
+  final String? shortname;
+  final String? subpath;
+  final bool? isActive;
+  Translation? displayname;
+  Translation? description;
+  final Set<String>? tags;
+  final String? createdAt;
+  final String? updatedAt;
+  final String? ownerShortname;
+  final Payload? payload;
+  final List<dynamic>? acl;
+  final Map<String, dynamic>? attachments;
 
   /// Converts the ResponseEntry object to a JSON object.
+  @override
   Map<String, dynamic> toJson() {
     return {
       'email': email,

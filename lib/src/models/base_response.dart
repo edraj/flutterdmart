@@ -2,9 +2,6 @@ import 'package:dmart/src/models/record.dart';
 import 'package:dmart/src/models/status.dart';
 
 class BaseResponse {
-  Status? status;
-  List<Record>? records;
-
   BaseResponse({this.status, this.records});
 
   BaseResponse.fromJson(Map<String, dynamic> json) {
@@ -16,6 +13,8 @@ class BaseResponse {
       });
     }
   }
+  Status? status;
+  List<Record>? records;
 
   /// Converts the BaseResponse object to a JSON object.
   Map<String, dynamic> toJson() {

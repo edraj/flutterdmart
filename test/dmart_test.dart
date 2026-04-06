@@ -2,61 +2,59 @@ import 'package:dmart/dmart.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
+  group('Dmart client', () {
     setUp(() {
       // Additional setup goes here.
     });
 
-    // test('Check dio init', () async {
-    //   const baseUrl = 'https://dmart.cc/dmart';
-    //   Dmart.dmartServerUrl = baseUrl;
-    //   Dmart.initDmart();
-    //   expect(true, true);
-    // });
-    //
-    // test('Test login', () async {
-    //   const baseUrl = 'https://dmart.cc/dmart';
-    //   Dmart.dmartServerUrl = baseUrl;
-    //   Dmart.initDmart();
-    //   final response = await Dmart.login(
-    //     LoginRequest(shortname: 'test', password: 'test'),
-    //   );
-    //   print(response);
-    //   expect(response, isNotNull);
-    // });
-
-    test('Test get payload', () async {
+    test('login, profile, and updateProfile succeed', () async {
       const baseUrl = 'https://dmart.cc/dmart';
       Dmart.dmartServerUrl = baseUrl;
-      Dmart.initDmart();
-      final _ = await Dmart.login(
-        LoginRequest(shortname: 'dmart', password: 'TestTest1234'),
-      );
-      var (x, y) = await Dmart.getProfile();
-      print(x?.records![0].attributes.language);
+      await Dmart.init();
 
-      (x, y) = await Dmart.updateProfile(
+      final loginResponse = await Dmart.login(
+        LoginRequest(
+          shortname: const String.fromEnvironment(
+            'DMART_USER',
+            defaultValue: 'dmart',
+          ),
+          password: const String.fromEnvironment(
+            'DMART_PASS',
+            defaultValue: '',
+          ),
+        ),
+      );
+      expect(loginResponse.token, isNotNull);
+
+      final profile = await Dmart.getProfile();
+      expect(profile.records, isNotEmpty);
+
+      await Dmart.updateProfile(
         ActionRequestRecord(
-          shortname: 'dmart',
+          shortname: const String.fromEnvironment(
+            'DMART_USER',
+            defaultValue: 'dmart',
+          ),
           resourceType: ResourceType.user,
           subpath: 'users',
           attributes: {'language': 'kurdish'},
         ),
       );
+    });
 
-      print(y?.info);
+    test('throws DmartApiException on bad credentials', () async {
+      const baseUrl = 'https://dmart.cc/dmart';
+      Dmart.dmartServerUrl = baseUrl;
+      await Dmart.init();
 
-      // final (response, error) = await Dmart.query(
-      //   QueryRequest(
-      //     queryType: QueryType.search,
-      //     spaceName: 'management',
-      //     subpath: 'users',
-      //     filterTypes: [ResourceType.comment],
-      //   ),
-      //   scope: 'public',
-      // );
-      // print(response!.toJson());
-      // expect(response, isNotNull);
+      expect(
+        () => Dmart.login(LoginRequest(shortname: 'nobody', password: 'wrong')),
+        throwsA(isA<DmartApiException>()),
+      );
+    });
+
+    test('throws DmartException when not initialized', () {
+      expect(() => Dmart.getProfile(), throwsA(isA<DmartException>()));
     });
   });
 }

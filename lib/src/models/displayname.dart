@@ -1,18 +1,5 @@
-class Displayname {
-  String? en;
-  String? ar;
-  String? ku;
+import 'package:dmart/src/models/translation.dart';
 
-  Displayname({this.en, this.ar, this.ku});
-
-  Displayname.fromJson(Map<String, dynamic> json) {
-    en = json['en'];
-    ar = json['ar'];
-    ku = json['ku'];
-  }
-
-  /// Converts the Displayname object to a JSON object.
-  Map<String, dynamic> toJson() {
-    return {'ar': ar, 'en': en, 'ku': ku};
-  }
-}
+/// Deprecated: Use [Translation] instead.
+@Deprecated('Use Translation instead')
+typedef Displayname = Translation;

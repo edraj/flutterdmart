@@ -1,1 +1,2 @@
-enum SortyType { ascending, descending }
+/// The sort order for query results.
+enum SortType { ascending, descending }

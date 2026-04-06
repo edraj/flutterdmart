@@ -1,11 +1,30 @@
 import 'package:dmart/src/enums/user_type.dart';
 import 'package:dmart/src/models/base_response.dart';
-import 'package:dmart/src/models/displayname.dart';
 import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/record.dart';
 import 'package:dmart/src/models/status.dart';
+import 'package:dmart/src/models/translation.dart';
 
 class LoginRequest {
+  LoginRequest({required this.shortname, required this.password});
+
+  LoginRequest.withShortnameAndOTP({
+    required this.shortname,
+    required this.otp,
+  });
+
+  LoginRequest.withEmail({required this.email, required this.password});
+
+  LoginRequest.withEmailAndOTP({required this.email, required this.otp});
+
+  LoginRequest.withInvitation({
+    required this.shortname,
+    required this.invitation,
+  });
+
+  LoginRequest.withMSISDN({required this.msisdn, required this.password});
+
+  LoginRequest.withMSISDNAndOTP({required this.msisdn, required this.otp});
   String? shortname;
   String? email;
   String? otp;
@@ -14,20 +33,6 @@ class LoginRequest {
   String? deviceID;
   String? msisdn;
   String? password;
-
-  LoginRequest({required this.shortname, required this.password});
-
-  LoginRequest.withShortnameAndOTP({required this.shortname, required this.otp});
-
-  LoginRequest.withEmail({required this.email, required this.password});
-
-  LoginRequest.withEmailAndOTP({required this.email, required this.otp});
-
-  LoginRequest.withInvitation({required this.shortname, required this.invitation});
-
-  LoginRequest.withMSISDN({required this.msisdn, required this.password});
-
-  LoginRequest.withMSISDNAndOTP({required this.msisdn, required this.otp});
 
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
@@ -46,53 +51,64 @@ class LoginRequest {
 }
 
 class LoginResponse extends BaseResponse {
-  String? token;
-  UserType? type;
-  Displayname? displayname;
-  Error? error;
-
   LoginResponse({this.token, required super.status, super.records});
 
   /// Converts the LoginResponse object to a JSON map.
   LoginResponse.fromJson(Map<String, dynamic> json) {
     status = Status.values.byName(json['status']);
     if (status == Status.failed) {
-      error = Error.fromJson(json['error']);
+      error = DmartError.fromJson(json['error']);
       return;
     }
     if (json['records'] != null && json['records']!.isNotEmpty) {
       records = [];
-      Record? record = Record.fromJson(json['records'][0]);
+      final Record record = Record.fromJson(json['records'][0]);
       records?.add(record);
-      LoginAttributes? attribute = LoginAttributes.fromJson(record.attributes);
+      final LoginAttributes attribute = LoginAttributes.fromJson(
+        record.attributes,
+      );
       token = attribute.accessToken;
       type = UserType.values.byName(attribute.type ?? 'web');
       displayname = attribute.displayname;
     }
   }
+  String? token;
+  UserType? type;
+  Translation? displayname;
+  DmartError? error;
 
   /// Converts the LoginResponse object to a JSON map.
+  @override
   Map<String, dynamic> toJson() {
-    return {'status': status?.name, 'records': records?.map((record) => record.toJson()).toList()};
+    return {
+      'status': status?.name,
+      'records': records?.map((record) => record.toJson()).toList(),
+    };
   }
 }
 
 class LoginAttributes {
-  String? accessToken;
-  String? type;
-  Displayname? displayname;
-
   LoginAttributes({this.accessToken, this.type, this.displayname});
 
   /// Converts the LoginAttributes object to a JSON map.
   LoginAttributes.fromJson(Map<String, dynamic> json) {
     accessToken = json['access_token'];
     type = json['type'];
-    displayname = json['displayname'] != null ? Displayname.fromJson(json['displayname']) : null;
+    displayname =
+        json['displayname'] != null
+            ? Translation.fromJson(json['displayname'])
+            : null;
   }
+  String? accessToken;
+  String? type;
+  Translation? displayname;
 
   /// Converts the LoginAttributes object to a JSON map.
   Map<String, dynamic> toJson() {
-    return {'access_token': accessToken, 'type': type, 'displayname': displayname?.toJson()};
+    return {
+      'access_token': accessToken,
+      'type': type,
+      'displayname': displayname?.toJson(),
+    };
   }
 }

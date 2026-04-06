@@ -2,6 +2,28 @@ import 'package:dmart/src/enums/action_type.dart';
 
 /// Permission is a class that represents the permissions of a user on a resource.
 class Permission {
+  Permission({
+    required this.allowedActions,
+    required this.conditions,
+    required this.restrictedFields,
+    this.allowedFieldsValues,
+  });
+
+  factory Permission.fromJson(Map<String, dynamic> json) {
+    return Permission(
+      allowedActions:
+          (json['allowed_actions'] as List<dynamic>)
+              .map((action) => ActionType.fromJson(action.toString()))
+              .toList(),
+      conditions:
+          (json['conditions'] as List<dynamic>)
+              .map((condition) => condition.toString())
+              .toList(),
+      restrictedFields: json['restricted_fields'],
+      allowedFieldsValues: json['allowed_fields_values'],
+    );
+  }
+
   /// The actions allowed on the resource.
   final List<ActionType> allowedActions;
 
@@ -14,32 +36,10 @@ class Permission {
   /// The values allowed for the fields.
   final Map<String, dynamic>? allowedFieldsValues;
 
-  Permission({
-    required this.allowedActions,
-    required this.conditions,
-    required this.restrictedFields,
-    this.allowedFieldsValues,
-  });
-
-  factory Permission.fromJson(Map<String, dynamic> json) {
-    return Permission(
-      allowedActions:
-          (json['allowed_actions'] as List<dynamic>)
-              .map((action) => ActionType.values.byName(action.toString()))
-              .toList(),
-      conditions:
-          (json['conditions'] as List<dynamic>)
-              .map((condition) => condition.toString())
-              .toList(),
-      restrictedFields: json['restricted_fields'],
-      allowedFieldsValues: json['allowed_fields_values'],
-    );
-  }
-
   /// Converts the Permission object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
-      'allowed_actions': allowedActions.map((type) => type.toString().split('.').last).toList(),
+      'allowed_actions': allowedActions.map((type) => type.jsonValue).toList(),
       'conditions': conditions,
       'restricted_fields': restrictedFields,
       'allowed_fields_values': allowedFieldsValues,

@@ -3,13 +3,6 @@ import 'package:dmart/src/models/payload.dart';
 import 'package:dmart/src/models/translation.dart';
 
 class ResponseRecord {
-  final ResourceType resourceType;
-  final String uuid;
-  final String shortname;
-  final String subpath;
-
-  final ResponseRecordAttributes attributes;
-
   ResponseRecord({
     required this.resourceType,
     required this.uuid,
@@ -25,9 +18,17 @@ class ResponseRecord {
       shortname: json['shortname'],
       subpath: json['subpath'],
 
-      attributes: ResponseRecordAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
+      attributes: ResponseRecordAttributes.fromJson(
+        Map<String, dynamic>.from(json['attributes']),
+      ),
     );
   }
+  final ResourceType resourceType;
+  final String uuid;
+  final String shortname;
+  final String subpath;
+
+  final ResponseRecordAttributes attributes;
 
   /// Converts the ResponseRecord object to a JSON object.
   Map<String, dynamic> toJson() {
@@ -43,16 +44,6 @@ class ResponseRecord {
 }
 
 class ResponseRecordAttributes {
-  final bool isActive;
-  Translation? displayname;
-  Translation? description;
-  final Set<String> tags;
-  final String createdAt;
-  final String updatedAt;
-  final String ownerShortname;
-  final Payload? payload;
-  final String? slug;
-
   ResponseRecordAttributes({
     required this.isActive,
     this.displayname,
@@ -66,26 +57,43 @@ class ResponseRecordAttributes {
   });
 
   factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
-    ResponseRecordAttributes responseRecordAttributes = ResponseRecordAttributes(
-      isActive: json['is_active'],
-      tags: Set<String>.from(json['tags'] ?? []),
-      createdAt: json['created_at'],
-      updatedAt: json['updated_at'],
-      slug: json['slug'],
-      ownerShortname: json['owner_shortname'],
-      payload: json['payload'] != null ? Payload.fromJson(Map<String, dynamic>.from(json['payload'])) : null,
-    );
+    final ResponseRecordAttributes responseRecordAttributes =
+        ResponseRecordAttributes(
+          isActive: json['is_active'],
+          tags: Set<String>.from(json['tags'] ?? []),
+          createdAt: json['created_at'],
+          updatedAt: json['updated_at'],
+          slug: json['slug'],
+          ownerShortname: json['owner_shortname'],
+          payload:
+              json['payload'] != null
+                  ? Payload.fromJson(Map<String, dynamic>.from(json['payload']))
+                  : null,
+        );
 
     if (json['displayname'] != null) {
-      responseRecordAttributes.displayname = Translation.fromJson(Map<String, dynamic>.from(json['displayname']));
+      responseRecordAttributes.displayname = Translation.fromJson(
+        Map<String, dynamic>.from(json['displayname']),
+      );
     }
 
     if (json['description'] != null) {
-      responseRecordAttributes.description = Translation.fromJson(Map<String, dynamic>.from(json['description'] ?? {}));
+      responseRecordAttributes.description = Translation.fromJson(
+        Map<String, dynamic>.from(json['description'] ?? {}),
+      );
     }
 
     return responseRecordAttributes;
   }
+  final bool isActive;
+  Translation? displayname;
+  Translation? description;
+  final Set<String> tags;
+  final String createdAt;
+  final String updatedAt;
+  final String ownerShortname;
+  final Payload? payload;
+  final String? slug;
 
   /// Converts the responseRecordAttributes object to a JSON object.
   Map<String, dynamic> toJson() {
