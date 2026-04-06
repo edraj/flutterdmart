@@ -35,7 +35,7 @@ class QueryRequest {
   String? sortBy;
 
   /// The type of sort to perform.
-  SortyType? sortType;
+  SortType? sortType;
 
   /// Whether to retrieve the JSON payload of the resources.
   bool? retrieveJsonPayload;
@@ -85,7 +85,9 @@ class QueryRequest {
       'type': queryType.toString().split('.').last,
       'space_name': spaceName,
       'subpath': subpath,
-      'filter_types': filterTypes?.map((type) => type.toString().split('.').last).toList(),
+      'filter_types': filterTypes
+          ?.map((type) => type.toString().split('.').last)
+          .toList(),
       'filter_schema_names': filterSchemaNames,
       'filter_shortnames': filterShortnames,
       'search': search,

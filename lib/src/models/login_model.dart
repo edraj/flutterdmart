@@ -1,9 +1,9 @@
 import 'package:dmart/src/enums/user_type.dart';
 import 'package:dmart/src/models/base_response.dart';
-import 'package:dmart/src/models/displayname.dart';
 import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/record.dart';
 import 'package:dmart/src/models/status.dart';
+import 'package:dmart/src/models/translation.dart';
 
 class LoginRequest {
   String? shortname;
@@ -17,13 +17,19 @@ class LoginRequest {
 
   LoginRequest({required this.shortname, required this.password});
 
-  LoginRequest.withShortnameAndOTP({required this.shortname, required this.otp});
+  LoginRequest.withShortnameAndOTP({
+    required this.shortname,
+    required this.otp,
+  });
 
   LoginRequest.withEmail({required this.email, required this.password});
 
   LoginRequest.withEmailAndOTP({required this.email, required this.otp});
 
-  LoginRequest.withInvitation({required this.shortname, required this.invitation});
+  LoginRequest.withInvitation({
+    required this.shortname,
+    required this.invitation,
+  });
 
   LoginRequest.withMSISDN({required this.msisdn, required this.password});
 
@@ -48,8 +54,8 @@ class LoginRequest {
 class LoginResponse extends BaseResponse {
   String? token;
   UserType? type;
-  Displayname? displayname;
-  Error? error;
+  Translation? displayname;
+  DmartError? error;
 
   LoginResponse({this.token, required super.status, super.records});
 
@@ -57,7 +63,7 @@ class LoginResponse extends BaseResponse {
   LoginResponse.fromJson(Map<String, dynamic> json) {
     status = Status.values.byName(json['status']);
     if (status == Status.failed) {
-      error = Error.fromJson(json['error']);
+      error = DmartError.fromJson(json['error']);
       return;
     }
     if (json['records'] != null && json['records']!.isNotEmpty) {
@@ -73,14 +79,17 @@ class LoginResponse extends BaseResponse {
 
   /// Converts the LoginResponse object to a JSON map.
   Map<String, dynamic> toJson() {
-    return {'status': status?.name, 'records': records?.map((record) => record.toJson()).toList()};
+    return {
+      'status': status?.name,
+      'records': records?.map((record) => record.toJson()).toList(),
+    };
   }
 }
 
 class LoginAttributes {
   String? accessToken;
   String? type;
-  Displayname? displayname;
+  Translation? displayname;
 
   LoginAttributes({this.accessToken, this.type, this.displayname});
 
@@ -88,11 +97,17 @@ class LoginAttributes {
   LoginAttributes.fromJson(Map<String, dynamic> json) {
     accessToken = json['access_token'];
     type = json['type'];
-    displayname = json['displayname'] != null ? Displayname.fromJson(json['displayname']) : null;
+    displayname = json['displayname'] != null
+        ? Translation.fromJson(json['displayname'])
+        : null;
   }
 
   /// Converts the LoginAttributes object to a JSON map.
   Map<String, dynamic> toJson() {
-    return {'access_token': accessToken, 'type': type, 'displayname': displayname?.toJson()};
+    return {
+      'access_token': accessToken,
+      'type': type,
+      'displayname': displayname?.toJson(),
+    };
   }
 }

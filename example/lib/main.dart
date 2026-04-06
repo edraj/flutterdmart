@@ -6,19 +6,18 @@ import 'consts.dart';
 
 Future<void> main() async {
   Dmart.dmartServerUrl = 'https://api.dmart.cc';
-  Dmart.initDmart();
+  await Dmart.initDmart();
 
   // Creating a user
   final CreateUserAttributes createUserAttributes = CreateUserAttributes(
-    displayname: Displayname(en: 'test'),
+    displayname: Translation(en: 'test'),
     invitation: 'ABC',
     password: '@Jimmy123_',
     roles: ['super_admin'],
   );
-  var (responseCreateUser, error) = await Dmart.createUser(CreateUserRequest(
-    shortname: 'jimmy',
-    attributes: createUserAttributes,
-  ));
+  var (responseCreateUser, error) = await Dmart.createUser(
+    CreateUserRequest(shortname: 'jimmy', attributes: createUserAttributes),
+  );
 
   // User login
   var (responseLogin, _) = await Dmart.login(
@@ -35,19 +34,20 @@ Future<void> main() async {
 
   // Create space
   ActionRequest createSpaceActionRequest = ActionRequest(
-      spaceName: 'my_space',
-      requestType: RequestType.create,
-      records: [
-        ActionRequestRecord(
-          resourceType: ResourceType.space,
-          shortname: 'my_space',
-          subpath: '/',
-          attributes: {
-            'displayname': {'en': 'Space'},
-            'shortname': 'space',
-          },
-        ),
-      ]);
+    spaceName: 'my_space',
+    requestType: RequestType.create,
+    records: [
+      ActionRequestRecord(
+        resourceType: ResourceType.space,
+        shortname: 'my_space',
+        subpath: '/',
+        attributes: {
+          'displayname': {'en': 'Space'},
+          'shortname': 'space',
+        },
+      ),
+    ],
+  );
 
   // var (respCreateSpace, _) = await Dmart.createSpace(createSpaceActionRequest);
 
@@ -65,20 +65,25 @@ Future<void> main() async {
   }
 
   // Retrieve entry
-  var (respEntry, _) = await Dmart.retrieveEntry(RetrieveEntryRequest(
-    resourceType: ResourceType.user,
-    spaceName: 'management',
-    subpath: 'users',
-    shortname: 'jimmy',
-    retrieveJsonPayload: true,
-  ));
+  var (respEntry, _) = await Dmart.retrieveEntry(
+    RetrieveEntryRequest(
+      resourceType: ResourceType.user,
+      spaceName: 'management',
+      subpath: 'users',
+      shortname: 'jimmy',
+      retrieveJsonPayload: true,
+    ),
+  );
 
   // Get entry payload
-  var (respEntryPayload, _) = await Dmart.getPayload(GetPayloadRequest(
+  var (respEntryPayload, _) = await Dmart.getPayload(
+    GetPayloadRequest(
       resourceType: ResourceType.content,
       spaceName: 'myspace',
       subpath: 'mysubpath',
-      shortname: 'myentry'));
+      shortname: 'myentry',
+    ),
+  );
 
   // Create a folder
   ActionRequestRecord actionRequestRecordFolder = ActionRequestRecord(
@@ -87,11 +92,13 @@ Future<void> main() async {
     shortname: 'my_subpath',
     attributes: subpathAttributes,
   );
-  var (respRequestFolder, err) = await Dmart.request(ActionRequest(
-    spaceName: 'my_space',
-    requestType: RequestType.create,
-    records: [actionRequestRecordFolder],
-  ));
+  var (respRequestFolder, err) = await Dmart.request(
+    ActionRequest(
+      spaceName: 'my_space',
+      requestType: RequestType.create,
+      records: [actionRequestRecordFolder],
+    ),
+  );
 
   // Create a content
   ActionRequestRecord actionRequestRecord = ActionRequestRecord(
@@ -104,15 +111,17 @@ Future<void> main() async {
       "payload": {
         "content_type": "json",
         "schema_shortname": null,
-        "body": {"isAlive": true}
-      }
+        "body": {"isAlive": true},
+      },
     },
   );
-  var (respRequestContent, _) = await Dmart.request(ActionRequest(
-    spaceName: 'my_space',
-    requestType: RequestType.create,
-    records: [actionRequestRecord],
-  ));
+  var (respRequestContent, _) = await Dmart.request(
+    ActionRequest(
+      spaceName: 'my_space',
+      requestType: RequestType.create,
+      records: [actionRequestRecord],
+    ),
+  );
 
   // Create an attachment for a content
   ActionRequestRecord actionRequestRecordAttachment = ActionRequestRecord(
@@ -126,16 +135,18 @@ Future<void> main() async {
         "schema_shortname": null,
         "body": {
           "attachmentName": "my attachment",
-          "isImportant": "very important"
-        }
-      }
+          "isImportant": "very important",
+        },
+      },
     },
   );
-  var (respRequestAttachment, _) = await Dmart.request(ActionRequest(
-    spaceName: 'my_space',
-    requestType: RequestType.create,
-    records: [actionRequestRecordAttachment],
-  ));
+  var (respRequestAttachment, _) = await Dmart.request(
+    ActionRequest(
+      spaceName: 'my_space',
+      requestType: RequestType.create,
+      records: [actionRequestRecordAttachment],
+    ),
+  );
 
   // var (respCreateSpace, _) = await Dmart.createSpace(createSpaceActionRequest);
 
@@ -159,16 +170,12 @@ Future<void> main() async {
   var (respLogout, _) = await Dmart.logout();
 
   // Submit an entry
-  var (respSubmitEntry, _) = await Dmart.submit(
-    "applications",
-    "log",
-    "logs",
-    null,
-    null,
-    {
-      "shortname": "myentry",
-      "resource_type": ResourceType.content.name,
-      "state": "awesome entry it is !"
-    },
-  );
+  var (
+    respSubmitEntry,
+    _,
+  ) = await Dmart.submit("applications", "log", "logs", null, null, {
+    "shortname": "myentry",
+    "resource_type": ResourceType.content.name,
+    "state": "awesome entry it is !",
+  });
 }

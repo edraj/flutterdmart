@@ -11,7 +11,7 @@ class ActionResponse extends ApiResponse {
 
   ActionResponse({
     required Status status,
-    Error? error,
+    DmartError? error,
     this.records,
     this.attributes,
   }) : super(status: status, error: error);
@@ -19,13 +19,12 @@ class ActionResponse extends ApiResponse {
   factory ActionResponse.fromJson(Map<String, dynamic> json) {
     ActionResponse actionResponse = ActionResponse(
       status: json['status'] == 'success' ? Status.success : Status.failed,
-      error: json['error'] != null ? Error.fromJson(json['error']) : null,
+      error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
     if (json['records'] != null) {
-      actionResponse.records =
-          (json['records'] as List<dynamic>)
-              .map((record) => ActionResponseRecord.fromJson(record))
-              .toList();
+      actionResponse.records = (json['records'] as List<dynamic>)
+          .map((record) => ActionResponseRecord.fromJson(record))
+          .toList();
     }
     if (json['attributes'] != null) {
       actionResponse.attributes = Attributes.fromJson(json['attributes']);
@@ -54,7 +53,7 @@ class ActionResponse extends ApiResponse {
 }
 
 class ActionResponseRecord extends ResponseRecord {
-  late final ActionResponseAttachments? attachments;
+  final ActionResponseAttachments? attachments;
 
   ActionResponseRecord({
     required super.resourceType,
@@ -62,6 +61,7 @@ class ActionResponseRecord extends ResponseRecord {
     required super.shortname,
     required super.subpath,
     required super.attributes,
+    this.attachments,
   });
 
   factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
@@ -76,19 +76,16 @@ class ActionResponseRecord extends ResponseRecord {
             'owner_shortname': json['owner_shortname'],
           });
 
-    var actionResponseRecord = ActionResponseRecord(
+    return ActionResponseRecord(
       resourceType: ResourceType.values.byName(json['resource_type']),
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
       attributes: attributes,
+      attachments: json['attachments'] != null
+          ? ActionResponseAttachments.fromJson(json['attachments'])
+          : null,
     );
-    if (json['attachments'] != null) {
-      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(
-        json['attachments'],
-      );
-    }
-    return actionResponseRecord;
   }
 
   /// Converts the ActionResponseRecord object to a JSON object.
@@ -114,18 +111,16 @@ class ActionResponseAttachments {
 
   factory ActionResponseAttachments.fromJson(Map<String, dynamic> json) {
     return ActionResponseAttachments(
-      media:
-          json['media'] != null
-              ? (json['media'] as List<dynamic>?)
-                  ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
-                  .toList()
-              : null,
-      json:
-          json['json'] != null
-              ? (json['json'] as List<dynamic>?)
-                  ?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord))
-                  .toList()
-              : null,
+      media: json['media'] != null
+          ? (json['media'] as List<dynamic>?)
+                ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
+                .toList()
+          : null,
+      json: json['json'] != null
+          ? (json['json'] as List<dynamic>?)
+                ?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord))
+                .toList()
+          : null,
     );
   }
 

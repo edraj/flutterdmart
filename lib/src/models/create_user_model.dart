@@ -1,6 +1,6 @@
-import 'package:dmart/src/models/displayname.dart';
 import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/request/action_request.dart';
+import 'package:dmart/src/models/translation.dart';
 
 class CreateUserRequest {
   late CreateUserAttributes attributes;
@@ -20,7 +20,7 @@ class CreateUserRequest {
 
 class CreateUserAttributes {
   late String invitation;
-  late Displayname displayname;
+  late Translation displayname;
   late String? email;
   late String? profilePicUrl;
   late String? msisdn;
@@ -55,14 +55,27 @@ class CreateUserAttributes {
     this.emailOTP,
   });
 
-  factory CreateUserAttributes.fromJson(Map<String, dynamic> json) => CreateUserAttributes(
-    invitation: json['invitation'],
-    displayname: Displayname.fromJson(json['displayname']),
-    email: json['email'],
-    profilePicUrl: json['profile_pic_url'],
-    msisdn: json['msisdn'],
-    password: json['password'],
-  );
+  factory CreateUserAttributes.fromJson(Map<String, dynamic> json) =>
+      CreateUserAttributes(
+        invitation: json['invitation'],
+        displayname: Translation.fromJson(json['displayname']),
+        email: json['email'],
+        profilePicUrl: json['profile_pic_url'],
+        msisdn: json['msisdn'],
+        password: json['password'],
+        roles: json['roles'] != null ? List<String>.from(json['roles']) : null,
+        groups: json['groups'] != null
+            ? List<String>.from(json['groups'])
+            : null,
+        firebaseToken: json['firebase_token'],
+        deviceID: json['device_id'],
+        language: json['language'],
+        isEmailVerified: json['is_email_verified'],
+        isMsisdnVerified: json['is_msisdn_verified'],
+        forcePasswordChange: json['force_password_change'],
+        msisdnOTP: json['msisdn_otp'],
+        emailOTP: json['email_otp'],
+      );
 
   /// Converts the CreateUserAttributes object to a JSON object.
   Map<String, dynamic> toJson() => {
@@ -77,9 +90,9 @@ class CreateUserAttributes {
     'firebase_token': firebaseToken,
     'device_id': deviceID,
     'language': language,
-    'isEmailVerified': isEmailVerified,
-    'isMsisdnVerified': isMsisdnVerified,
-    'forcePasswordChange': forcePasswordChange,
+    'is_email_verified': isEmailVerified,
+    'is_msisdn_verified': isMsisdnVerified,
+    'force_password_change': forcePasswordChange,
     'is_active': true,
     'msisdn_otp': msisdnOTP,
     'email_otp': emailOTP,
@@ -89,15 +102,17 @@ class CreateUserAttributes {
 class CreateUserResponse {
   late String status;
   late List<ActionRequestRecord> records;
-  Error? error;
+  DmartError? error;
 
   CreateUserResponse({required this.status, required this.records, this.error});
 
   factory CreateUserResponse.fromJson(Map<String, dynamic> json) {
     return CreateUserResponse(
       status: json['status'],
-      records: (json['records'] as List).map((e) => ActionRequestRecord.fromJson(e)).toList(),
-      error: json['error'] != null ? Error.fromJson(json['error']) : null,
+      records: (json['records'] as List)
+          .map((e) => ActionRequestRecord.fromJson(e))
+          .toList(),
+      error: json['error'] != null ? DmartError.fromJson(json['error']) : null,
     );
   }
 

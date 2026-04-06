@@ -1,13 +1,14 @@
-class Error {
+/// Represents an error returned by the Dmart API.
+class DmartError {
   final String? type;
   final int? code;
   final String? message;
   final List<Map<String, dynamic>>? info;
 
-  const Error({this.type, this.code, this.message, this.info});
+  const DmartError({this.type, this.code, this.message, this.info});
 
-  factory Error.fromJson(Map<String, dynamic> json) {
-    return Error(
+  factory DmartError.fromJson(Map<String, dynamic> json) {
+    return DmartError(
       type: json['type'],
       code: json['code'],
       message: json['message'],
@@ -15,7 +16,7 @@ class Error {
     );
   }
 
-  /// Converts the Error object to a JSON object.
+  /// Converts the DmartError object to a JSON object.
   Map<String, dynamic> toJson() {
     return {'type': type, 'code': code, 'message': message, 'info': info};
   }
