@@ -2,16 +2,17 @@ import 'package:dmart/dmart.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('A group of tests', () {
+  group('Dmart client', () {
     setUp(() {
       // Additional setup goes here.
     });
 
-    test('Test get payload', () async {
+    test('login, profile, and updateProfile succeed', () async {
       const baseUrl = 'https://dmart.cc/dmart';
       Dmart.dmartServerUrl = baseUrl;
-      await Dmart.initDmart();
-      final (loginResponse, loginError) = await Dmart.login(
+      await Dmart.init();
+
+      final loginResponse = await Dmart.login(
         LoginRequest(
           shortname: const String.fromEnvironment(
             'DMART_USER',
@@ -23,15 +24,12 @@ void main() {
           ),
         ),
       );
-      expect(loginError, isNull);
-      expect(loginResponse, isNotNull);
+      expect(loginResponse.token, isNotNull);
 
-      final (profile, profileError) = await Dmart.getProfile();
-      expect(profileError, isNull);
-      expect(profile, isNotNull);
-      expect(profile?.records, isNotEmpty);
+      final profile = await Dmart.getProfile();
+      expect(profile.records, isNotEmpty);
 
-      final (updated, updateError) = await Dmart.updateProfile(
+      await Dmart.updateProfile(
         ActionRequestRecord(
           shortname: const String.fromEnvironment(
             'DMART_USER',
@@ -42,9 +40,21 @@ void main() {
           attributes: {'language': 'kurdish'},
         ),
       );
+    });
 
-      expect(updateError, isNull);
-      expect(updated, isTrue);
+    test('throws DmartApiException on bad credentials', () async {
+      const baseUrl = 'https://dmart.cc/dmart';
+      Dmart.dmartServerUrl = baseUrl;
+      await Dmart.init();
+
+      expect(
+        () => Dmart.login(LoginRequest(shortname: 'nobody', password: 'wrong')),
+        throwsA(isA<DmartApiException>()),
+      );
+    });
+
+    test('throws DmartException when not initialized', () {
+      expect(() => Dmart.getProfile(), throwsA(isA<DmartException>()));
     });
   });
 }

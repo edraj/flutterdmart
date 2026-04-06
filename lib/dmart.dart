@@ -13,6 +13,7 @@ export 'src/enums/query_type.dart';
 export 'src/enums/request_type.dart';
 export 'src/enums/resource_attachment_type.dart';
 export 'src/enums/resource_type.dart';
+export 'src/enums/scope.dart';
 export 'src/enums/sort_type.dart';
 export 'src/enums/user_type.dart';
 export 'src/enums/validation_status.dart';

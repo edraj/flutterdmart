@@ -15,7 +15,7 @@ class Payload {
   /// Converts a JSON object to a Payload object.
   factory Payload.fromJson(Map<String, dynamic> json) {
     final Payload payload = Payload(
-      contentType: ContentType.get(json['content_type']),
+      contentType: ContentType.parse(json['content_type']),
       schemaShortname: json['schema_shortname'],
       checksum: json['checksum'],
       body: json['body'],
