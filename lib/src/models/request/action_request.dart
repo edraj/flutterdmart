@@ -65,7 +65,6 @@ class ActionRequestRecord {
           json['attachments'] != null
               ? Map<ResourceType, List<dynamic>>.from(json['attachments'])
               : null,
-      isActive: json['is_active'] ?? false,
     );
   }
 
