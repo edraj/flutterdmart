@@ -9,12 +9,8 @@ class ActionResponse extends ApiResponse {
   List<ActionResponseRecord>? records;
   Attributes? attributes;
 
-  ActionResponse({
-    required Status status,
-    Error? error,
-    this.records,
-    this.attributes,
-  }) : super(status: status, error: error);
+  ActionResponse({required Status status, Error? error, this.records, this.attributes})
+    : super(status: status, error: error);
 
   factory ActionResponse.fromJson(Map<String, dynamic> json) {
     ActionResponse actionResponse = ActionResponse(
@@ -23,9 +19,7 @@ class ActionResponse extends ApiResponse {
     );
     if (json['records'] != null) {
       actionResponse.records =
-          (json['records'] as List<dynamic>)
-              .map((record) => ActionResponseRecord.fromJson(record))
-              .toList();
+          (json['records'] as List<dynamic>).map((record) => ActionResponseRecord.fromJson(record)).toList();
     }
     if (json['attributes'] != null) {
       actionResponse.attributes = Attributes.fromJson(json['attributes']);
@@ -54,7 +48,7 @@ class ActionResponse extends ApiResponse {
 }
 
 class ActionResponseRecord extends ResponseRecord {
-  late final ActionResponseAttachments? attachments;
+  ActionResponseAttachments? attachments;
 
   ActionResponseRecord({
     required super.resourceType,
@@ -65,16 +59,17 @@ class ActionResponseRecord extends ResponseRecord {
   });
 
   factory ActionResponseRecord.fromJson(Map<String, dynamic> json) {
-    final attributes = json['attributes'] != null
-        ? ResponseRecordAttributes.fromJson(json['attributes'])
-        : ResponseRecordAttributes.fromJson({
-            'is_active': json['is_active'],
-            'payload': json['payload'],
-            'tags': json['tags'],
-            'created_at': json['created_at'],
-            'updated_at': json['updated_at'],
-            'owner_shortname': json['owner_shortname'],
-          });
+    final attributes =
+        json['attributes'] != null
+            ? ResponseRecordAttributes.fromJson(json['attributes'])
+            : ResponseRecordAttributes.fromJson({
+              'is_active': json['is_active'] ?? false,
+              'payload': json['payload'],
+              'tags': json['tags'],
+              'created_at': json['created_at'],
+              'updated_at': json['updated_at'],
+              'owner_shortname': json['owner_shortname'],
+            });
 
     var actionResponseRecord = ActionResponseRecord(
       resourceType: ResourceType.values.byName(json['resource_type']),
@@ -84,9 +79,7 @@ class ActionResponseRecord extends ResponseRecord {
       attributes: attributes,
     );
     if (json['attachments'] != null) {
-      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(
-        json['attachments'],
-      );
+      actionResponseRecord.attachments = ActionResponseAttachments.fromJson(json['attachments']);
     }
     return actionResponseRecord;
   }
@@ -116,15 +109,11 @@ class ActionResponseAttachments {
     return ActionResponseAttachments(
       media:
           json['media'] != null
-              ? (json['media'] as List<dynamic>?)
-                  ?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord))
-                  .toList()
+              ? (json['media'] as List<dynamic>?)?.map((mediaRecord) => ResponseRecord.fromJson(mediaRecord)).toList()
               : null,
       json:
           json['json'] != null
-              ? (json['json'] as List<dynamic>?)
-                  ?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord))
-                  .toList()
+              ? (json['json'] as List<dynamic>?)?.map((jsonRecord) => ResponseRecord.fromJson(jsonRecord)).toList()
               : null,
     );
   }
