@@ -6,18 +6,18 @@ class Permission {
   final List<ActionType> allowedActions;
 
   /// The conditions to check for the permissions.
-  final List<String> conditions;
+  final List<String>? conditions;
 
   /// The fields restricted by the permissions.
-  final List<dynamic> restrictedFields;
+  final List<dynamic>? restrictedFields;
 
   /// The values allowed for the fields.
   final Map<String, dynamic>? allowedFieldsValues;
 
   Permission({
     required this.allowedActions,
-    required this.conditions,
-    required this.restrictedFields,
+    this.conditions,
+    this.restrictedFields,
     this.allowedFieldsValues,
   });
 
@@ -28,8 +28,8 @@ class Permission {
               .map((action) => ActionType.values.byName(action.toString()))
               .toList(),
       conditions:
-          (json['conditions'] as List<dynamic>)
-              .map((condition) => condition.toString())
+          (json['conditions'] as List<dynamic>?)
+              ?.map((condition) => condition.toString())
               .toList(),
       restrictedFields: json['restricted_fields'],
       allowedFieldsValues: json['allowed_fields_values'],
