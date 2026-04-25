@@ -47,9 +47,9 @@ class ResponseRecordAttributes {
   Translation? displayname;
   Translation? description;
   final Set<String> tags;
-  final String createdAt;
-  final String updatedAt;
-  final String ownerShortname;
+  final String? createdAt;
+  final String? updatedAt;
+  final String? ownerShortname;
   final Payload? payload;
   final String? slug;
 
@@ -58,9 +58,9 @@ class ResponseRecordAttributes {
     this.displayname,
     this.description,
     required this.tags,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.ownerShortname,
+    this.createdAt,
+    this.updatedAt,
+    this.ownerShortname,
     this.payload,
     this.slug,
   });
