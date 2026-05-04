@@ -43,7 +43,7 @@ class ResponseRecord {
 }
 
 class ResponseRecordAttributes {
-  final bool isActive;
+  final bool? isActive;
   Translation? displayname;
   Translation? description;
   final Set<String> tags;
@@ -54,7 +54,7 @@ class ResponseRecordAttributes {
   final String? slug;
 
   ResponseRecordAttributes({
-    required this.isActive,
+    this.isActive,
     this.displayname,
     this.description,
     required this.tags,
