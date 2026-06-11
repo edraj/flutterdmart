@@ -67,7 +67,7 @@ class ResponseRecordAttributes {
 
   factory ResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
     ResponseRecordAttributes responseRecordAttributes = ResponseRecordAttributes(
-      isActive: json['is_active'],
+      isActive: json['is_active'] ?? false,
       tags: Set<String>.from(json['tags'] ?? []),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
