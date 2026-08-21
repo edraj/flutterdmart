@@ -35,7 +35,7 @@ void main() {
       var (x, y) = await Dmart.getProfile();
       print(x?.records![0].attributes.language);
 
-      (x, y) = await Dmart.updateProfile(
+      final (_, updateError) = await Dmart.updateProfile(
         ActionRequestRecord(
           shortname: 'dmart',
           resourceType: ResourceType.user,
@@ -44,7 +44,7 @@ void main() {
         ),
       );
 
-      print(y?.info);
+      print(updateError?.info);
 
       // final (response, error) = await Dmart.query(
       //   QueryRequest(

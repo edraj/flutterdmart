@@ -1,3 +1,8 @@
+## 2.8.0
+- Relicense under LGPL-3.0-or-later
+- Upgrade dependencies to latest (dio 5.11, lints 6, test 1.31) to pick up CVE fixes
+- Raise minimum Dart SDK to ^3.8.0 (required by lints 6)
+
 ## 1.1.0
 - add update profile
 
