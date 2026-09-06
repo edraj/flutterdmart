@@ -2,11 +2,13 @@ class SendOTPRequest {
   final String? shortname;
   final String? msisdn;
   final String? email;
+  final String? purpose;
 
   SendOTPRequest({
     this.shortname,
     this.msisdn,
     this.email,
+    this.purpose,
   });
 
   Map<String, dynamic> toJson() {
@@ -14,6 +16,7 @@ class SendOTPRequest {
       'shortname': shortname,
       'msisdn': msisdn,
       'email': email,
+      'purpose': purpose
     };
   }
 }
