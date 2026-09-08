@@ -184,6 +184,22 @@ class Dmart {
     }
   }
 
+  /// Deletes the user.
+  static Future<(ApiResponse?, Error?)> deleteUser() async {
+    _isTokenNull();
+    try {
+      final response = await _dio.post(
+        '/user/delete',
+        data: {},
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
+      );
+
+      return (ApiResponse.fromJson(response.data), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
   /// Requests an OTP for the given [SendOTPRequest].
   static Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request) async {
     try {
