@@ -6,6 +6,7 @@ import 'package:dmart/dmart.dart';
 import 'package:dmart/src/enums/content_type.dart' as DmartContentType;
 import 'package:dmart/src/exceptions.dart';
 import 'package:dmart/src/extensions/map_extension.dart';
+import 'package:dmart/src/models/request/verify_contact_request.dart';
 import 'package:http_parser/http_parser.dart';
 
 /// Dmart class that has all the methods to interact with the Dmart server.
@@ -145,7 +146,11 @@ class Dmart {
   /// Logs in the user with the given [loginRequest].
   static Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest) async {
     try {
-      final response = await _dio.post('/user/login', data: loginRequest.toJson(), options: Options(headers: headers));
+      final response = await _dio.post(
+        '/user/login',
+        data: loginRequest.toJson(),
+        options: Options(headers: headers),
+      );
       var loginResponse = LoginResponse.fromJson(response.data);
       token = loginResponse.token;
       return (loginResponse, null);
@@ -341,6 +346,21 @@ class Dmart {
           message: "Unable to retrieve the profile.",
         ),
       );
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Verifies a user contact.
+  static Future<(ApiResponse?, Error?)> verifyContact(VerifyContactRequest request) async {
+    _isTokenNull();
+    try {
+      final response = await _dio.post(
+        '/user/verify-contact',
+        data: request.toJson(),
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
+      );
+      return (ApiResponse.fromJson(response.data), null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));
     }
@@ -554,7 +574,11 @@ class Dmart {
       }
       url += '/$schemaShortname/$subpath';
 
-      final response = await _dio.post(url, data: record, options: Options(headers: headers));
+      final response = await _dio.post(
+        url,
+        data: record,
+        options: Options(headers: headers),
+      );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {
       return (null, _returnExceptionError(e));
