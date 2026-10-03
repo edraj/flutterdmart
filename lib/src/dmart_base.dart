@@ -6,7 +6,6 @@ import 'package:dmart/dmart.dart';
 import 'package:dmart/src/enums/content_type.dart' as DmartContentType;
 import 'package:dmart/src/exceptions.dart';
 import 'package:dmart/src/extensions/map_extension.dart';
-import 'package:dmart/src/models/request/verify_contact_request.dart';
 import 'package:http_parser/http_parser.dart';
 
 /// Dmart class that has all the methods to interact with the Dmart server.
@@ -206,12 +205,17 @@ class Dmart {
   }
 
   /// Requests an OTP for the given [SendOTPRequest].
+  ///
+  /// This is the single OTP issuing endpoint. [SendOTPRequest.purpose] (see
+  /// [OtpPurpose]) decides what the code can be redeemed for. The server
+  /// answers 200 with no body for every well-formed request, including when
+  /// it sent nothing (unknown user, resend cooldown, daily cap).
   static Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request) async {
     try {
       final response = await _dio.post(
         '/user/otp-request',
         data: request.toJson().withoutNulls(),
-        options: Options(headers: headers),
+        options: Options(headers: _otpRequestHeaders(request.purpose)),
       );
       return (ApiResponse.fromJson(response.data), null);
     } on DioException catch (e) {
@@ -219,11 +223,47 @@ class Dmart {
     }
   }
 
-  /// Requests an OTP for login with the given [SendOTPRequest].
-  static Future<(ApiResponse?, Error?)> otpRequestLogin(SendOTPRequest request) async {
+  // verify-contact codes are only issued to a logged-in user, so send the
+  // token when there is one. The other purposes are anonymous.
+  static Map<String, dynamic> _otpRequestHeaders(String purpose) {
+    if (purpose == OtpPurpose.verifyContact && token != null) {
+      return {...headers, "Authorization": "Bearer $token"};
+    }
+    return headers;
+  }
+
+  /// Requests a login OTP. Sends [request] with its purpose set to
+  /// [OtpPurpose.login], whatever it was.
+  @Deprecated("Use otpRequest with purpose OtpPurpose.login. "
+      "dmart >= 1.4.0 removed /user/otp-request-login.")
+  static Future<(ApiResponse?, Error?)> otpRequestLogin(SendOTPRequest request) {
+    return otpRequest(SendOTPRequest(
+      shortname: request.shortname,
+      msisdn: request.msisdn,
+      email: request.email,
+      purpose: OtpPurpose.login,
+    ));
+  }
+
+  /// Requests a password-reset OTP. Redeem it with [passwordResetConfirm].
+  @Deprecated("Use otpRequest with purpose OtpPurpose.reset. "
+      "dmart >= 1.4.0 removed /user/password-reset-request.")
+  static Future<(ApiResponse?, Error?)> passwordResetRequest(PasswordResetRequest request) {
+    return otpRequest(SendOTPRequest(
+      shortname: request.shortname,
+      msisdn: request.msisdn,
+      email: request.email,
+      purpose: OtpPurpose.reset,
+    ));
+  }
+
+  /// Sets a new password using an OTP issued with purpose [OtpPurpose.reset].
+  /// Identify the user with exactly one of shortname, email or msisdn, the
+  /// same one used to request the code.
+  static Future<(ApiResponse?, Error?)> passwordResetConfirm(PasswordResetConfirmRequest request) async {
     try {
       final response = await _dio.post(
-        '/user/otp-request-login',
+        '/user/password-reset-confirm',
         data: request.toJson().withoutNulls(),
         options: Options(headers: headers),
       );
@@ -233,33 +273,16 @@ class Dmart {
     }
   }
 
-  /// Requests a password reset with the given [PasswordResetRequest].
-  static Future<(ApiResponse?, Error?)> passwordResetRequest(PasswordResetRequest request) async {
-    try {
-      final response = await _dio.post(
-        '/user/password-reset-request',
-        data: request.toJson().withoutNulls(),
-        options: Options(headers: headers),
-      );
-      return (ApiResponse.fromJson(response.data), null);
-    } on DioException catch (e) {
-      return (null, _returnExceptionError(e));
-    }
-  }
-
-  /// Confirms OTP with the given [ConfirmOTPRequest].
-  static Future<(ApiResponse?, Error?)> confirmOTP(ConfirmOTPRequest request) async {
-    _isTokenNull();
-    try {
-      final response = await _dio.post(
-        '/user/otp-confirm',
-        data: request.toJson().withoutNulls(),
-        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-      );
-      return (ApiResponse.fromJson(response.data), null);
-    } on DioException catch (e) {
-      return (null, _returnExceptionError(e));
-    }
+  /// Confirms a contact with an OTP issued with purpose
+  /// [OtpPurpose.verifyContact]. Sent to `/user/verify-contact`.
+  @Deprecated("Use verifyContact. dmart >= 1.4.0 replaced /user/otp-confirm "
+      "with /user/verify-contact.")
+  static Future<(ApiResponse?, Error?)> confirmOTP(ConfirmOTPRequest request) {
+    return verifyContact(VerifyContactRequest(
+      msisdn: request.msisdn,
+      email: request.email,
+      code: request.otp,
+    ));
   }
 
   /// Resets a user with the given [shortname].
@@ -357,7 +380,7 @@ class Dmart {
     try {
       final response = await _dio.post(
         '/user/verify-contact',
-        data: request.toJson(),
+        data: request.toJson().withoutNulls(),
         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
       return (ApiResponse.fromJson(response.data), null);
