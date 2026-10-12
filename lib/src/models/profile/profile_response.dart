@@ -108,7 +108,7 @@ class ProfileResponseRecordAttributes {
       'firebase_token': firebaseToken,
       if (displayname != null) 'displayname': displayname!.toJson(),
       'type': type,
-      'language': language.toString(),
+      'language': language?.name,
       'is_email_verified': isEmailVerified,
       'is_msisdn_verified': isMsisdnVerified,
       'force_password_change': forcePasswordChange,
