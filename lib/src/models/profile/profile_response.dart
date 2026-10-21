@@ -58,6 +58,10 @@ class ProfileResponseRecordAttributes {
   final bool isEmailVerified;
   final bool isMsisdnVerified;
   final bool forcePasswordChange;
+
+  /// The caller's permission map. dmart deprecates it here in favour of
+  /// `/user/permissions` (`Dmart.getPermissions`); it is empty once a server
+  /// leaves it out.
   final Map<String, Permission> permissions;
   final Map<String, dynamic>? payload;
   final List<String> groups;
@@ -93,9 +97,7 @@ class ProfileResponseRecordAttributes {
       isMsisdnVerified: json['is_msisdn_verified'],
       forcePasswordChange: json['force_password_change'],
       payload: json['payload']?['body'],
-      permissions: Map<String, Permission>.from(
-        json['permissions'].map((key, value) => MapEntry(key, Permission.fromJson(value))),
-      ),
+      permissions: Permission.mapFromJson(json['permissions']),
       groups: List<String>.from(json['groups'] ?? []),
     );
   }

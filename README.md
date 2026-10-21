@@ -29,6 +29,7 @@ Methods:
 * `Future<(ApiResponse?, Error?)> userReset(String shortname)` - Resets a user's password.
 * `Future<(ApiResponse?, Error?)> validatePassword(String password)` - Validates the user's password.
 * `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
+* `Future<(Map<String, Permission>?, Error?)> getPermissions()` - Retrieves the current user's permission map from `/user/permissions` (or the profile's copy on a server without that route).
 * `Future<(ProfileResponse?, Error?)> updateProfile(ActionRequestRecord profile)` - Updates the user's profile.
 * `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
 * `Future<(ActionResponse?, Error?)> request(ActionRequest action)` -  Performs an action on the Dmart system.

@@ -36,6 +36,13 @@ class Permission {
     );
   }
 
+  /// Reads a permission map, keyed `"space:subpath:resource_type"`, as dmart
+  /// sends it from `/user/permissions` and the profile. Absent is empty.
+  static Map<String, Permission> mapFromJson(Object? json) {
+    if (json is! Map) return {};
+    return json.map((key, value) => MapEntry(key.toString(), Permission.fromJson(Map<String, dynamic>.from(value))));
+  }
+
   /// Converts the Permission object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
