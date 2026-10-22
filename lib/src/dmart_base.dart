@@ -32,6 +32,9 @@ class Dmart {
 
   static final Map<String, dynamic> headers = {"content-type": "application/json"};
 
+  /// dmart's error code for a route the server does not have.
+  static const int _invalidRoute = 230;
+
   static Error _returnExceptionError(DioException e) {
     if (e.response?.data?["error"] != null) {
       return Error.fromJson(e.response?.data["error"]);
@@ -341,6 +344,42 @@ class Dmart {
         ),
       );
     } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Retrieves the caller's permission map from `/user/permissions`, keyed
+  /// `"space:subpath:resource_type"`. dmart deprecates the copy in the
+  /// profile for this route. A server without the route answers
+  /// INVALID_ROUTE (230, with HTTP 422) and is answered from the profile.
+  static Future<(Map<String, Permission>?, Error?)> getPermissions() async {
+    _isTokenNull();
+    try {
+      final response = await _dio.get(
+        '/user/permissions',
+        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
+      );
+      final data = response.data;
+      if (data is Map && data['status'] == 'success') {
+        return (Permission.mapFromJson(data['attributes']?['permissions']), null);
+      }
+      return (
+        null,
+        Error(
+          type: 'unknown',
+          code: 0,
+          info: [data is Map && data['error'] is Map ? Map<String, dynamic>.from(data['error']) : {}],
+          message: "Unable to retrieve the permissions.",
+        ),
+      );
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      final code = data is Map && data['error'] is Map ? data['error']['code'] : null;
+      if (code == _invalidRoute || e.response?.statusCode == 404) {
+        final (profile, error) = await getProfile();
+        if (profile == null) return (null, error);
+        return (profile.records!.first.attributes.permissions, null);
+      }
       return (null, _returnExceptionError(e));
     }
   }

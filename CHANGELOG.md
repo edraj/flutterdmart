@@ -1,3 +1,8 @@
+## 2.13.0
+- Add `getPermissions`, which reads the caller's permission map from `/user/permissions`. dmart deprecates the copy in `/user/profile`, the heaviest part of that response, in favour of this route. A server without the route answers `INVALID_ROUTE` (230, HTTP 422); that answer, or a bare 404, is answered from the profile's map.
+- `getProfile` no longer fails on a profile without `permissions`; `ProfileResponseRecordAttributes.permissions` is then empty. Until now a server that left the map out made every `getProfile` call throw.
+- Add `Permission.mapFromJson`.
+
 ## 2.12.0
 - Use the OTP routes of dmart >= 1.4.0, which removed `/user/otp-request-login`, `/user/password-reset-request` and `/user/otp-confirm`:
   - `otpRequestLogin` and `passwordResetRequest` now call `/user/otp-request` with purpose `login` / `reset`.
