@@ -16,6 +16,15 @@ class Dmart {
   /// The token that is used for authentication.
   static String? token;
 
+  /// This device's id, sent as the `X-DeviceId` header on [login] when the
+  /// [LoginRequest] carries no `deviceID` of its own (the body value wins).
+  ///
+  /// dmart >= 1.7.2 refuses a mobile account's sign-in without a device id
+  /// (`INVALID_DATA`, [DmartErrorCode.invalidData]). Set it once, through
+  /// [initDmart] or directly, with a value that stays the same for the
+  /// install. dmart >= 1.7.3 reads the header; older servers only the body.
+  static String? deviceId;
+
   /// The instance of the Dio class.
   static Dio? _dioInstance;
 
@@ -31,9 +40,6 @@ class Dmart {
   }
 
   static final Map<String, dynamic> headers = {"content-type": "application/json"};
-
-  /// dmart's error code for a route the server does not have.
-  static const int _invalidRoute = 230;
 
   static Error _returnExceptionError(DioException e) {
     if (e.response?.data?["error"] != null) {
@@ -92,6 +98,8 @@ class Dmart {
         return "application/octet-stream";
       case DmartContentType.ContentType.apk:
         return "application/vnd.android.package-archive";
+      case DmartContentType.ContentType.binary:
+        return "application/octet-stream";
     }
   }
 
@@ -100,12 +108,15 @@ class Dmart {
   /// `dioConfig` is used to override the default configuration of Dio.
   /// `interceptors` is used to override the default interceptors of Dio.
   /// `isDioVerbose` is used to enable the verbose mode of Dio.
+  /// `deviceId` sets [Dmart.deviceId], sent as `X-DeviceId` on [login].
   static void initDmart({
     Dio? dio,
     BaseOptions? dioConfig,
     Iterable<Interceptor> interceptors = const [],
     bool isDioVerbose = false,
+    String? deviceId,
   }) async {
+    if (deviceId != null) Dmart.deviceId = deviceId;
     if (dio != null) {
       _dioInstance = dio;
       dmartServerUrl = dio.options.baseUrl;
@@ -146,12 +157,31 @@ class Dmart {
   }
 
   /// Logs in the user with the given [loginRequest].
+  ///
+  /// A failed sign-in comes back as an [Error] whose [Error.code] says what
+  /// to do next (see [DmartErrorCode]):
+  /// - [DmartErrorCode.otpNeeded] (115): the password was right but a code is
+  ///   needed too. dmart has sent one; call [login] again with the same
+  ///   identifier, password and device id plus the code, e.g.
+  ///   [LoginRequest.withPasswordAndOTP]. Admins always sign in this way, and
+  ///   since dmart 1.7.2 so does a mobile account's first sign-in from a
+  ///   device.
+  /// - [DmartErrorCode.userIsntVerified] (11): a password sign-in named an
+  ///   email or phone the account has not proven (dmart >= 1.7.10). Offer a
+  ///   code sign-in or a password reset to that address.
+  /// - [DmartErrorCode.invalidData]: a mobile account signed in without a
+  ///   device id. Set [LoginRequest.deviceID] or [Dmart.deviceId].
   static Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest) async {
     try {
       final response = await _dio.post(
         '/user/login',
         data: loginRequest.toJson(),
-        options: Options(headers: headers),
+        options: Options(
+          headers: {
+            ...headers,
+            if (loginRequest.deviceID == null && deviceId != null) "X-DeviceId": deviceId,
+          },
+        ),
       );
       var loginResponse = LoginResponse.fromJson(response.data);
       token = loginResponse.token;
@@ -161,7 +191,15 @@ class Dmart {
     }
   }
 
-  /// Creates a user with the given [createUserRequest].
+  /// Registers a user with the given [createUserRequest] (`POST /user/create`).
+  ///
+  /// Open registration needs a code for each address given: request one with
+  /// [otpRequest] and purpose [OtpPurpose.register], then pass it as
+  /// [CreateUserAttributes.emailOTP] / [CreateUserAttributes.msisdnOTP]. Since
+  /// dmart 1.7.10 a server that allows registration always requires them.
+  /// [CreateUserRequest.shortname] picks the username (dmart >= 1.7.9; check
+  /// it first with [checkExisting]); the default `"auto"` lets the server
+  /// make one.
   static Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest) async {
     try {
       final response = await _dio.post(
@@ -288,21 +326,6 @@ class Dmart {
     ));
   }
 
-  /// Resets a user with the given [shortname].
-  static Future<(ApiResponse?, Error?)> userReset(String shortname) async {
-    _isTokenNull();
-    try {
-      final response = await _dio.post(
-        '/user/reset',
-        data: {'shortname': shortname},
-        options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
-      );
-      return (ApiResponse.fromJson(response.data), null);
-    } on DioException catch (e) {
-      return (null, _returnExceptionError(e));
-    }
-  }
-
   /// Validates password for the authenticated user.
   static Future<(ApiResponse?, Error?)> validatePassword(String password) async {
     _isTokenNull();
@@ -375,7 +398,7 @@ class Dmart {
     } on DioException catch (e) {
       final data = e.response?.data;
       final code = data is Map && data['error'] is Map ? data['error']['code'] : null;
-      if (code == _invalidRoute || e.response?.statusCode == 404) {
+      if (code == DmartErrorCode.invalidRoute || e.response?.statusCode == 404) {
         final (profile, error) = await getProfile();
         if (profile == null) return (null, error);
         return (profile.records!.first.attributes.permissions, null);
@@ -385,6 +408,13 @@ class Dmart {
   }
 
   /// Update the profile of the user.
+  ///
+  /// Changing the password needs the current one: send `old_password` with
+  /// `password` in the attributes. dmart refuses a change without it
+  /// ([DmartErrorCode.passwordResetError]), even under
+  /// `force_password_change`, and an account with no password sets its first
+  /// one with [passwordResetConfirm]. Email and msisdn change through
+  /// [verifyContact], not here.
   static Future<(bool?, Error?)> updateProfile(ActionRequestRecord profile) async {
     _isTokenNull();
     try {
@@ -413,7 +443,14 @@ class Dmart {
     }
   }
 
-  /// Verifies a user contact.
+  /// Verifies a user contact with a code issued by [otpRequest] with purpose
+  /// [OtpPurpose.verifyContact].
+  ///
+  /// Confirming the address already on the account needs only the code.
+  /// Changing it to a new address also needs [VerifyContactRequest.password]
+  /// on an account that has one (admins always), or, on a passwordless
+  /// account, [VerifyContactRequest.currentCode]: a verify-contact code sent
+  /// to the existing phone, else the existing email.
   static Future<(ApiResponse?, Error?)> verifyContact(VerifyContactRequest request) async {
     _isTokenNull();
     try {
@@ -661,6 +698,30 @@ class Dmart {
         .replaceAll('..', '.');
   }
 
+  /// Reads the server's client settings from `GET /public/client-config`
+  /// (dmart >= 1.6.12): code length and resend wait, upload and query limits,
+  /// and whether custom password and username rules apply. No sign-in needed.
+  static Future<(ClientConfig?, Error?)> getClientConfig() async {
+    try {
+      final response = await _dio.get('/public/client-config', options: Options(headers: headers));
+      final data = response.data;
+      if (data is Map && data['status'] == 'success') {
+        return (ClientConfig.fromJson(Map<String, dynamic>.from(data['attributes'] ?? {})), null);
+      }
+      return (
+        null,
+        Error(
+          type: 'unknown',
+          code: 0,
+          info: [data is Map && data['error'] is Map ? Map<String, dynamic>.from(data['error']) : {}],
+          message: "Unable to retrieve the client config.",
+        ),
+      );
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
   /// Retrieves the manifest.
   static Future<dynamic> getManifest() async {
     try {
@@ -687,16 +748,19 @@ class Dmart {
     }
   }
 
-  /// Attaches a record to a space with the given [spaceName], [record], and optional [payloadFile].
+  /// Attaches a record to a space through `POST /public/attach/{spaceName}`,
+  /// with the given [record] and optional [payloadFile].
   ///
   /// The [record] is sent as a JSON-encoded form field, and [payloadFile] is sent as
-  /// a multipart file upload if provided.
+  /// a multipart file upload if provided. This is dmart's anonymous upload
+  /// route: the space must be in the server's `ALLOWED_SUBMIT_MODELS`, and
+  /// the attachment is created inactive. No sign-in is needed; the token is
+  /// sent when there is one.
   static Future<(ActionResponse?, Error?)> attach({
     required String spaceName,
     required Record record,
     File? payloadFile,
   }) async {
-    _isTokenNull();
     try {
       final formData = FormData();
       formData.fields.add(MapEntry('record', json.encode(record.toJson())));
@@ -706,9 +770,12 @@ class Dmart {
       }
 
       final response = await _dio.post(
-        '/attach/$spaceName',
+        '/public/attach/$spaceName',
         data: formData,
-        options: Options(contentType: 'multipart/form-data', headers: {...headers, "Authorization": "Bearer $token"}),
+        options: Options(
+          contentType: 'multipart/form-data',
+          headers: {...headers, if (token != null) "Authorization": "Bearer $token"},
+        ),
       );
       return (ActionResponse.fromJson(response.data), null);
     } on DioException catch (e) {

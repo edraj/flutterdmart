@@ -17,7 +17,11 @@ enum ContentType {
   csv,
   sqlite,
   parquet,
-  apk;
+  apk,
+
+  /// A file of no more specific kind: what dmart >= 1.5.6 records for an
+  /// upload of an unknown or `application/octet-stream` type.
+  binary;
 
   static ContentType get(String value) {
     return switch (value) {

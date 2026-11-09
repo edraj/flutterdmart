@@ -66,6 +66,16 @@ class ProfileResponseRecordAttributes {
   final Map<String, dynamic>? payload;
   final List<String> groups;
 
+  /// The user's hosted mailbox, if the directory gives it one (dmart >= 1.6.0).
+  /// Read-only here: only an admin sets it, through `/managed/request`.
+  final String? mailbox;
+
+  /// Other addresses delivered to [mailbox] (dmart >= 1.6.0). Read-only here.
+  final List<String> mailAliases;
+
+  /// The directory services the user may use (dmart >= 1.6.0). Read-only here.
+  final List<String> services;
+
   ProfileResponseRecordAttributes({
     this.email,
     this.msisdn,
@@ -80,6 +90,9 @@ class ProfileResponseRecordAttributes {
     required this.permissions,
     this.payload,
     required this.groups,
+    this.mailbox,
+    this.mailAliases = const [],
+    this.services = const [],
   });
 
   factory ProfileResponseRecordAttributes.fromJson(Map<String, dynamic> json) {
@@ -99,6 +112,9 @@ class ProfileResponseRecordAttributes {
       payload: json['payload']?['body'],
       permissions: Permission.mapFromJson(json['permissions']),
       groups: List<String>.from(json['groups'] ?? []),
+      mailbox: json['mailbox'],
+      mailAliases: List<String>.from(json['mail_aliases'] ?? []),
+      services: List<String>.from(json['services'] ?? []),
     );
   }
 
@@ -116,6 +132,9 @@ class ProfileResponseRecordAttributes {
       'force_password_change': forcePasswordChange,
       'permissions': permissions.map((key, value) => MapEntry(key, value.toJson())),
       'groups': groups,
+      if (mailbox != null) 'mailbox': mailbox,
+      if (mailAliases.isNotEmpty) 'mail_aliases': mailAliases,
+      if (services.isNotEmpty) 'services': services,
     };
   }
 }

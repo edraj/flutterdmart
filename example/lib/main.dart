@@ -11,9 +11,10 @@ Future<void> main() async {
   // Creating a user
   final CreateUserAttributes createUserAttributes = CreateUserAttributes(
     displayname: Displayname(en: 'test'),
-    invitation: 'ABC',
+    email: 'jimmy@example.com',
+    // The code sent by Dmart.otpRequest(SendOTPRequest(email: ..., purpose: OtpPurpose.register)).
+    emailOTP: '123456',
     password: '@Jimmy123_',
-    roles: ['super_admin'],
   );
   var (responseCreateUser, error) = await Dmart.createUser(CreateUserRequest(
     shortname: 'jimmy',

@@ -44,6 +44,7 @@ class QueryRequest {
   bool? retrieveAttachments;
 
   /// Whether to validate the schema of the resources.
+  @Deprecated("dmart >= 1.5.0 ignores validate_schema on queries.")
   bool? validateSchema;
 
   /// The jq filter to apply to the resources.
@@ -52,7 +53,9 @@ class QueryRequest {
   /// Whether to filter the resources by the exact subpath.
   bool? exactSubpath;
 
-  /// The number of resources to retrieve.
+  /// The number of resources to retrieve. Leave it null for the server's
+  /// default (`default_query_limit` in [ClientConfig], normally 10); `-1`
+  /// asks for the server's maximum.
   int? limit;
 
   /// The offset of the resources to retrieve.
@@ -95,6 +98,7 @@ class QueryRequest {
       'sort_type': sortType?.toString().split('.').last,
       'retrieve_json_payload': retrieveJsonPayload,
       'retrieve_attachments': retrieveAttachments,
+      // ignore: deprecated_member_use_from_same_package
       'validate_schema': validateSchema,
       'jq_filter': jqFilter,
       'exact_subpath': exactSubpath,

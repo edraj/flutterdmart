@@ -1,1 +1,1 @@
-enum UserType { web, mobile, bot }
+enum UserType { web, mobile, bot, admin }

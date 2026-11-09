@@ -7,16 +7,18 @@ A Dart implementation of the Dmart that depends on dio.
 Properties:
 * `String dmartServerUrl` - The base URL of the Dmart instance.
 * `String token` - The token to be used for authentication.
+* `String? deviceId` - This device's id (null until set), sent as `X-DeviceId` on `login` when the request has none. dmart >= 1.7.2 requires a device id for mobile sign-in.
 
 Methods:
-* `void initDmart({Dio? dio, BaseOptions? dioConfig, Iterable<Interceptor> interceptors = const [], bool isDioVerbose = false,})` - Initializes the Dio networking instance.
+* `void initDmart({Dio? dio, BaseOptions? dioConfig, Iterable<Interceptor> interceptors = const [], bool isDioVerbose = false, String? deviceId})` - Initializes the Dio networking instance.
 * * if `dio` is set:
 * * * `dioConfig` will not take effect.
 * * * `isDioVerbose` will still extend the interceptor.
 * * * `interceptors` will still extend the interceptor.
 * `Future<dynamic> getManifest()` - Retrieves the Dmart manifest.
 * `Future<dynamic> getSettings()` - Retrieves the Dmart settings.
-* `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information.
+* `Future<(ClientConfig?, Error?)> getClientConfig()` - Reads `/public/client-config` (dmart >= 1.6.12): code length, resend wait, upload and query limits, password and username rules. No token needed.
+* `Future<(LoginResponse?, Error?)> login(LoginRequest loginRequest)` - Authenticates a user and returns login information. An error with code `DmartErrorCode.otpNeeded` (115) means: send the same login again with the code dmart sent (`LoginRequest.withPasswordAndOTP`). `DmartErrorCode.userIsntVerified` (11) means the email or phone used is not proven yet.
 * `Future<(CreateUserResponse?, Error?)> createUser(CreateUserRequest createUserRequest)` - Creates a new user.
 * `Future<(ApiResponse?, Error?)> logout()` - Logs the user out.
 * `Future<(ApiResponse?, Error?)> otpRequest(SendOTPRequest request)` - Requests an OTP. `purpose` (see `OtpPurpose`: `login`, `reset`, `register`, `verify-contact`) decides what the code can be redeemed for.
@@ -26,7 +28,6 @@ Methods:
 * * `otpRequestLogin(SendOTPRequest request)` - same as `otpRequest` with `OtpPurpose.login`.
 * * `passwordResetRequest(PasswordResetRequest request)` - same as `otpRequest` with `OtpPurpose.reset`.
 * * `confirmOTP(ConfirmOTPRequest request)` - same as `verifyContact`.
-* `Future<(ApiResponse?, Error?)> userReset(String shortname)` - Resets a user's password.
 * `Future<(ApiResponse?, Error?)> validatePassword(String password)` - Validates the user's password.
 * `Future<(ProfileResponse?, Error?)> getProfile()` - Retrieves the current user's profile.
 * `Future<(Map<String, Permission>?, Error?)> getPermissions()` - Retrieves the current user's permission map from `/user/permissions` (or the profile's copy on a server without that route).
@@ -34,7 +35,6 @@ Methods:
 * `Future<(ApiQueryResponse?, Error?)> query(QueryRequest query, {String scope = "managed"})` -  Executes a query against the Dmart backend.
 * `Future<(ActionResponse?, Error?)> request(ActionRequest action)` -  Performs an action on the Dmart system.
 * `Future<(ResponseEntry?, Error?)> retrieveEntry(RetrieveEntryRequest request, {String scope = "managed"})` -  Fetches a specific entry from Dmart.
-* `Future<(ActionResponse?, Error?)> createSpace(ActionRequest action)` - Creates a new space.
 * `Future<(ApiQueryResponse?, Error?)> getSpaces()` - Retrieves a list of spaces.
 * `Future<dynamic> getPayload(GetPayloadRequest request)` - Retrieves payload data.
 * `Future<(ApiQueryResponse?, Error?)> progressTicket(ProgressTicketRequest request)` - Updates a progress ticket.
@@ -67,9 +67,10 @@ var (respSettings, _) = await Dmart.getSettings();
 ```dart
 final CreateUserAttributes createUserAttributes = CreateUserAttributes(
     displayname: Displayname(en: 'test'),
-    invitation: 'ABC',
+    email: 'jimmy@example.com',
+    // The code sent by Dmart.otpRequest(SendOTPRequest(email: ..., purpose: OtpPurpose.register)).
+    emailOTP: '123456',
     password: '@Jimmy123_',
-    roles: ['super_admin'],
 );
 var (responseCreateUser, error) = await Dmart.createUser(CreateUserRequest(
     shortname: 'jimmy',

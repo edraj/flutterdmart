@@ -47,12 +47,17 @@ class ApiQueryResponseAttributes {
   final int total;
   final int returned;
 
-  ApiQueryResponseAttributes({required this.total, required this.returned});
+  /// True when [total] is the server's cap (`QUERY_TOTAL_CAP`) rather than
+  /// the exact count: there are at least [total] matches.
+  final bool totalIsLowerBound;
+
+  ApiQueryResponseAttributes({required this.total, required this.returned, this.totalIsLowerBound = false});
 
   factory ApiQueryResponseAttributes.fromJson(Map<String, dynamic> json) {
     return ApiQueryResponseAttributes(
       total: json['total'],
       returned: json['returned'],
+      totalIsLowerBound: json['total_is_lower_bound'] == true,
     );
   }
 
@@ -61,6 +66,7 @@ class ApiQueryResponseAttributes {
     return {
       'total': total,
       'returned': returned,
+      if (totalIsLowerBound) 'total_is_lower_bound': true,
     };
   }
 }

@@ -29,6 +29,19 @@ class LoginRequest {
 
   LoginRequest.withMSISDNAndOTP({required this.msisdn, required this.otp});
 
+  /// The second step of a password sign-in that answered
+  /// [DmartErrorCode.otpNeeded] (115): the same identifier and password,
+  /// plus the code dmart sent. Give exactly one of [shortname], [email] or
+  /// [msisdn], and the same [deviceID] as the first step.
+  LoginRequest.withPasswordAndOTP({
+    this.shortname,
+    this.email,
+    this.msisdn,
+    required this.password,
+    required this.otp,
+    this.deviceID,
+  });
+
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
       'shortname': shortname,
