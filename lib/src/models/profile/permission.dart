@@ -24,8 +24,11 @@ class Permission {
   factory Permission.fromJson(Map<String, dynamic> json) {
     return Permission(
       allowedActions:
+          // An action this package doesn't know yet is left out rather than
+          // failing the whole profile.
           (json['allowed_actions'] as List<dynamic>)
-              .map((action) => ActionType.values.byName(action.toString()))
+              .map(ActionType.tryParse)
+              .whereType<ActionType>()
               .toList(),
       conditions:
           (json['conditions'] as List<dynamic>?)

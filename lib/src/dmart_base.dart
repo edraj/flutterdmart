@@ -98,6 +98,11 @@ class Dmart {
         return "application/octet-stream";
       case DmartContentType.ContentType.apk:
         return "application/vnd.android.package-archive";
+      case DmartContentType.ContentType.comment:
+      case DmartContentType.ContentType.reaction:
+        return "application/json";
+      case DmartContentType.ContentType.opaque:
+        return "application/octet-stream";
       case DmartContentType.ContentType.binary:
         return "application/octet-stream";
     }
@@ -528,7 +533,7 @@ class Dmart {
     try {
       if (subpath == "/") subpath = "__root__";
       final response = await _dio.get(
-        '/$scope/entry/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}?retrieve_json_payload=${request.retrieveJsonPayload}&retrieve_attachments=${request.retrieveAttachments}&validate_schema=${request.validateSchema}'
+        '/$scope/entry/${request.resourceType.wire}/${request.spaceName}/${request.subpath}/${request.shortname}?retrieve_json_payload=${request.retrieveJsonPayload}&retrieve_attachments=${request.retrieveAttachments}&validate_schema=${request.validateSchema}'
             .replaceAll(RegExp(r'/+'), '/'),
         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
@@ -572,7 +577,7 @@ class Dmart {
     }
     try {
       final response = await _dio.get(
-        '/$scope/payload/${request.resourceType.name}/${request.spaceName}/${request.subpath}/${request.shortname}${request.schemaShortname}${request.ext}',
+        '/$scope/payload/${request.resourceType.wire}/${request.spaceName}/${request.subpath}/${request.shortname}${request.schemaShortname}${request.ext}',
         options: Options(headers: {...headers, "Authorization": "Bearer $token"}),
       );
 
