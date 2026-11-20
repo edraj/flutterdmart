@@ -18,6 +18,9 @@ enum ContentType {
   sqlite,
   parquet,
   apk,
+  comment,
+  reaction,
+  opaque,
 
   /// A file of no more specific kind: what dmart >= 1.5.6 records for an
   /// upload of an unknown or `application/octet-stream` type.
@@ -31,7 +34,8 @@ enum ContentType {
       "image_webp" => ContentType.imageWebp,
       "image_gif" => ContentType.imageGif,
       "image" => ContentType.image,
-      _ => ContentType.values.byName(value),
+      // A content type this package doesn't know yet reads as binary.
+      _ => ContentType.values.asNameMap()[value] ?? ContentType.binary,
     };
   }
 }

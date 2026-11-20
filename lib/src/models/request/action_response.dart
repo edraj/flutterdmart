@@ -72,7 +72,7 @@ class ActionResponseRecord extends ResponseRecord {
             });
 
     var actionResponseRecord = ActionResponseRecord(
-      resourceType: ResourceType.values.byName(json['resource_type']),
+      resourceType: ResourceType.fromWire(json['resource_type']),
       uuid: json['uuid'],
       shortname: json['shortname'],
       subpath: json['subpath'],
@@ -87,7 +87,7 @@ class ActionResponseRecord extends ResponseRecord {
   /// Converts the ActionResponseRecord object to a JSON object.
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['resource_type'] = resourceType.name;
+    data['resource_type'] = resourceType.wire;
     data['uuid'] = uuid;
     data['shortname'] = shortname;
     data['subpath'] = subpath;

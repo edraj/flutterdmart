@@ -20,7 +20,7 @@ class GetPayloadRequest {
   /// Converts the request to a JSON object.
   Map<String, dynamic> toJson() {
     return {
-      'resource_type': resourceType.name,
+      'resource_type': resourceType.wire,
       'space_name': spaceName,
       'subpath': subpath,
       'shortname': shortname,
