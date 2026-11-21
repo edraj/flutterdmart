@@ -1,3 +1,19 @@
+## 3.0.0
+**Compatibility:** works with csdmart 1.8.0 and earlier. The enums gain members, so an app that `switch`es over `ResourceType`, `ActionType` or `ContentType` without a `default` needs cases for them.
+
+### Fixed
+- A response no longer fails to parse when it holds a type this package doesn't know.
+  - Resource types, actions and content types were read with `.values.byName`, which throws on an unfamiliar name. So one reply, lock, data asset or integration record failed a whole query, and one `assign`, `lock` or `unlock` grant failed a whole profile.
+  - `ResourceType.fromWire` now reads a type this package doesn't know yet as `ResourceType.unknown`.
+  - A permission leaves out an action it doesn't know.
+  - `ContentType.get` reads an unknown content type as `binary`.
+- Resource types go out under dmart's names. Requests and URLs used the Dart name, so `pluginWrapper` reached dmart as `pluginWrapper` instead of `plugin_wrapper`. `ResourceType.wire` carries dmart's name.
+
+### Added
+- `ResourceType`: `csv`, `jsonl`, `parquet`, `sqlite`, `dataAsset` (`data_asset`), `lock`, `log`, `reply`, `share` and `integration` (csdmart 1.8.0), plus `unknown`.
+- `ActionType`: `assign`, `lock` and `unlock`, and `ActionType.tryParse`.
+- `ContentType`: `comment`, `reaction` and `opaque`.
+
 ## 2.14.0
 **Compatibility:** Requires csdmart ≥ 1.6.12 (getClientConfig needs it; getPermissions falls back to the profile and the rest works on older servers). Top-level `shortname` on sign-up and the username rule in client config need ≥ 1.7.9. Aligned with csdmart 1.7.10.
 

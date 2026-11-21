@@ -57,7 +57,7 @@ class ActionRequestRecord {
 
   factory ActionRequestRecord.fromJson(Map<String, dynamic> json) {
     return ActionRequestRecord(
-      resourceType: ResourceType.values.byName(json['resource_type']),
+      resourceType: ResourceType.fromWire(json['resource_type']),
       shortname: json['shortname'],
       subpath: json['subpath'],
       attributes: Map<String, dynamic>.from(json['attributes']),
@@ -71,7 +71,7 @@ class ActionRequestRecord {
   /// Converts the ActionRequestRecord object to a JSON object.
   Map<String, dynamic> toJson() {
     return {
-      "resource_type": resourceType.name,
+      "resource_type": resourceType.wire,
       "shortname": shortname,
       "subpath": subpath,
       "attributes": attributes,

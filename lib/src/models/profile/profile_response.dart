@@ -39,7 +39,7 @@ class ProfileResponseRecord {
 
   factory ProfileResponseRecord.fromJson(Map<String, dynamic> json) {
     return ProfileResponseRecord(
-      resourceType: ResourceType.values.byName(json['resource_type']),
+      resourceType: ResourceType.fromWire(json['resource_type']),
       shortname: json['shortname'],
       subpath: json['subpath'],
       attributes: ProfileResponseRecordAttributes.fromJson(Map<String, dynamic>.from(json['attributes'])),
