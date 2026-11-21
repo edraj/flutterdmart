@@ -1,4 +1,4 @@
-## Unreleased
+## 3.0.0
 **Compatibility:** works with csdmart 1.8.0 and earlier. The enums gain members, so an app that `switch`es over `ResourceType`, `ActionType` or `ContentType` without a `default` needs cases for them.
 
 ### Fixed
