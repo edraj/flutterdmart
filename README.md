@@ -94,6 +94,51 @@ LoginRequest.withMsisdn
 Dmart.token = 'xxx.yyy.zzz';
 ```
 
+* Security keys, passkeys and authenticator apps (dmart >= 1.8.1)
+
+An account with a security key or an authenticator app answers its password
+with `DmartErrorCode.otpNeeded` (115), and `error.secondFactor` says what it
+needs. The package stays pure Dart: the app gives it the phone's passkey API
+as a `PasskeyAuthenticator`, through whichever Flutter plugin it uses for
+Android's Credential Manager and iOS's AuthenticationServices. dmart's options
+are the WebAuthn JSON those APIs take, and the credential JSON they return is
+what dmart takes back.
+
+```dart
+class PhoneKeys implements PasskeyAuthenticator {
+  @override
+  Future<Map<String, dynamic>> getCredential(Map<String, dynamic> options) async =>
+      // e.g. Credential Manager's GetPublicKeyCredentialOption(jsonEncode(options)),
+      // and the credential's authenticationResponseJson, decoded.
+      jsonDecode(await myPasskeyPlugin.authenticate(jsonEncode(options)));
+
+  @override
+  Future<Map<String, dynamic>> createCredential(Map<String, dynamic> options) async =>
+      jsonDecode(await myPasskeyPlugin.register(jsonEncode(options)));
+}
+
+// The password, then the key.
+var (signedIn, error) = await Dmart.loginWithSecurityKey(
+  LoginRequest(shortname: 'jimmy', password: '@Jimmy123_'), PhoneKeys());
+
+// An authenticator app's code.
+if (error?.secondFactor?.wantsAppCode ?? false) {
+  (signedIn, error) = await Dmart.login(LoginRequest.withSecondFactor(
+    shortname: 'jimmy', password: '@Jimmy123_', totp: codeFromTheApp));
+}
+
+// Key-only sign-in, for an account that turned it on.
+(signedIn, error) = await Dmart.loginWithKeyAlone(shortname: 'jimmy', authenticator: PhoneKeys());
+```
+
+A phone offers an app the keys of a domain only when the domain names the
+app: list it in the server's `WEBAUTHN_ANDROID_APPS` (package and signing
+certificate's SHA-256) or `WEBAUTHN_IOS_APPS` (`TEAMID.bundle.id`), and give
+the iOS app the `webcredentials:` associated domain. The signed-in account's
+factors: `getSecondFactors`, `securityKeyProof`, `addSecurityKey`,
+`removeSecurityKey`, `newRecoveryCodes`, `setKeyOnly`, `totpBegin`,
+`totpConfirm`, `totpRemove`.
+
 * Get user profile
 
 ```dart

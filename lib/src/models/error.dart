@@ -1,3 +1,5 @@
+import 'package:dmart/src/models/second_factors.dart';
+
 class Error {
   final String? type;
   final int? code;
@@ -12,6 +14,20 @@ class Error {
       code: json['code'],
       message: json['message'],
       info: json['info']?.cast<Map<String, dynamic>>(),
+    );
+  }
+
+  /// The second step a sign-in asks for (dmart >= 1.8.1), or null:
+  /// `info[0]` of an `OTP_NEEDED` (115) or `SECOND_FACTOR_REQUIRED` (116)
+  /// answer for an account with a key or an authenticator app.
+  SecondFactorStep? get secondFactor {
+    final step = (info != null && info!.isNotEmpty) ? info!.first : null;
+    final factors = step?['factors'];
+    if (factors is! List) return null;
+    final webauthn = step!['webauthn'];
+    return SecondFactorStep(
+      factors: factors.map((f) => '$f').toList(),
+      webauthn: webauthn is Map ? KeyChallenge.fromJson(Map<String, dynamic>.from(webauthn)) : null,
     );
   }
 

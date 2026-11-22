@@ -1,6 +1,6 @@
 name: dmart
 description: A pure Dart implementation of the Dmart client that depends on dio.
-version: 3.0.0
+version: 3.1.0
 repository: https://github.com/edraj/flutterdmart
 
 platforms:

@@ -1,3 +1,12 @@
+## 3.1.0
+**Compatibility:** the second-factor calls need csdmart >= 1.8.1; the rest is unchanged.
+
+### Added
+- **Second factors at sign-in:** `LoginRequest.withSecondFactor` carries a security key's answer (`webauthn`), an authenticator app's code (`totp`) or a `recoveryCode`. `Error.secondFactor` reads the step an `otpNeeded` (115) or `secondFactorRequired` (116) answer asks for.
+- **Keys through the phone's own passkey API:** `PasskeyAuthenticator` is the app's bridge to Android's Credential Manager or iOS's AuthenticationServices, through any Flutter plugin. The package stays pure Dart. `loginWithSecurityKey` does the password and the key; `loginWithKeyAlone` is key-only sign-in; `addSecurityKey` adds a key.
+- **The account's factors:** `getSecondFactors`, `securityKeyProof`, `removeSecurityKey`, `newRecoveryCodes`, `setKeyOnly`, and an authenticator app's `totpBegin`, `totpConfirm` and `totpRemove`.
+- **`DmartErrorCode`** gains `secondFactorRequired` (116) and `secondFactorInvalid` (117), as pydmart and tsdmart do.
+
 ## 3.0.0
 **Compatibility:** works with csdmart 1.8.0 and earlier. The enums gain members, so an app that `switch`es over `ResourceType`, `ActionType` or `ContentType` without a `default` needs cases for them.
 
