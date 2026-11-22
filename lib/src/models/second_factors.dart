@@ -1,17 +1,16 @@
 // Second factors (dmart >= 1.8.1): a security key or passkey, an
 // authenticator app (TOTP), recovery codes, and key-only sign-in.
 
-/// A device's passkey API, as the app wires it: Android's Credential Manager,
-/// iOS's AuthenticationServices, or a browser's `navigator.credentials`.
+/// The device's passkey API: [PlatformPasskeys] by default, which is Android's
+/// Credential Manager, iOS's and macOS's AuthenticationServices, Windows Hello,
+/// or the browser's `navigator.credentials` on the web. Another implementation
+/// stands in for it in tests, or wraps another plugin.
 ///
 /// dmart's options are the WebAuthn JSON those APIs take (base64url fields),
-/// and the credential they return, as JSON, is what dmart takes back, so an
-/// implementation passes both through. On Android, `getCredential` hands
-/// `jsonEncode(options)` to a `GetPublicKeyCredentialOption` and returns the
-/// `PublicKeyCredential`'s `authenticationResponseJson`, decoded. A phone
+/// and the credential they return, as JSON, is what dmart takes back. A phone
 /// offers the keys only to an app the server's domain names (dmart's
 /// `WEBAUTHN_ANDROID_APPS` / `WEBAUTHN_IOS_APPS`).
-abstract interface class PasskeyAuthenticator {
+abstract interface class PasskeyDevice {
   /// Asks a key to sign: [options] are WebAuthn request options. Returns the
   /// PublicKeyCredential as JSON.
   Future<Map<String, dynamic>> getCredential(Map<String, dynamic> options);

@@ -197,19 +197,19 @@ class Dmart {
   }
 
   /// Signs in an account whose second factor is a security key or passkey
-  /// (dmart >= 1.8.1): the password, then the key's answer through
-  /// [authenticator], with the password again. An account without a key
+  /// (dmart >= 1.8.1): the password, then the key's answer through [device]
+  /// (the phone's own passkey API by default), with the password again. An account without a key
   /// signs in with the first step. Any other second step (an authenticator
   /// app's code) comes back as the [Error], whose [Error.secondFactor] says
   /// what it needs; finish it with [LoginRequest.withSecondFactor].
   static Future<(LoginResponse?, Error?)> loginWithSecurityKey(
-    LoginRequest request,
-    PasskeyAuthenticator authenticator,
-  ) async {
+    LoginRequest request, {
+    PasskeyDevice? device,
+  }) async {
     final (signedIn, error) = await login(request);
     final step = error?.secondFactor;
     if (signedIn != null || step == null || !step.wantsKey) return (signedIn, error);
-    final (answer, keyError) = await _askKey(step.webauthn!, authenticator);
+    final (answer, keyError) = await _askKey(step.webauthn!, device);
     if (answer == null) return (null, keyError);
     return login(request..webauthn = answer);
   }
@@ -230,27 +230,27 @@ class Dmart {
     }
   }
 
-  /// Key-only sign-in (dmart >= 1.8.1): the key and its PIN through
-  /// [authenticator], no password, for an account that turned it on
+  /// Key-only sign-in (dmart >= 1.8.1): the key and its PIN through [device]
+  /// (the phone's own passkey API by default), no password, for an account that turned it on
   /// ([setKeyOnly]). Every refusal is [DmartErrorCode.secondFactorInvalid].
   static Future<(LoginResponse?, Error?)> loginWithKeyAlone({
     String? shortname,
     String? email,
     String? msisdn,
-    required PasskeyAuthenticator authenticator,
+    PasskeyDevice? device,
   }) async {
     final (challenge, error) = await keyOnlyChallenge(shortname: shortname, email: email, msisdn: msisdn);
     if (challenge == null) return (null, error);
-    final (answer, keyError) = await _askKey(challenge, authenticator);
+    final (answer, keyError) = await _askKey(challenge, device);
     if (answer == null) return (null, keyError);
     return login(LoginRequest.withSecondFactor(
       shortname: shortname, email: email, msisdn: msisdn, password: null, webauthn: answer));
   }
 
-  // The key's answer to [challenge], or the authenticator's failure as an Error.
-  static Future<(KeyAnswer?, Error?)> _askKey(KeyChallenge challenge, PasskeyAuthenticator authenticator) async {
+  // The key's answer to [challenge], or the device's failure as an Error.
+  static Future<(KeyAnswer?, Error?)> _askKey(KeyChallenge challenge, PasskeyDevice? device) async {
     try {
-      final credential = await authenticator.getCredential(challenge.options);
+      final credential = await (device ?? PlatformPasskeys()).getCredential(challenge.options);
       return (KeyAnswer(challengeId: challenge.challengeId, credential: credential), null);
     } catch (e) {
       return (null, Error(type: 'client', code: 0, info: [], message: 'the security key did not answer: $e'));
@@ -281,31 +281,31 @@ class Dmart {
 
   /// The proof a change needs from an account with a key: [password] (left
   /// out for a key-only account) and the key's answer to a proof challenge.
-  static Future<(SecondFactorProof?, Error?)> securityKeyProof(
-    PasskeyAuthenticator authenticator, {
+  static Future<(SecondFactorProof?, Error?)> securityKeyProof({
     String? password,
+    PasskeyDevice? device,
   }) async {
     final (attributes, error) = await _secondFactorCall('/user/passkeys/proof-options', body: {});
     if (attributes == null) return (null, error);
-    final (answer, keyError) = await _askKey(KeyChallenge.fromJson(attributes), authenticator);
+    final (answer, keyError) = await _askKey(KeyChallenge.fromJson(attributes), device);
     if (answer == null) return (null, keyError);
     return (SecondFactorProof(password: password, webauthn: answer), null);
   }
 
-  /// Adds a security key or passkey to the signed-in account through
-  /// [authenticator]. The account's first second factor comes with ten
+  /// Adds a security key or passkey to the signed-in account through [device]
+  /// (the phone's own passkey API by default). The account's first second factor comes with ten
   /// recovery codes, shown once; they are the first value.
   static Future<(List<String>?, Error?)> addSecurityKey(
-    SecondFactorProof proof,
-    PasskeyAuthenticator authenticator, {
+    SecondFactorProof proof, {
     String? name,
+    PasskeyDevice? device,
   }) async {
     final (begun, error) = await _secondFactorCall('/user/passkeys/register-options', body: proof.toJson());
     if (begun == null) return (null, error);
     final challenge = KeyChallenge.fromJson(begun);
     final Map<String, dynamic> credential;
     try {
-      credential = await authenticator.createCredential(challenge.options);
+      credential = await (device ?? PlatformPasskeys()).createCredential(challenge.options);
     } catch (e) {
       return (null, Error(type: 'client', code: 0, info: [], message: 'no new key was made: $e'));
     }

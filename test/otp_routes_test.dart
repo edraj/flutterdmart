@@ -5,7 +5,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dmart/dmart.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Records each request and answers with a dmart success body.
 class _RecordingAdapter implements HttpClientAdapter {

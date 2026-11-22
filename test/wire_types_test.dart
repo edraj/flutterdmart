@@ -1,5 +1,5 @@
 import 'package:dmart/dmart.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 // dmart's resource types, actions and content types are read with
 // .values.byName, which throws on a name the package doesn't know, so one

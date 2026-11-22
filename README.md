@@ -1,6 +1,7 @@
 # Dart client for Dmart
 
-A Dart implementation of the Dmart that depends on dio.
+The Dmart client for Flutter apps, on dio. Security keys and passkeys go
+through the device's own passkey API (the `passkeys` plugin).
 
 ## APIs
 
@@ -98,28 +99,17 @@ Dmart.token = 'xxx.yyy.zzz';
 
 An account with a security key or an authenticator app answers its password
 with `DmartErrorCode.otpNeeded` (115), and `error.secondFactor` says what it
-needs. The package stays pure Dart: the app gives it the phone's passkey API
-as a `PasskeyAuthenticator`, through whichever Flutter plugin it uses for
-Android's Credential Manager and iOS's AuthenticationServices. dmart's options
-are the WebAuthn JSON those APIs take, and the credential JSON they return is
-what dmart takes back.
+needs. Keys go through the device's own passkey API, `PlatformPasskeys` (the
+`passkeys` plugin): Android's Credential Manager, iOS's and macOS's
+AuthenticationServices, Windows Hello, or the browser's WebAuthn. It offers
+security keys over USB and NFC as well as the device's passkeys. A
+`PasskeyDevice` passed as `device:` stands in for it, in tests or for another
+plugin.
 
 ```dart
-class PhoneKeys implements PasskeyAuthenticator {
-  @override
-  Future<Map<String, dynamic>> getCredential(Map<String, dynamic> options) async =>
-      // e.g. Credential Manager's GetPublicKeyCredentialOption(jsonEncode(options)),
-      // and the credential's authenticationResponseJson, decoded.
-      jsonDecode(await myPasskeyPlugin.authenticate(jsonEncode(options)));
-
-  @override
-  Future<Map<String, dynamic>> createCredential(Map<String, dynamic> options) async =>
-      jsonDecode(await myPasskeyPlugin.register(jsonEncode(options)));
-}
-
 // The password, then the key.
 var (signedIn, error) = await Dmart.loginWithSecurityKey(
-  LoginRequest(shortname: 'jimmy', password: '@Jimmy123_'), PhoneKeys());
+  LoginRequest(shortname: 'jimmy', password: '@Jimmy123_'));
 
 // An authenticator app's code.
 if (error?.secondFactor?.wantsAppCode ?? false) {
@@ -128,13 +118,15 @@ if (error?.secondFactor?.wantsAppCode ?? false) {
 }
 
 // Key-only sign-in, for an account that turned it on.
-(signedIn, error) = await Dmart.loginWithKeyAlone(shortname: 'jimmy', authenticator: PhoneKeys());
+(signedIn, error) = await Dmart.loginWithKeyAlone(shortname: 'jimmy');
 ```
 
 A phone offers an app the keys of a domain only when the domain names the
 app: list it in the server's `WEBAUTHN_ANDROID_APPS` (package and signing
 certificate's SHA-256) or `WEBAUTHN_IOS_APPS` (`TEAMID.bundle.id`), and give
-the iOS app the `webcredentials:` associated domain. The signed-in account's
+the iOS app the `webcredentials:` associated domain. The `passkeys` plugin's
+README has the rest of each platform's setup (Android's minimum SDK, iOS's
+entitlement). The signed-in account's
 factors: `getSecondFactors`, `securityKeyProof`, `addSecurityKey`,
 `removeSecurityKey`, `newRecoveryCodes`, `setKeyOnly`, `totpBegin`,
 `totpConfirm`, `totpRemove`.
