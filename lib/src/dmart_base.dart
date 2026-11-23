@@ -196,6 +196,161 @@ class Dmart {
     }
   }
 
+  /// Signs in an account whose second factor is a security key or passkey
+  /// (dmart >= 1.8.1): the password, then the key's answer through [device]
+  /// (the phone's own passkey API by default), with the password again. An account without a key
+  /// signs in with the first step. Any other second step (an authenticator
+  /// app's code) comes back as the [Error], whose [Error.secondFactor] says
+  /// what it needs; finish it with [LoginRequest.withSecondFactor].
+  static Future<(LoginResponse?, Error?)> loginWithSecurityKey(
+    LoginRequest request, {
+    PasskeyDevice? device,
+  }) async {
+    final (signedIn, error) = await login(request);
+    final step = error?.secondFactor;
+    if (signedIn != null || step == null || !step.wantsKey) return (signedIn, error);
+    final (answer, keyError) = await _askKey(step.webauthn!, device);
+    if (answer == null) return (null, keyError);
+    return login(request..webauthn = answer);
+  }
+
+  /// Key-only sign-in's challenge for an account's name (dmart >= 1.8.1),
+  /// before there is a session. Every name gets one; only an account that
+  /// turned key-only sign-in on gets one its key answers.
+  static Future<(KeyChallenge?, Error?)> keyOnlyChallenge({String? shortname, String? email, String? msisdn}) async {
+    try {
+      final response = await _dio.post(
+        '/user/passkeys/login-options',
+        data: {'shortname': ?shortname, 'email': ?email, 'msisdn': ?msisdn},
+        options: Options(headers: headers),
+      );
+      return (KeyChallenge.fromJson(Map<String, dynamic>.from(response.data['attributes'] as Map)), null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// Key-only sign-in (dmart >= 1.8.1): the key and its PIN through [device]
+  /// (the phone's own passkey API by default), no password, for an account that turned it on
+  /// ([setKeyOnly]). Every refusal is [DmartErrorCode.secondFactorInvalid].
+  static Future<(LoginResponse?, Error?)> loginWithKeyAlone({
+    String? shortname,
+    String? email,
+    String? msisdn,
+    PasskeyDevice? device,
+  }) async {
+    final (challenge, error) = await keyOnlyChallenge(shortname: shortname, email: email, msisdn: msisdn);
+    if (challenge == null) return (null, error);
+    final (answer, keyError) = await _askKey(challenge, device);
+    if (answer == null) return (null, keyError);
+    return login(LoginRequest.withSecondFactor(
+      shortname: shortname, email: email, msisdn: msisdn, password: null, webauthn: answer));
+  }
+
+  // The key's answer to [challenge], or the device's failure as an Error.
+  static Future<(KeyAnswer?, Error?)> _askKey(KeyChallenge challenge, PasskeyDevice? device) async {
+    try {
+      final credential = await (device ?? PlatformPasskeys()).getCredential(challenge.options);
+      return (KeyAnswer(challengeId: challenge.challengeId, credential: credential), null);
+    } catch (e) {
+      return (null, Error(type: 'client', code: 0, info: [], message: 'the security key did not answer: $e'));
+    }
+  }
+
+  // A second-factor call (`/user/passkeys/*`, `/user/totp/*`): its
+  // `attributes`, or the error.
+  static Future<(Map<String, dynamic>?, Error?)> _secondFactorCall(String path, {Map<String, dynamic>? body}) async {
+    _isTokenNull();
+    try {
+      final options = Options(headers: {...headers, "Authorization": "Bearer $token"});
+      final response = body == null
+          ? await _dio.get(path, options: options)
+          : await _dio.post(path, data: body, options: options);
+      final attributes = response.data['attributes'];
+      return (attributes is Map ? Map<String, dynamic>.from(attributes) : <String, dynamic>{}, null);
+    } on DioException catch (e) {
+      return (null, _returnExceptionError(e));
+    }
+  }
+
+  /// The signed-in account's second factors (dmart >= 1.8.1).
+  static Future<(SecondFactors?, Error?)> getSecondFactors() async {
+    final (attributes, error) = await _secondFactorCall('/user/passkeys');
+    return (attributes == null ? null : SecondFactors.fromJson(attributes), error);
+  }
+
+  /// The proof a change needs from an account with a key: [password] (left
+  /// out for a key-only account) and the key's answer to a proof challenge.
+  static Future<(SecondFactorProof?, Error?)> securityKeyProof({
+    String? password,
+    PasskeyDevice? device,
+  }) async {
+    final (attributes, error) = await _secondFactorCall('/user/passkeys/proof-options', body: {});
+    if (attributes == null) return (null, error);
+    final (answer, keyError) = await _askKey(KeyChallenge.fromJson(attributes), device);
+    if (answer == null) return (null, keyError);
+    return (SecondFactorProof(password: password, webauthn: answer), null);
+  }
+
+  /// Adds a security key or passkey to the signed-in account through [device]
+  /// (the phone's own passkey API by default). The account's first second factor comes with ten
+  /// recovery codes, shown once; they are the first value.
+  static Future<(List<String>?, Error?)> addSecurityKey(
+    SecondFactorProof proof, {
+    String? name,
+    PasskeyDevice? device,
+  }) async {
+    final (begun, error) = await _secondFactorCall('/user/passkeys/register-options', body: proof.toJson());
+    if (begun == null) return (null, error);
+    final challenge = KeyChallenge.fromJson(begun);
+    final Map<String, dynamic> credential;
+    try {
+      credential = await (device ?? PlatformPasskeys()).createCredential(challenge.options);
+    } catch (e) {
+      return (null, Error(type: 'client', code: 0, info: [], message: 'no new key was made: $e'));
+    }
+    final (done, doneError) = await _secondFactorCall('/user/passkeys/register', body: {
+      'webauthn': KeyAnswer(challengeId: challenge.challengeId, credential: credential).toJson(),
+      'name': ?name,
+    });
+    if (done == null) return (null, doneError);
+    return ([for (final c in (done['recovery_codes'] as List? ?? [])) '$c'], null);
+  }
+
+  /// Removes one of the account's keys. Removing its last key ends its
+  /// sessions, this one too.
+  static Future<(Map<String, dynamic>?, Error?)> removeSecurityKey(String id, SecondFactorProof proof) =>
+      _secondFactorCall('/user/passkeys/remove', body: {'id': id, ...proof.toJson()});
+
+  /// Ten new recovery codes; the old set is void.
+  static Future<(List<String>?, Error?)> newRecoveryCodes(SecondFactorProof proof) async {
+    final (attributes, error) = await _secondFactorCall('/user/passkeys/recovery-codes', body: proof.toJson());
+    return (attributes == null ? null : [for (final c in (attributes['recovery_codes'] as List? ?? [])) '$c'], error);
+  }
+
+  /// Key-only sign-in on or off for the signed-in account; it needs a key.
+  static Future<(Map<String, dynamic>?, Error?)> setKeyOnly(bool enabled, SecondFactorProof proof) =>
+      _secondFactorCall('/user/passkeys/key-only', body: {'enabled': enabled, ...proof.toJson()});
+
+  /// An authenticator app's setup: show [TotpSetup.uri] as a QR code, or
+  /// [TotpSetup.secret] to type in, then [totpConfirm] with a code from it.
+  static Future<(TotpSetup?, Error?)> totpBegin(SecondFactorProof proof) async {
+    final (attributes, error) = await _secondFactorCall('/user/totp/begin', body: proof.toJson());
+    return (attributes == null ? null : TotpSetup.fromJson(attributes), error);
+  }
+
+  /// Confirms the app with a code from it. The recovery codes come back when
+  /// it is the account's first second factor; otherwise an empty list.
+  static Future<(List<String>?, Error?)> totpConfirm(String setupId, String code) async {
+    final (attributes, error) = await _secondFactorCall('/user/totp/confirm', body: {'setup_id': setupId, 'code': code});
+    return (attributes == null ? null : [for (final c in (attributes['recovery_codes'] as List? ?? [])) '$c'], error);
+  }
+
+  /// Removes the account's app: [SecondFactorProof.password] and
+  /// [SecondFactorProof.totp] (and the key's answer with a key).
+  static Future<(Map<String, dynamic>?, Error?)> totpRemove(SecondFactorProof proof) =>
+      _secondFactorCall('/user/totp/remove', body: proof.toJson());
+
   /// Registers a user with the given [createUserRequest] (`POST /user/create`).
   ///
   /// Open registration needs a code for each address given: request one with

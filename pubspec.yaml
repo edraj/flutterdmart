@@ -1,6 +1,6 @@
 name: dmart
-description: A pure Dart implementation of the Dmart client that depends on dio.
-version: 3.0.0
+description: The Dmart client for Flutter apps, on dio, with security keys and passkeys through the device's own passkey API.
+version: 3.0.1
 repository: https://github.com/edraj/flutterdmart
 
 platforms:
@@ -12,13 +12,18 @@ platforms:
   windows:
 
 environment:
-  sdk: ^3.8.0
+  sdk: ^3.11.0
+  flutter: ">=3.41.0"
 
 # Add regular dependencies here.
 dependencies:
   dio: ^5.11.0
+  flutter:
+    sdk: flutter
   http_parser: ^4.1.2
+  passkeys: ^2.24.2
 
 dev_dependencies:
+  flutter_test:
+    sdk: flutter
   lints: ^6.1.0
-  test: ^1.31.2

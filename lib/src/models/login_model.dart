@@ -3,6 +3,7 @@ import 'package:dmart/src/models/base_response.dart';
 import 'package:dmart/src/models/displayname.dart';
 import 'package:dmart/src/models/error.dart';
 import 'package:dmart/src/models/record.dart';
+import 'package:dmart/src/models/second_factors.dart';
 import 'package:dmart/src/models/status.dart';
 
 class LoginRequest {
@@ -14,6 +15,16 @@ class LoginRequest {
   String? deviceID;
   String? msisdn;
   String? password;
+
+  /// The second step for an account with an authenticator app: its code
+  /// (dmart >= 1.8.1).
+  String? totp;
+
+  /// Instead of the key or the app's code: one of the account's recovery codes.
+  String? recoveryCode;
+
+  /// The second step for an account with a security key: the key's answer.
+  KeyAnswer? webauthn;
 
   LoginRequest({required this.shortname, required this.password});
 
@@ -42,6 +53,20 @@ class LoginRequest {
     this.deviceID,
   });
 
+  /// The second step of a password sign-in for an account with a security
+  /// key or an authenticator app (dmart >= 1.8.1): the same identifier and
+  /// password, plus the key's answer, the app's code or a recovery code.
+  LoginRequest.withSecondFactor({
+    this.shortname,
+    this.email,
+    this.msisdn,
+    required this.password,
+    this.webauthn,
+    this.totp,
+    this.recoveryCode,
+    this.deviceID,
+  });
+
   Map<String, dynamic> toJson() {
     final data = <String, dynamic>{
       'shortname': shortname,
@@ -52,6 +77,9 @@ class LoginRequest {
       'otp': otp,
       'invitation': invitation,
       'password': password,
+      'totp': totp,
+      'recovery_code': recoveryCode,
+      'webauthn': webauthn?.toJson(),
     };
     data.removeWhere((key, value) => value == null);
     return data;

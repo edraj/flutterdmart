@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:dmart/dmart.dart';
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// Answers each path from [routes] with its status and body; any other path
 /// gets a bare 404.

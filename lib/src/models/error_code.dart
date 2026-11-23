@@ -5,7 +5,7 @@
 /// status of the response is separate: [conflict] arrives with HTTP 409 and
 /// [passwordHashingBusy] with HTTP 503, but [otpNeeded] arrives with HTTP 401.
 ///
-/// pydmart and tsdmart carry the same 19 codes under the same name
+/// pydmart and tsdmart carry the same 21 codes under the same name
 /// (`DmartErrorCode`).
 class DmartErrorCode {
   DmartErrorCode._();
@@ -30,6 +30,15 @@ class DmartErrorCode {
   /// `device_id`). Admins always sign in this way, and since dmart 1.7.2 so
   /// does a mobile account's first sign-in from a device.
   static const int otpNeeded = 115;
+
+  /// An account with a security key or an authenticator app, on a path that
+  /// can't do that step (a code alone, social sign-in), or an admin's key
+  /// setup (dmart >= 1.8.1).
+  static const int secondFactorRequired = 116;
+
+  /// The second step was refused: the key's answer, the app's code or the
+  /// recovery code (dmart >= 1.8.1). Sign in with the password again.
+  static const int secondFactorInvalid = 117;
 
   /// The password change or reset was refused, e.g. `old_password` missing on
   /// `POST /user/profile`.

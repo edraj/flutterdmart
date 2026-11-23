@@ -33,6 +33,8 @@ export 'src/models/query/query_request.dart';
 export 'src/models/query/query_response.dart';
 export 'src/models/query/response_record.dart';
 export 'src/models/record.dart';
+export 'src/models/second_factors.dart';
+export 'src/platform_passkeys.dart';
 export 'src/models/request/action_request.dart';
 export 'src/models/request/action_response.dart';
 export 'src/models/request/check_existing_params.dart';
